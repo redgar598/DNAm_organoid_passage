@@ -800,7 +800,7 @@ ggplot(plt_db_direction, aes(mean_db, db))+geom_point(aes(color=sig, alpha=sig),
   stat_smooth(method="lm", se=F, color="black")
 
 
-ggsave(here("figs","GSE141256_db_directionality.pdf"), width=5, height=3.75)
+#ggsave(here("figs","GSE141256_db_directionality.pdf"), width=5, height=3.75)
 ggsave(here("figs/jpeg","GSE141256_db_directionality.jpeg"), width=5, height=3.75)
 
 print(paste("Correlation of delta betas between cohorts: ", round(cor(plt_db_direction$db, plt_db_direction$mean_db),2), sep=""))
