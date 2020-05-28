@@ -1005,7 +1005,7 @@ ggplot(plt_db_direction, aes(mean_db, db))+geom_point(aes(color=sig, alpha=sig),
   stat_smooth(method="lm", se=F, color="black")
 
 
-ggsave(here("figs","MTAB_db_directionality.pdf"), width=5, height=3.75)
+#ggsave(here("figs","MTAB_db_directionality.pdf"), width=5, height=3.75)
 ggsave(here("figs/jpeg","MTAB_db_directionality.jpeg"), width=5, height=3.75)
 
 print(paste("Correlation of delta betas between cohorts: ", round(cor(plt_db_direction$db, plt_db_direction$mean_db),2), sep=""))
@@ -1114,7 +1114,7 @@ ggplot(plt_db_direction, aes(mean_db, db))+geom_point(aes(color=sig, alpha=sig),
   stat_smooth(method="lm", se=F, color="black")
 
 
-ggsave(here("figs","MTAB_db_directionality_fetal.pdf"), width=5, height=3.75)
+#ggsave(here("figs","MTAB_db_directionality_fetal.pdf"), width=5, height=3.75)
 ggsave(here("figs/jpeg","MTAB_db_directionality_fetal.jpeg"), width=5, height=3.75)
 
 print(paste("Correlation of delta betas between cohorts: ", round(cor(plt_db_direction$db, plt_db_direction$mean_db),2), sep=""))
