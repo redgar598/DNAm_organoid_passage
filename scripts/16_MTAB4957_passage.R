@@ -165,6 +165,7 @@ print(paste("Samples available: ",ncol(MTAB_organoid_beta),"\nProbes available: 
 
 
 
+save(MTAB_organoid_beta, sampleinfo_organoid, file=paste(here("data"),"/MTAB4957_beta_organoids.RData",sep=""))
 
 
 
@@ -234,6 +235,7 @@ print(paste("Organoid samples available: ",nrow(sampleinfo_organoid), sep=""))
 # match the DNAm data
 MTAB_organoid_beta<-MTAB_organoid_beta[,which(colnames(MTAB_organoid_beta)%in%sampleinfo_organoid$Assay.Name)]
 identical(colnames(MTAB_organoid_beta),sampleinfo_organoid$Assay.Name)
+
 
 
 
