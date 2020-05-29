@@ -375,6 +375,23 @@ dev.off()
 
 
 
+#' ### paired samples for EM explination
+plts_paired_example<-lapply(c(rev(grep("T046 SC", epic.organoid$sample_ID))), function(x){
+  print(x)
+  passage<-paste("passage: ",epic.organoid$passage.or.rescope.no_numeric[x],"\nIndividual: ", epic.organoid$case.no[x],"\nRatio I/H: ",round(epic.organoid$thresholded_prior_ratio[x],2), sep="")
+  converted<-as.numeric(round(organoid_beta_VeryVariable[,x]*1000,0))
+  counts<-rep(1000, length(converted))
+  res = em(converted, counts, .41, .31, .27, 0.01, .1, .1, .90, .03, .5, .05)
+  draw_fit_params_gg(converted, counts, res,passage)
+})
+
+
+ggsave(here("figs","Mix_model_Paired.pdf"),do.call(grid.arrange,plts_paired_example), width = 5, height=8)
+ggsave(here("figs/jpeg","Mix_model_Paired.jpeg"),do.call(grid.arrange,plts_paired_example), width = 5, height=8)
+
+
+
+
 
 
 #'## R Session Info
