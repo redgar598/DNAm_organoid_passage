@@ -166,7 +166,7 @@ print(paste("Samples available: ",ncol(MTAB_organoid_beta),"\nProbes available: 
 
 
 save(MTAB_organoid_beta, sampleinfo_organoid, file=paste(here("data"),"/MTAB4957_beta_organoids.RData",sep=""))
-
+#load(here("data", "MTAB4957_beta_organoids.RData"))
 
 
 #' ### Tidy meta data available
@@ -666,7 +666,7 @@ ggsave(here("figs","MTAB4957_mixture_model_ratio_threshold_maximize.pdf"), width
 ## plot all samples
 plts_paired<-lapply(1:nrow(sampleinfo_organoid_notfetal), function(x){
   print(x)
-  passage<-paste("passage: ",sampleinfo_organoid_notfetal$passage.or.rescope.no_numeric[x],"\nIndividual: ", sampleinfo_organoid_notfetal$Characteristics.individual.[x],"\nRatio I/H: " ,round(epic.organoid$thresholded_prior_ratio[x],2), sep="")
+  passage<-paste("passage: ",sampleinfo_organoid_notfetal$passage.or.rescope.no_numeric[x],"\nIndividual: ", sampleinfo_organoid_notfetal$Characteristics.individual.[x],"\nRatio I/H: " ,round(sampleinfo_organoid_notfetal$thresholded_prior_ratio[x],2), sep="")
   converted<-as.numeric(round(MTAB4957_beta_VeryVariable[,x]*1000,0))
   counts<-rep(1000, length(converted))
   res = em(converted, counts, .41, .31, .27, 0.01, .1, .1, .90, .03, .5, .05)
@@ -903,7 +903,7 @@ ggsave(here("figs","MTAB4957_fetal_mixture_model_ratio_threshold_maximize.pdf"),
 ## plot all samples
 plts_paired<-lapply(1:nrow(sampleinfo_organoid_fetal), function(x){
   print(x)
-  passage<-paste("passage: ",sampleinfo_organoid_fetal$passage.or.rescope.no_numeric[x],"\nIndividual: ", sampleinfo_organoid_fetal$Characteristics.individual.[x],"\nRatio I/H: " ,round(epic.organoid$thresholded_prior_ratio[x],2), sep="")
+  passage<-paste("passage: ",sampleinfo_organoid_fetal$passage.or.rescope.no_numeric[x],"\nIndividual: ", sampleinfo_organoid_fetal$Characteristics.individual.[x],"\nRatio I/H: " ,round(sampleinfo_organoid_fetal$thresholded_prior_ratio[x],2), sep="")
   converted<-as.numeric(round(MTAB4957_beta_VeryVariable[,x]*1000,0))
   counts<-rep(1000, length(converted))
   res = em(converted, counts, .41, .31, .27, 0.01, .1, .1, .90, .03, .5, .05)

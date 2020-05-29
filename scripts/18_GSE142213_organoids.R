@@ -198,6 +198,8 @@ ggplot(Loadings_meta, aes(PC1, PC2, fill=primary_site))+geom_point(shape=21,size
 
 
 
+save(GSE144213_beta, GSE144213_meta, file=paste(here("data"),"/GSE144213_beta_organoids.RData",sep=""))
+#load(here("data", "GSE144213_beta_organoids.RData"))
 
 
 #' #### Variable Beta Distribution (not fetal)

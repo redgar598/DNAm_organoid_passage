@@ -701,7 +701,7 @@ ggsave(here("figs","GSE141256_Mixture_model_ratio_threshold_maximize.pdf"), widt
 #' ### Plot all samples
 plts_paired<-lapply(1:nrow(GSE141256_meta_combo_spheroids), function(x){#1:nrow(epic.organoid)
   print(x)
-  passage<-paste("passage: ",GSE141256_meta_combo_spheroids$passage_numeric[x],"\nIndividual: ", GSE141256_meta_combo_spheroids$Sample.ID[x],"\nRatio I/H: ",round(epic.organoid$thresholded_prior_ratio[x],2), sep="")
+  passage<-paste("passage: ",GSE141256_meta_combo_spheroids$passage_numeric[x],"\nIndividual: ", GSE141256_meta_combo_spheroids$Sample.ID[x],"\nRatio I/H: ",round(GSE141256_meta_combo_spheroids$thresholded_prior_ratio[x],2), sep="")
   converted<-as.numeric(round(GSE141256_beta_VeryVariable[,x]*1000,0))
   counts<-rep(1000, length(converted))
   res = em(converted, counts, .41, .31, .27, 0.01, .1, .1, .90, .03, .5, .05)

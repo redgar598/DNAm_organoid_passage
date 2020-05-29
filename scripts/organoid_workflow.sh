@@ -1,6 +1,6 @@
 #### Organoid pipeline
 conda activate org_pass
-cd /nfs/research1/zerbino/redgar/organoid_passage_DNAm
+cd /nfs/research1/zerbino/redgar/DNAm_organoid_passage
 git pull
 
 
@@ -33,7 +33,7 @@ bsub -M 25000 -R "rusage[mem=25000]" python scripts/03_heteroskedascity_CpGs_com
 ##############
 ### Check out the CpGs
 ##############
-bsub -M 20000 -R "rusage[mem=20000]" Rscript scripts/04_passage_CpGs.R
+bsub -M 60000 -R "rusage[mem=60000]" Rscript scripts/04_passage_CpGs.R
 
 
 
