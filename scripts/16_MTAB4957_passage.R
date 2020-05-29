@@ -297,17 +297,17 @@ Loadings$Assay.Name<-rownames(Loadings)
 Loadings_meta<-merge(Loadings, sampleinfo_organoid, by="Assay.Name")
 
 ggplot(Loadings_meta, aes(PC1, PC2, fill=Characteristics.developmental.stage.))+geom_point(shape=21,size=3, color="black")+theme_bw()+
-  xlab("PC1 (29%)")+ylab("PC2 (10%)")+th+theme(axis.text = element_text(size=12),
+  xlab(paste("PC1 (",round(Importance[1]*100,0),"%)", sep=""))+ylab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),
                                                axis.title = element_text(size=14),
                                                plot.margin = margin(1, 0.1, 1, 1, "cm"))
 
 ggplot(Loadings_meta, aes(PC1, PC2, fill=Characteristics.sampling.site.))+geom_point(shape=21,size=3, color="black")+theme_bw()+
-  xlab("PC1 (29%)")+ylab("PC2 (10%)")+th+theme(axis.text = element_text(size=12),
+  xlab(paste("PC1 (",round(Importance[1]*100,0),"%)", sep=""))+ylab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),
                                                axis.title = element_text(size=14),
                                                plot.margin = margin(1, 0.1, 1, 1, "cm"))
 
 ggplot(Loadings_meta, aes(PC2, PC3, fill=Characteristics.sampling.site.))+geom_point(shape=21,size=3, color="black")+theme_bw()+
-    xlab("PC2 (10%)")+ylab("PC3 (8%)")+th+theme(axis.text = element_text(size=12),
+  xlab(paste("PC1 (",round(Importance[1]*100,0),"%)", sep=""))+ylab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),
                                                  axis.title = element_text(size=14),
                                                  plot.margin = margin(1, 0.1, 1, 1, "cm"))
 
@@ -315,7 +315,7 @@ ggplot(Loadings_meta, aes(PC2, PC3, fill=Characteristics.sampling.site.))+geom_p
 
 pc_plt<-ggplot(Loadings_meta, aes(PC2, PC3, fill=as.factor(passage.or.rescope.no_numeric),color=Characteristics.developmental.stage.))+geom_line(aes(PC2,PC3, group=sample_ID), color="lightgrey")+#, color=sampling.time.point
   geom_point(shape=21,size=3)+#
-  theme_bw()+xlab("PC2 (10%)")+ylab("PC3 (8%)")+th+theme(axis.text = element_text(size=12),axis.title = element_text(size=14))+
+  theme_bw()+xlab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+ylab(paste("PC3 (",round(Importance[3]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),axis.title = element_text(size=14))+
   scale_fill_manual(values=pass_col,name="Passage\nNumber")+scale_color_manual(values=c("black","white","black"))
 
 legend<-ggplot(sampleinfo_organoid, aes(as.factor(-passage.or.rescope.no_numeric), fill=as.factor(passage.or.rescope.no_numeric)))+geom_bar(color="black")+
@@ -335,7 +335,7 @@ grid.arrange(pc_plt,arrangeGrob(r,legend,r, heights=c(0.6,1.25,0.4)), ncol=2, wi
 #' High passage fetal toward older organoids?
 ggplot(Loadings_meta, aes(PC1, PC2, fill=as.factor(passage.or.rescope.no_numeric), color=Characteristics.developmental.stage.))+geom_line(aes(PC1,PC2, group=sample_ID), color="lightgrey")+#, color=sampling.time.point
   geom_point(shape=21,size=3)+#
-  theme_bw()+xlab("PC2 (10%)")+ylab("PC3 (8%)")+th+theme(axis.text = element_text(size=12),axis.title = element_text(size=14))+
+  theme_bw()+xlab(paste("PC1 (",round(Importance[1]*100,0),"%)", sep=""))+ylab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),axis.title = element_text(size=14))+
   scale_fill_manual(values=pass_col,name="Passage\nNumber")+scale_color_manual(values=c("black","white","black"))
 
 
@@ -376,22 +376,22 @@ Loadings_meta<-merge(Loadings, sampleinfo_organoid_notfetal, by="Assay.Name")
 
 #' Sample Site
 ggplot(Loadings_meta, aes(PC1, PC2, fill=Characteristics.sampling.site.))+geom_point(shape=21,size=3, color="black")+theme_bw()+
-  xlab("PC1 (19%)")+ylab("PC2 (13%)")+th+theme(axis.text = element_text(size=12),
+  xlab(paste("PC1 (",round(Importance[1]*100,0),"%)", sep=""))+ylab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),
                                                axis.title = element_text(size=14),
                                                plot.margin = margin(1, 0.1, 1, 1, "cm"))
 #' Condition
 ggplot(Loadings_meta, aes(PC1, PC2, fill=condition))+geom_point(shape=21,size=3, color="black")+theme_bw()+
-  xlab("PC1 (19%)")+ylab("PC2 (13%)")+th+theme(axis.text = element_text(size=12),
+  xlab(paste("PC1 (",round(Importance[1]*100,0),"%)", sep=""))+ylab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),
                                                axis.title = element_text(size=14),
                                                plot.margin = margin(1, 0.1, 1, 1, "cm"))
 #' Sample Site PC2/3
 ggplot(Loadings_meta, aes(PC2, PC3, fill=Characteristics.sampling.site.))+geom_point(shape=21,size=3, color="black")+theme_bw()+
-  xlab("PC2 (13%)")+ylab("PC3 (10%)")+th+theme(axis.text = element_text(size=12),
+  xlab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+ylab(paste("PC3 (",round(Importance[3]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),
                                                axis.title = element_text(size=14),
                                                plot.margin = margin(1, 0.1, 1, 1, "cm"))
 #' Sample Site PC3/4
 ggplot(Loadings_meta, aes(PC3, PC4, fill=Characteristics.sampling.site.))+geom_point(shape=21,size=3, color="black")+theme_bw()+
-  xlab("PC3 (10%)")+ylab("PC4 (6%)")+th+theme(axis.text = element_text(size=12),
+  xlab(paste("PC3 (",round(Importance[3]*100,0),"%)", sep=""))+ylab(paste("PC4 (",round(Importance[4]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),
                                                axis.title = element_text(size=14),
                                                plot.margin = margin(1, 0.1, 1, 1, "cm"))
 
@@ -399,7 +399,7 @@ ggplot(Loadings_meta, aes(PC3, PC4, fill=Characteristics.sampling.site.))+geom_p
 
 pc_plt<-ggplot(Loadings_meta, aes(PC2, PC3, fill=as.factor(passage.or.rescope.no_numeric)))+geom_line(aes(PC2,PC3, group=sample_ID), color="lightgrey")+#, color=sampling.time.point
   geom_point(shape=21,size=3)+#
-  theme_bw()+xlab("PC2 (10%)")+ylab("PC3 (8%)")+th+theme(axis.text = element_text(size=12),axis.title = element_text(size=14))+
+  theme_bw()+xlab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+ylab(paste("PC3 (",round(Importance[3]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),axis.title = element_text(size=14))+
   scale_fill_manual(values=pass_col,name="Passage\nNumber")+scale_color_manual(values=c("black","white","black"))
 
 legend<-ggplot(sampleinfo_organoid_notfetal, aes(as.factor(-passage.or.rescope.no_numeric), fill=as.factor(passage.or.rescope.no_numeric)))+geom_bar(color="black")+
@@ -653,6 +653,8 @@ df<-cbind(df,(binom.confint(df$passed_num, df$count, method="exact", conf.level=
 df$upper<-df$upper*100
 df$lower<-df$lower*100
 
+print(df)
+
 ggplot(df, aes(as.numeric(as.character(passage)), passing))+
   geom_errorbar(aes(ymin=lower, ymax=upper), colour="grey70", width=.25)+
   geom_line(color="grey20")+geom_point(size=1.25,shape=21,color="black",aes(fill=passage.factor))+xlab("Passage")+
@@ -718,7 +720,7 @@ Loadings_meta<-merge(Loadings, sampleinfo_organoid_fetal, by="Assay.Name")
 
 #' Sample Site
 ggplot(Loadings_meta, aes(PC1, PC2, fill=Characteristics.sampling.site.))+geom_point(shape=21,size=3, color="black")+theme_bw()+
-  xlab("PC1 (20%)")+ylab("PC2 (13%)")+th+theme(axis.text = element_text(size=12),
+  xlab(paste("PC1 (",round(Importance[1]*100,0),"%)", sep=""))+ylab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),
                                                axis.title = element_text(size=14),
                                                plot.margin = margin(1, 0.1, 1, 1, "cm"))
 
@@ -727,7 +729,7 @@ ggplot(Loadings_meta, aes(PC1, PC2, fill=Characteristics.sampling.site.))+geom_p
 
 pc_plt<-ggplot(Loadings_meta, aes(PC1, PC2, fill=as.factor(passage.or.rescope.no_numeric)))+geom_line(aes(PC1,PC2, group=sample_ID), color="lightgrey")+#, color=sampling.time.point
   geom_point(shape=21,size=3)+#
-  theme_bw()+xlab("PC1 (36%)")+ylab("PC1 (14%)")+th+theme(axis.text = element_text(size=12),axis.title = element_text(size=14))+
+  theme_bw()+xlab(paste("PC1 (",round(Importance[1]*100,0),"%)", sep=""))+ylab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),axis.title = element_text(size=14))+
   scale_fill_manual(values=c(colorRampPalette(brewer.pal(11, "Spectral"))(11), "#544791","#4a3e80", "#40366f","#221d3c"),name="Passage\nNumber")+scale_color_manual(values=c("black","white","black"))
 
 legend<-ggplot(sampleinfo_organoid_fetal, aes(as.factor(-passage.or.rescope.no_numeric), fill=as.factor(passage.or.rescope.no_numeric)))+geom_bar(color="black")+
@@ -890,6 +892,8 @@ df$passage.factor <- factor(df$passage, levels = c(23,21,14,12,9,7,6,5,3,2,1))
 df<-cbind(df,(binom.confint(df$passed_num, df$count, method="exact", conf.level=0.95)))
 df$upper<-df$upper*100
 df$lower<-df$lower*100
+
+print(df)
 
 ggplot(df, aes(as.numeric(as.character(passage)), passing))+
   geom_errorbar(aes(ymin=lower, ymax=upper), colour="grey70", width=.25)+

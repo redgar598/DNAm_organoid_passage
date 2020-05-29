@@ -18,9 +18,13 @@ ggplot(sampleinfo, aes(Age, DNAmAge))+geom_abline(color="lightgrey")+geom_point(
   annotate("text", x=20, y=5, label = paste("r = ", round(cor(sampleinfo$Age, sampleinfo$DNAmAge), 2)), size = 5)+
   xlim(0,25)+ylim(0,25)
 
+ggsave(here("figs/jpeg","tmp_organoid_Age_cor.jpeg"),width = 5, height = 5)
+
 
 ggplot(sampleinfo, aes(sample.site, AgeAccelerationResidual, fill=sample.site))+geom_boxplot(color="black", outlier.shape=NA)+
   geom_point(shape=21,position=position_jitter(w=0.15), size=2)+theme_bw()+scale_fill_manual(values=c("#a6d96a","cornflowerblue"), name="Sample\nSite")+th+xlab("")+ylab("Age Acceleration Residual ")
+ggsave(here("figs/jpeg","tmp_organoid_Age_acc.jpeg"),width = 5, height = 5)
+
 
 ggplot(sampleinfo, aes(sample.site, AgeAccelerationResidual, fill=sample.site))+
   geom_boxplot(color="black", outlier.shape=NA)+
@@ -28,6 +32,8 @@ ggplot(sampleinfo, aes(sample.site, AgeAccelerationResidual, fill=sample.site))+
   geom_point(shape=21, size=2)+
   theme_bw()+
   scale_fill_manual(values=c("#a6d96a","cornflowerblue"), name="Sample\nSite")+th+xlab("")+ylab("Age Acceleration Residual ")
+ggsave(here("figs/jpeg","tmp_organoid_Age_acc_paired.jpeg"),width = 5, height = 5)
+
 
 summary(aov(sampleinfo$AgeAccelerationResidual~sampleinfo$sample.site))
 
@@ -44,3 +50,10 @@ paired_ageacc<-do.call(rbind,lapply(as.character(unique(sampleinfo$case.pass)), 
 
 t.test(paired_ageacc$TI, paired_ageacc$SC, paired = TRUE)
 
+
+ggplot(sampleinfo, aes(passage.or.rescope.no_numeric,AgeAccelerationResidual, 
+                          fill=as.factor(passage.or.rescope.no_numeric)))+
+  geom_line(aes(passage.or.rescope.no_numeric,AgeAccelerationResidual, group=sample_ID), color="lightgrey")+
+  geom_point(shape=21, size=3)+scale_fill_brewer(palette = "Spectral",name="Passage\nNumber")+th+theme_bw()
+
+ggsave(here("figs/jpeg","tmp_organoid_Age_acc_passage.jpeg"),width = 7, height = 5)

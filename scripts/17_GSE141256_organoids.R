@@ -687,6 +687,8 @@ df<-cbind(df,(binom.confint(df$passed_num, df$count, method="exact", conf.level=
 df$upper<-df$upper*100
 df$lower<-df$lower*100
 
+print(df)
+
 ggplot(df, aes(as.numeric(as.character(passage)), passing))+
   geom_errorbar(aes(ymin=lower, ymax=upper), colour="grey70", width=.25)+
   geom_line(color="grey20")+geom_point(size=1.25,shape=21,color="black",aes(fill=passage))+xlab("Passage")+
