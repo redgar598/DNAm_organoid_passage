@@ -122,7 +122,7 @@ bsub -M 20000 -R "rusage[mem=20000]" Rscript scripts/15_cancer_beta_simplified.R
 
 
 ###############
-### Validation in MTAB4957 AND LEWIS scripts
+### Validation in other datasets
 ##############
 bsub -M 80000 -R "rusage[mem=80000]" Rscript scripts/16_MTAB4957_passage.R
 bsub -M 80000 -R "rusage[mem=80000]" Rscript scripts/17_GSE141256_organoids.R
@@ -130,10 +130,3 @@ bsub -M 80000 -R "rusage[mem=80000]" Rscript scripts/17_GSE141256_organoids.R
 
 
 bsub -M 40000 -R "rusage[mem=40000]" Rscript scripts/18_GSE142213_organoids.R
-
-
-
-#### tinkering
-for iter in $(seq 1 1 80); do
-	bsub -M 20000 -R "rusage[mem=20000]" Rscript scripts/testing_iter_em.R $iter
-done
