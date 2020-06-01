@@ -25,6 +25,16 @@ The scripts were run in the order below (also in [organoid_workflow.sh](https://
 | [16_MTAB4957_passage.R](https://github.com/redgar598/DNAm_organoid_passage/tree/master/output/16_MTAB4957_passage.html)                                         | Validate passage effect in pediatric and fetal organoids from [E-MTAB-4957](https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-4957/) |         S4, S5, S7         |
 | [17_GSE141256_organoids.R](https://github.com/redgar598/DNAm_organoid_passage/tree/master/output/17_GSE141256_organoids.html)                                   | Validate passage effect in organoid samples from [GSE141256](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE141256)  |        S6          |
 | [18_GSE142213_organoids.R](https://github.com/redgar598/DNAm_organoid_passage/tree/master/output/18_GSE142213_organoids.html)                                   | Explore the trimodality of cancer organoids [GSE142213](https://www.ncbi.nlm.nih.gov/gds/?term=GSE142213[Accession]) |        S10          |
+
+
+
+## Functions imported throughout workflow above
+
+| Script                                                                                                                                                                            | Functions                                                                                     |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| [00_EM_array_uniform_background_maximise_betabinom.R](https://github.com/redgar598/organoid_passage_DNAm/tree/master/scripts/00_EM_array_uniform_background_maximise_betabinom.R) | Expectation Maximization fitting of beta-binomial distributions to methylation distribution   |
+| [00_heat_scree_plot_generic.R](https://github.com/redgar598/organoid_passage_DNAm/tree/master/scripts/00_heat_scree_plot_generic.R)                                               | Plot the associations between PCA loadings and meta data                                      |
+| [00_pretty_plots.R](https://github.com/redgar598/organoid_passage_DNAm/tree/master/scripts/00_pretty_plots.R)                                                                     | Colour palettes and themes for all plots                                                      |
 ----
 
 
