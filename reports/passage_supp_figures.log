@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.3.6)  29 MAY 2020 13:47
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.3.6)  1 JUN 2020 09:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -895,19 +895,73 @@ Overfull \hbox (9.48892pt too wide) in paragraph at lines 131--132
  [][] 
  []
 
-<../figs/EPIC_distribution_reg_CpGs.pdf, id=15, 433.62pt x 433.62pt>
+<../figs/MTAB4957_beta_fetal_with_primary.pdf, id=15, 271.0125pt x 180.675pt>
+File: ../figs/MTAB4957_beta_fetal_with_primary.pdf Graphic file (type pdf)
+<use ../figs/MTAB4957_beta_fetal_with_primary.pdf>
+Package pdftex.def Info: ../figs/MTAB4957_beta_fetal_with_primary.pdf  used on 
+input line 148.
+(pdftex.def)             Requested size: 166.7306pt x 111.15718pt.
+
+Overfull \hbox (9.76393pt too wide) in paragraph at lines 148--149
+[][] 
+ []
+
+<../figs/MTAB4957_fetal_mixture_model_ratio_threshold_maximize.pdf, id=16, 216.
+81pt x 144.54pt>
+File: ../figs/MTAB4957_fetal_mixture_model_ratio_threshold_maximize.pdf Graphic
+ file (type pdf)
+<use ../figs/MTAB4957_fetal_mixture_model_ratio_threshold_maximize.pdf>
+Package pdftex.def Info: ../figs/MTAB4957_fetal_mixture_model_ratio_threshold_m
+aximize.pdf  used on input line 153.
+(pdftex.def)             Requested size: 166.7306pt x 111.15938pt.
+
+Overfull \hbox (10.44449pt too wide) in paragraph at lines 153--154
+ [][] 
+ []
+
+<../figs/MTAB4957_beta_paired_fetal.pdf, id=17, 433.62pt x 271.0125pt>
+File: ../figs/MTAB4957_beta_paired_fetal.pdf Graphic file (type pdf)
+<use ../figs/MTAB4957_beta_paired_fetal.pdf>
+Package pdftex.def Info: ../figs/MTAB4957_beta_paired_fetal.pdf  used on input 
+line 157.
+(pdftex.def)             Requested size: 333.46758pt x 208.42801pt.
+<../figs/Passage_differential_CpGs_MTAB4957_fetal.pdf, id=18, 343.2825pt x 289.
+08pt>
+File: ../figs/Passage_differential_CpGs_MTAB4957_fetal.pdf Graphic file (type p
+df)
+<use ../figs/Passage_differential_CpGs_MTAB4957_fetal.pdf>
+Package pdftex.def Info: ../figs/Passage_differential_CpGs_MTAB4957_fetal.pdf  
+used on input line 160.
+(pdftex.def)             Requested size: 187.57352pt x 157.95349pt.
+
+Overfull \hbox (10.44449pt too wide) in paragraph at lines 160--161
+[][] 
+ []
+
+<../figs/jpeg/MTAB_db_directionality_fetal.jpeg, id=19, 361.35pt x 271.0125pt>
+File: ../figs/jpeg/MTAB_db_directionality_fetal.jpeg Graphic file (type jpg)
+<use ../figs/jpeg/MTAB_db_directionality_fetal.jpeg>
+Package pdftex.def Info: ../figs/jpeg/MTAB_db_directionality_fetal.jpeg  used o
+n input line 165.
+(pdftex.def)             Requested size: 187.57352pt x 140.67918pt.
+
+Overfull \hbox (9.48892pt too wide) in paragraph at lines 165--166
+ [][] 
+ []
+
+<../figs/EPIC_distribution_reg_CpGs.pdf, id=20, 433.62pt x 433.62pt>
 File: ../figs/EPIC_distribution_reg_CpGs.pdf Graphic file (type pdf)
 <use ../figs/EPIC_distribution_reg_CpGs.pdf>
 Package pdftex.def Info: ../figs/EPIC_distribution_reg_CpGs.pdf  used on input 
 line 181.
 (pdftex.def)             Requested size: 333.46758pt x 333.48482pt.
-<../figs/cancer_public_same_variable_cpg_num.pdf, id=16, 722.7pt x 361.35pt>
+<../figs/cancer_public_same_variable_cpg_num.pdf, id=21, 722.7pt x 361.35pt>
 File: ../figs/cancer_public_same_variable_cpg_num.pdf Graphic file (type pdf)
 <use ../figs/cancer_public_same_variable_cpg_num.pdf>
 Package pdftex.def Info: ../figs/cancer_public_same_variable_cpg_num.pdf  used 
 on input line 186.
 (pdftex.def)             Requested size: 416.83289pt x 208.41423pt.
-<../figs/GSE144213_variable_CpGs.pdf, id=17, 542.025pt x 1084.05pt>
+<../figs/GSE144213_variable_CpGs.pdf, id=22, 542.025pt x 1084.05pt>
 File: ../figs/GSE144213_variable_CpGs.pdf Graphic file (type pdf)
 <use ../figs/GSE144213_variable_CpGs.pdf>
 Package pdftex.def Info: ../figs/GSE144213_variable_CpGs.pdf  used on input lin
@@ -923,30 +977,34 @@ pdf> <../figs/Passage_differential_CpGs_MTAB4957.pdf> <../figs/jpeg/MTAB_db_dir
 ectionality.jpeg>] [5 <../figs/MTAB4957_EPIC_beta_paired.pdf>] [6 <../figs/GSE1
 41256_variable_CpGs.pdf> <../figs/GSE141256_Mixture_model_ratio_threshold_maxim
 ize.pdf> <../figs/GSE141256_paired_beta.pdf> <../figs/Passage_differential_CpGs
-_GSE141256.pdf> <../figs/jpeg/GSE141256_db_directionality.jpeg>] [7 <../figs/EP
-IC_distribution_reg_CpGs.pdf> <../figs/cancer_public_same_variable_cpg_num.pdf>
-] [8 <../figs/GSE144213_variable_CpGs.pdf>] (./passage_supp_figures.aux)
+_GSE141256.pdf> <../figs/jpeg/GSE141256_db_directionality.jpeg>] [7 <../figs/MT
+AB4957_beta_fetal_with_primary.pdf> <../figs/MTAB4957_fetal_mixture_model_ratio
+_threshold_maximize.pdf> <../figs/MTAB4957_beta_paired_fetal.pdf> <../figs/Pass
+age_differential_CpGs_MTAB4957_fetal.pdf> <../figs/jpeg/MTAB_db_directionality_
+fetal.jpeg>] [8 <../figs/EPIC_distribution_reg_CpGs.pdf> <../figs/cancer_public
+_same_variable_cpg_num.pdf>] [9 <../figs/GSE144213_variable_CpGs.pdf>]
+(./passage_supp_figures.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 6081 strings out of 492982
- 88305 string characters out of 6134897
- 184981 words of memory out of 5000000
- 9535 multiletter control sequences out of 15000+600000
+ 6107 strings out of 492982
+ 89686 string characters out of 6134897
+ 190660 words of memory out of 5000000
+ 9556 multiletter control sequences out of 15000+600000
  8420 words of font info for 31 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,9n,41p,1090b,536s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 41i,9n,41p,1093b,538s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf
 -dist/fonts/type1/public/amsfonts/cm/cmr17.pfb>
-Output written on passage_supp_figures.pdf (8 pages, 850179 bytes).
+Output written on passage_supp_figures.pdf (9 pages, 1091414 bytes).
 PDF statistics:
- 147 PDF objects out of 1000 (max. 8388607)
- 99 compressed objects within 1 object stream
+ 178 PDF objects out of 1000 (max. 8388607)
+ 119 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 86 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 111 words of extra memory for PDF output out of 10000 (max. 10000000)
 
