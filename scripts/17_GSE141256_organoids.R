@@ -814,7 +814,7 @@ colnames(epic.organoid_minimal)[1]<-"Assay.Name"
 epic.organoid_minimal$cohort<-"Original Organoids"
 
 GSE141256_meta_combo_spheroids_minimal<-GSE141256_meta_combo_spheroids[,c(6,13,16)]
-GSE141256_meta_combo_spheroids_minimal$cohort<-"MTAB-4957 Organoids"
+GSE141256_meta_combo_spheroids_minimal$cohort<-"GSE141256 Organoids"
 colnames(GSE141256_meta_combo_spheroids_minimal)[2:3]<-c("sample_ID","passage.or.rescope.no_numeric")
 
 sample_info_both<-rbind(GSE141256_meta_combo_spheroids_minimal,epic.organoid_minimal)

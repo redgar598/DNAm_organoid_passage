@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.3.6)  18 MAY 2020 16:47
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.3.6)  2 JUN 2020 15:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -741,10 +741,6 @@ Package: fr-subfig 2007/12/24 v0.1g (beta) floatrow: additions for subfig
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-
-LaTeX Warning: No positions in optional float specifier.
-               Default added (so using `tbp') on input line 33.
-
 <../figs/PC1_PC2_organoid.pdf, id=9, 469.755pt x 361.35pt>
 File: ../figs/PC1_PC2_organoid.pdf Graphic file (type pdf)
 <use ../figs/PC1_PC2_organoid.pdf>
@@ -766,11 +762,13 @@ Overfull \hbox (9.76393pt too wide) in paragraph at lines 70--71
 [][] 
  []
 
-<../figs/Mixture_model_prior_I_threshold.pdf, id=12, 216.81pt x 144.54pt>
-File: ../figs/Mixture_model_prior_I_threshold.pdf Graphic file (type pdf)
-<use ../figs/Mixture_model_prior_I_threshold.pdf>
-Package pdftex.def Info: ../figs/Mixture_model_prior_I_threshold.pdf  used on i
-nput line 75.
+<../figs/Mixture_model_ratio_threshold_maximize.pdf, id=12, 216.81pt x 144.54pt
+>
+File: ../figs/Mixture_model_ratio_threshold_maximize.pdf Graphic file (type pdf
+)
+<use ../figs/Mixture_model_ratio_threshold_maximize.pdf>
+Package pdftex.def Info: ../figs/Mixture_model_ratio_threshold_maximize.pdf  us
+ed on input line 75.
 (pdftex.def)             Requested size: 187.57352pt x 125.05623pt.
 
 Overfull \hbox (10.44449pt too wide) in paragraph at lines 75--76
@@ -829,29 +827,29 @@ Overfull \hbox (9.35559pt too wide) in paragraph at lines 91--96
 LaTeX Warning: Float too large for page by 10.61044pt on input line 101.
 
 [2 <../figs/PC1_PC2_organoid.pdf> <../figs/PC2_PC3_organoid.pdf>] [3 <../figs/P
-assage_variable_CpGs.pdf> <../figs/Mixture_model_prior_I_threshold.pdf> <../fig
-s/Passage_paried_beta.pdf>] [4 <../figs/Passage_representative_CpGs_FDR.pdf> <.
-./figs/Passage_hetero_hypo_hyper_reg_CpGs_FDR_background015.pdf> <../figs/Passa
-ge_hetero_hypo_hyper_DMR_CpGs_FDR_background015.pdf>]
+assage_variable_CpGs.pdf> <../figs/Mixture_model_ratio_threshold_maximize.pdf> 
+<../figs/Passage_paried_beta.pdf>] [4 <../figs/Passage_representative_CpGs_FDR.
+pdf> <../figs/Passage_hetero_hypo_hyper_reg_CpGs_FDR_background015.pdf> <../fig
+s/Passage_hetero_hypo_hyper_DMR_CpGs_FDR_background015.pdf>]
 (./passage_main_figures.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 6062 strings out of 492982
- 86500 string characters out of 6134897
- 180919 words of memory out of 5000000
- 9529 multiletter control sequences out of 15000+600000
+ 6060 strings out of 492982
+ 86503 string characters out of 6134897
+ 176919 words of memory out of 5000000
+ 9527 multiletter control sequences out of 15000+600000
  8420 words of font info for 31 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,11n,41p,1100b,534s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 41i,9n,41p,1100b,534s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf
 -dist/fonts/type1/public/amsfonts/cm/cmr17.pfb>
-Output written on passage_main_figures.pdf (4 pages, 238068 bytes).
+Output written on passage_main_figures.pdf (4 pages, 234330 bytes).
 PDF statistics:
  89 PDF objects out of 1000 (max. 8388607)
  61 compressed objects within 1 object stream

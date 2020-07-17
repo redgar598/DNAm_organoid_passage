@@ -30,20 +30,20 @@
 \newpage
 
 
-\begin{table}[]
-\begin{tabular}{lllllllllll|l}
-\hline
-\rowcolor[HTML]{EFEFEF} 
-\cellcolor[HTML]{EFEFEF}                                     & \multicolumn{10}{l}{\cellcolor[HTML]{EFEFEF}\textbf{Passage}}                                                                       & \cellcolor[HTML]{EFEFEF}                                 \\
-\rowcolor[HTML]{EFEFEF} 
-\multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}\textbf{Diagnosis}} & \textbf{1} & \textbf{2}  & \textbf{3} & \textbf{4} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{11} & \textbf{14} & \textbf{16} & \multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}\textbf{Total}} \\ \hline
-\cellcolor[HTML]{EFEFEF}\textbf{Control}                     & 5          & 27          & 8          & 5          & 5          & 5          & 1          & 0           & 0           & 0           & \textbf{56}                                              \\
-\cellcolor[HTML]{EFEFEF}\textbf{Other GI}                    & 2          & 1           & 0          & 1          & 0          & 0          & 0          & 0           & 0           & 0           & \textbf{4}                                               \\
-\cellcolor[HTML]{EFEFEF}\textbf{IBD}                          & 0          & 7           & 1          & 1          & 0          & 2          & 2          & 2           & 4           & 1           & \textbf{20}                                              \\
-\cellcolor[HTML]{EFEFEF}\textbf{Total}                       & \textbf{7} & \textbf{35} & \textbf{9} & \textbf{7} & \textbf{5} & \textbf{7} & \textbf{3} & \textbf{2}  & \textbf{4}  & \textbf{1}  & \textbf{80}                                              \\ \hline
-\end{tabular}
-\end{table}
-
+%\begin{table}[]
+%\begin{tabular}{lllllllllll|l}
+%\hline
+%\rowcolor[HTML]{EFEFEF} 
+%\cellcolor[HTML]{EFEFEF}                                     & \multicolumn{10}{l}{\cellcolor[HTML]{EFEFEF}\textbf{Passage}}                                                                       & \cellcolor[HTML]{EFEFEF}                                 \\
+%\rowcolor[HTML]{EFEFEF} 
+%\multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}\textbf{Diagnosis}} & \textbf{1} & \textbf{2}  & \textbf{3} & \textbf{4} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{11} & \textbf{14} & \textbf{16} & \multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}\textbf{Total}} \\ \hline
+%\cellcolor[HTML]{EFEFEF}\textbf{Control}                     & 5          & 27          & 8          & 5          & 5          & 5          & 1          & 0           & 0           & 0           & \textbf{56}                                              \\
+%\cellcolor[HTML]{EFEFEF}\textbf{Other GI}                    & 2          & 1           & 0          & 1          & 0          & 0          & 0          & 0           & 0           & 0           & \textbf{4}                                               \\
+%\cellcolor[HTML]{EFEFEF}\textbf{IBD}                          & 0          & 7           & 1          & 1          & 0          & 2          & 2          & 2           & 4           & 1           & \textbf{20}                                              \\
+%\cellcolor[HTML]{EFEFEF}\textbf{Total}                       & \textbf{7} & \textbf{35} & \textbf{9} & \textbf{7} & \textbf{5} & \textbf{7} & \textbf{3} & \textbf{2}  & \textbf{4}  & \textbf{1}  & \textbf{80}                                              \\ \hline
+%\end{tabular}
+%\end{table}
+%
 
 
 \begin{figure}
@@ -72,12 +72,12 @@
 \hspace{5mm}
 \begin{minipage}{.45\linewidth}
 \centering
-\sidesubfloat[]{\label{main:c}\includegraphics[width=1\textwidth]{../figs/Mixture_model_prior_I_threshold.pdf}}
+\sidesubfloat[]{\label{main:c}\includegraphics[width=1\textwidth]{../figs/Mixture_model_ratio_threshold_maximize.pdf}}
 \end{minipage}\par\bigskip
 \centering
 \sidesubfloat[]{\label{main:b}\includegraphics[width=1\textwidth]{../figs/Passage_paried_beta.pdf}}
 
-\caption{\textbf{The DNAm beta value distribution for high passage samples is trimodial while for low passage samples it is bimodial.} All beta distributions displayed are for the 51,545 most variable CpGs. (a) Beta value distributions for all samples at a given passage number. Curves are coloured by the passage number. (b) The percent of samples considered trimodal. Points are coloured by passage and the bars around each point represent the confidence interval for that percent. (c) Beta value distributions for samples derived from the same patient but cultured to a different number of passages. Plots are labelled with the patient ID number, sampling site of origin and the passage number of each sample derived from that patient and sampling site. Curves are coloured by high or low passage relative to the other sample(s).}
+\caption{\textbf{DNAm beta value distributions are trimodal for high passage samples but bimodal for low passage samples.} All beta distributions displayed are for the 51,545 most variable CpGs. (a) Beta value distributions for all samples at a given passage number. Curves are coloured by the passage number. (b) The percent of samples considered trimodal. Points are coloured by passage and the bars around each point represent the confidence interval for that percent. (c) Beta value distributions for samples derived from the same patient but cultured to a different number of passages. Plots are labelled with the patient ID number, sampling site of origin and the passage number of each sample derived from that patient and sampling site. Curves are coloured by high or low passage relative to the other sample(s).}
 \label{fig:main}
 \end{flushleft}
 \end{figure}
