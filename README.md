@@ -1,5 +1,5 @@
 # Organoid Passage DNAm
-Analysis of the effect of passage on organoid DNAm
+Analysis of the effect of passage on organoid DNAm test 
 
 # Workflow
 The scripts were run in the order below (also in [organoid_workflow.sh](https://github.com/redgar598/DNAm_organoid_passage/tree/master/scripts/organoid_workflow.sh))
