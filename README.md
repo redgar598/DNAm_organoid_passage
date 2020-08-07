@@ -39,7 +39,7 @@ The scripts were run in the order below (also in [organoid_workflow.sh](https://
 
 
 # Environment used for analysis
-The envrionment used is org_pass and can be created through the environment from yml file.
+The environment used is org_pass and can be created through the environment from yml file.
 ```
 conda env create -f org_pass.yml
 ```
@@ -69,4 +69,4 @@ install.packages("here")
 ```
 Version here_0.1
 
-The data folder provided on github does not include data. All files used include links to where the data is deposited pubically.
+The data folder provided on github does not include data. Data used will be linked once deposited pubically.
