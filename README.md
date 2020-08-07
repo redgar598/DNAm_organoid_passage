@@ -41,8 +41,8 @@ The scripts were run in the order below (also in [organoid_workflow.sh](https://
 
 | Script                                                                                                                                                                                                                                                           | Figures in Paper |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------|
-| [01_organoids_preprocessing.R](https://htmlpreview.github.io/?https://github.com/redgar598/DNAm_organoid_passage/blob/master/output/01_organoids_preprocessing.html) <br> Loads IDAT files normalizes, probe QC and sample QC                                    | 1, S1            |
-| [02_heteroskedasicity_CpGs.py](https://github.com/redgar598/DNAm_organoid_passage/tree/master/output/02_heteroskedasicity_CpGs.ipynb) <br> Subsampling of the low passage samples in 1,000 iterations. Calculates differential DNAm and heteroskedastic p values | -                |
+| [01_organoids_preprocessing.R](https://htmlpreview.github.io/?https://github.com/redgar598/DNAm_organoid_passage/blob/master/output/01_organoids_preprocessing.html) <br /> Loads IDAT files normalizes, probe QC and sample QC                                    | 1, S1            |
+| [02_heteroskedasicity_CpGs.py](https://github.com/redgar598/DNAm_organoid_passage/tree/master/output/02_heteroskedasicity_CpGs.ipynb) <br /> Subsampling of the low passage samples in 1,000 iterations. Calculates differential DNAm and heteroskedastic p values | -                |
 ----
 
 
