@@ -1,8 +1,10 @@
 # Organoid Passage DNAm
-Analysis of the effect of passage on organoid DNAm 
+Analysis of the effect of passage number on organoid DNAm .
 
 # Workflow
 The scripts were run in the order below (also in [organoid_workflow.sh](https://github.com/redgar598/DNAm_organoid_passage/tree/master/scripts/organoid_workflow.sh))
+
+Below links connect to notebook style outputs (html for R and ipynb for python code). The raw scripts are all available as well [here](https://github.com/redgar598/DNAm_organoid_passage/tree/master/scripts).
 
 | Script                                                                                                                                                                                                                                                                                                                                                                                                 | Figures in Paper |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------|
