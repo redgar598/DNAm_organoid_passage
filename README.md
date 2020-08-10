@@ -21,10 +21,10 @@ Below links connect to notebook style outputs (html for R and ipynb for python c
 | [11_EPIC_gene_annotation.R](https://htmlpreview.github.io/?https://github.com/redgar598/DNAm_organoid_passage/blob/master/output/11_EPIC_gene_annotation.html) <br /> Annotates all CpGs on the EPIC array with which gene and gene feature they are in.                                                                                                                                               | -                |
 | [13_prep_For_GO_ORA.R](https://htmlpreview.github.io/?https://github.com/redgar598/DNAm_organoid_passage/blob/master/output/13_prep_For_GO_ORA.html) <br /> Annotate the genes on the EPIC array with [GO sene sets](https://gemma.msl.ubc.ca/annots/Generic_human_ensemblIds_noParents.an.txt.gz) for a background gene list to compared to the genes associated with passage.                        | -                |
 | [14_post_GO_ORA.R](https://htmlpreview.github.io/?https://github.com/redgar598/DNAm_organoid_passage/blob/master/output/13_prep_For_GO_ORA.html) <br /> Tidy the output of erminej to include in the supplement of enriched GO groups.                                                                                                                                                                 | Tables S1-3      |
-| [15_cancer_beta_simplified.R](https://htmlpreview.github.io/?https://github.com/redgar598/DNAm_organoid_passage/blob/master/output/15_cancer_beta_simplified.html) <br /> View the distributions of the top variable CpGs in primary colorectal cancer samples [GSE42752](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi) and [GSE48684](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE48684). | S9               |
+| [15_cancer_beta_simplified.R](https://htmlpreview.github.io/?https://github.com/redgar598/DNAm_organoid_passage/blob/master/output/15_cancer_beta_simplified.html) <br /> View the distributions of the top variable CpGs in primary colorectal cancer samples [GSE42752](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE42752) and [GSE48684](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE48684). | S9               |
 | [16_MTAB4957_passage.R](https://htmlpreview.github.io/?https://github.com/redgar598/DNAm_organoid_passage/blob/master/output/16_MTAB4957_passage.html) <br /> Validate passage effect in pediatric and fetal organoids from [E-MTAB-4957](https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-4957/)                                                                                                 | S4, S5, S7       |
 | [17_GSE141256_organoids.R](https://htmlpreview.github.io/?https://github.com/redgar598/DNAm_organoid_passage/blob/master/output/17_GSE141256_organoids.html) <br /> Validate passage effect in organoid samples from [GSE141256](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE141256)                                                                                                         | S6               |
-| [18_GSE142213_organoids.R](https://htmlpreview.github.io/?https://github.com/redgar598/DNAm_organoid_passage/blob/master/output/18_GSE142213_organoids.html) <br /> Explore the trimodality of cancer organoids [GSE142213](https://www.ncbi.nlm.nih.gov/gds/?term=GSE142213[Accession])                                                                                                               | S10              |
+| [18_GSE142213_organoids.R](https://htmlpreview.github.io/?https://github.com/redgar598/DNAm_organoid_passage/blob/master/output/18_GSE142213_organoids.html) <br /> Explore the trimodality of cancer organoids [GSE142213](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE142213)                                                                                                               | S10              |
 
 ## Functions imported throughout workflow above
 
@@ -41,7 +41,7 @@ Below links connect to notebook style outputs (html for R and ipynb for python c
 
 
 # Environment used for analysis
-The environment used is org_pass and can be created through the environment from yml file.
+The environment used is org_pass and can be created through the environment from [yml](https://github.com/redgar598/DNAm_organoid_passage/tree/master/org_pass.yml) file.
 ```
 conda env create -f org_pass.yml
 ```
@@ -71,4 +71,4 @@ install.packages("here")
 ```
 Version here_0.1
 
-The data folder provided on github does not include data. Data used will be linked once deposited pubically.
+The data folder referenced in the analysis is not on github. However, all data used will be linked here once deposited pubically.
