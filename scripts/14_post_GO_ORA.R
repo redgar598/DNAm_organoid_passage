@@ -1,12 +1,12 @@
 #'---
-#'title: Prep lists fro Go ORA
+#'title: Tidy Output From GO ORA
 #'author: Rachel Edgar
 #'date: "`r Sys.Date()`"
 #'---
 #'
 
 #' #### Load Libraries
-library(here)
+suppressMessages(library(here))
 options(stringsAsFactors = FALSE)
 
 #' ### CpG to gene associations

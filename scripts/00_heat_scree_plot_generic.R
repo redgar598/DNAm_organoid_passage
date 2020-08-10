@@ -1,5 +1,5 @@
-library(gridExtra)
-library(reshape2)
+suppressMessages(library(gridExtra))
+suppressMessages(library(reshape2))
 
 heat_scree_plot<-function(Loadings, Importance, right_marg, left_marg){
   

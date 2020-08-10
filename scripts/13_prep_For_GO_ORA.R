@@ -1,13 +1,13 @@
 #'---
-#'title: Prep lists fro Go ORA
+#'title: Prep lists For GO ORA
 #'author: Rachel Edgar
 #'date: "`r Sys.Date()`"
 #'---
 #'
 
 #' #### Load Libraries
-library(here)
-library(dplyr)
+suppressMessages(library(here))
+suppressMessages(library(dplyr))
 options(stringsAsFactors = FALSE)
 
 
@@ -95,6 +95,16 @@ hypo_genes_mean_db<-hypo_genes_mean_db[which(hypo_genes_mean_db$Gene.stable.ID%i
 write.csv(hypo_genes_mean_db, file=paste(here("data"),"/hypo_genes.csv", sep=""), row.names = F, quote = F)
 print(paste("There are ",nrow(hypo_genes_mean_db), " genes associated with hypomethylated CpGs", sep=""))
 
+#' ## GO ORA in erminej run as below:
+#' Gene annotation file: Generic_human_ensemblIds_noParents_EPIC_array.an.txt
+#' Analysis -> Run Analysis -> ORA
+#' ORA Paste genes lists as "Quick list" (did not use a score)
+#' Gene lists to paste: hetero_genes.csv hyper_genes.csv hypo_genes.csv
+#' Biological process only
+#' max set size=400 min=5
+#' no log of score, larger scores are not better gene score threshold 0.0
+#' analysis-> save analysis -> chose each ORA run seperately -> include all genes in output (yes)
+#' save hyper.erminej.txt hypo.erminej.txt hetero.erminej.txt
 
 #'## R Session Info
 sessionInfo()

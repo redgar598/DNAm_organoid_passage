@@ -6,15 +6,15 @@
 
 #' #### Load Libraries
 suppressMessages(library(reshape))
-library(ggplot2)
-library(RColorBrewer)
-library(dplyr)
-library(lmtest)
-library(gridExtra)
-library(gtools)
-library(scales)
-library(here)
-library(binom)
+suppressMessages(library(ggplot2))
+suppressMessages(library(RColorBrewer))
+suppressMessages(library(dplyr))
+suppressMessages(library(lmtest))
+suppressMessages(library(gridExtra))
+suppressMessages(library(gtools))
+suppressMessages(library(scales))
+suppressMessages(library(here))
+suppressMessages(library(binom))
 
 
 options(stringsAsFactors = FALSE)
@@ -94,7 +94,7 @@ plt_hetero(diff_not_hetero_order[which(diff_not_hetero_order$mean_db>0),"CpG"][c
 plt_hetero(diff_not_hetero_order[which(diff_not_hetero_order$mean_db<0),"CpG"][c(1,46,3,20)])
 
 
-#' Combine these into a multi panle plot
+#' Combine these into a multi panel plot
 tmp <- suppressWarnings(ggplot_gtable(ggplot_build(plt_hetero(diff_not_hetero_order[1:4,"CpG"]))))
 leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
 legend <- tmp$grobs[[leg]]

@@ -1,4 +1,4 @@
-library('VGAM')
+suppressMessages(library('VGAM'))
 
 draw_fit_gg = function(converted, total, prior_H, prior_U, prior_M, prior_I, mu_U, rho_U, mu_M, rho_M, mu_I, rho_I, passage) {
 		ratio = converted/total

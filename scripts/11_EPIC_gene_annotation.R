@@ -5,7 +5,7 @@
 #'---
 #'
 
-library(here)
+suppressMessages(library(here))
 
 options(stringsAsFactors = FALSE)
 options(scipen = 999)

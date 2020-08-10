@@ -135,4 +135,7 @@ ggsave(here("figs","cancer_public_same_variable_cpg_num.pdf"),
        width=10, height=5)
 
 
-            
+    
+
+#'## R Session Info
+sessionInfo()        

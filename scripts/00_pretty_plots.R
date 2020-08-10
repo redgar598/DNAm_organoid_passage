@@ -1,4 +1,4 @@
-library(scales)
+suppressMessages(library(scales))
 
 
 ## color by sample site
