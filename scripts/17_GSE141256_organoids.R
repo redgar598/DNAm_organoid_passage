@@ -798,7 +798,7 @@ ggplot(plt_db_direction, aes(mean_db, db))+geom_point(aes(color=sig, alpha=sig),
   scale_color_manual(values=c("lightgrey", "cornflowerblue"), name="Significant\nWith Passage")+
   scale_alpha_manual(values=c(0.25,1), guide=F)+
   geom_hline(yintercept=c(-0.15,0.15), color="grey60")+geom_vline(xintercept=c(-0.15,0.15), color="grey60")+
-  ylim(-0.8,0.8)+xlim(-0.8,0.8)+xlab("Original Organoid\nPassage Delta Beta")+ylab("GSE141256 Organoid\nPassage Delta Beta")+
+  ylim(-0.8,0.8)+xlim(-0.8,0.8)+xlab("Cohort 1 Organoid\nPassage Delta Beta")+ylab("Cohort 3 Organoid\nPassage Delta Beta")+
   stat_smooth(method="lm", se=F, color="black")
 
 
@@ -811,11 +811,13 @@ print(paste("Correlation of delta betas between cohorts: ", round(cor(plt_db_dir
 #' ### representative CpGs
 epic.organoid_minimal<-epic.organoid[,c(2, 14, 17)]
 colnames(epic.organoid_minimal)[1]<-"Assay.Name"
-epic.organoid_minimal$cohort<-"Original Organoids"
+epic.organoid_minimal$cohort<-"Cohort 1 Organoids"
 
 GSE141256_meta_combo_spheroids_minimal<-GSE141256_meta_combo_spheroids[,c(6,13,16)]
-GSE141256_meta_combo_spheroids_minimal$cohort<-"GSE141256 Organoids"
+GSE141256_meta_combo_spheroids_minimal$cohort<-"Cohort 3 Organoids"
 colnames(GSE141256_meta_combo_spheroids_minimal)[2:3]<-c("sample_ID","passage.or.rescope.no_numeric")
+GSE141256_meta_combo_spheroids_minimal$sample_ID[grep("H", GSE141256_meta_combo_spheroids_minimal$sample_ID)]<-"H"
+GSE141256_meta_combo_spheroids_minimal$sample_ID[grep("F", GSE141256_meta_combo_spheroids_minimal$sample_ID)]<-"F"
 
 sample_info_both<-rbind(GSE141256_meta_combo_spheroids_minimal,epic.organoid_minimal)
 
