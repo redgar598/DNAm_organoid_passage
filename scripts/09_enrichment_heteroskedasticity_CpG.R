@@ -104,6 +104,119 @@ background_hypo<-background[which(!(background$IlmnID%in%rm_hypo)),]
 background_hyper<-background[which(!(background$IlmnID%in%rm_hyper)),]
 
 
+
+
+#' ## IBD CpGs
+IBD_CpG<-read.csv(here("data","Agliata_IBD_CpGs.csv"))
+IBD_CpG<-IBD_CpG$probe
+
+
+IBD_overlap<-function(CpG_list,background.probes,permutation_number){
+  real_CpG_IBD<-length(intersect(IBD_CpG, CpG_list))
+  bootstrap_IBD<-sapply(1:permutation_number, function(x){
+    set.seed(x)
+    Hit_number<-length(CpG_list)
+    rnd_CpGs<-background.probes[sample(1:length(background.probes),Hit_number)]
+    length(intersect(IBD_CpG, rnd_CpGs))
+  })
+  (length(which(bootstrap_IBD>=real_CpG_IBD))+1)/(permutation_number+1)}
+
+IBD_overlap(diff_CpG_db_hypo, background_hypo$IlmnID, 1000)
+IBD_overlap(diff_CpG_db_hyper, background_hyper$IlmnID, 1000)
+IBD_overlap(hetero_CpG$IlmnID,background$IlmnID, 1000)
+
+
+#' top CpGs from IBD study
+plt_hetero(c("cg16465027","cg19269426","cg07839457","cg16240683"))
+
+
+
+
+
+
+library(limma)
+#' ## Differential methylation with samplesite 
+mod<-model.matrix(~ 0 + sample.site, data=epic.organoid)
+fit <- lmFit(organoid_beta, mod)
+ebfit <- eBayes(fit)
+
+cont.matrix <- makeContrasts(SCvsTI=sample.siteSC-sample.siteTI, levels=mod)
+fit2 <- contrasts.fit(fit, cont.matrix)
+ebfit2 <- eBayes(fit2)
+topTable(ebfit2, adjust="BH")
+
+
+# delta beta
+samplesite_db<-sapply(1:nrow(organoid_beta), function(x){
+  sampleinfo_cpg<-epic.organoid
+  sampleinfo_cpg$beta<-as.numeric(organoid_beta[x,])
+  
+  mns<-tapply(sampleinfo_cpg$beta, sampleinfo_cpg$sample.site, mean)
+  mns[1]-mns[2]
+})
+
+sample_site_CpGs<-data.frame(CpG=rownames(organoid_beta), p.value=ebfit2$p.value[,1], db=samplesite_db)
+
+
+# Adjust P values
+sample_site_CpGs$p_adjusted<-p.adjust(sample_site_CpGs$p.value, method="BH")
+sig_sample_site_CpG<-sample_site_CpGs[which(sample_site_CpGs$p_adjusted<0.05 & abs(sample_site_CpGs$db)>0.15),] 
+
+
+# hypo
+length(intersect(diff_CpG_db_hypo, sig_sample_site_CpG$CpG))
+
+expected_overlap<-sapply(1:1000, function(x){
+  set.seed(x)
+  rnd_cpg<-rownames(organoid_beta)[sample(1:nrow(organoid_beta), length(diff_CpG_db_hypo))]
+  length(intersect(rnd_cpg,sig_sample_site_CpG$CpG))
+})
+
+(length(which(expected_overlap>length(intersect(diff_CpG_db_hypo, sig_sample_site_CpG$CpG))))+1)/1001
+
+
+# hyper
+length(intersect(diff_CpG_db_hyper, sig_sample_site_CpG$CpG))
+
+expected_overlap<-sapply(1:1000, function(x){
+  set.seed(x)
+  rnd_cpg<-rownames(organoid_beta)[sample(1:nrow(organoid_beta), length(diff_CpG_db_hyper))]
+  length(intersect(rnd_cpg,sig_sample_site_CpG$CpG))
+})
+
+(length(which(expected_overlap>length(intersect(diff_CpG_db_hyper, sig_sample_site_CpG$CpG))))+1)/1001
+
+
+
+# hetero
+length(intersect(hetero_CpG, sig_sample_site_CpG$CpG))
+
+expected_overlap<-sapply(1:1000, function(x){
+  set.seed(x)
+  rnd_cpg<-rownames(organoid_beta)[sample(1:nrow(organoid_beta), length(hetero_CpG))]
+  length(intersect(rnd_cpg,sig_sample_site_CpG$CpG))
+})
+
+(length(which(expected_overlap>length(intersect(hetero_CpG, sig_sample_site_CpG$CpG))))+1)/1001
+
+
+plt_sample_site<-function(CpGs){
+  betas<-melt(organoid_beta[CpGs,])
+  epic.organoid_plt<-merge(epic.organoid, betas, by.x="array.id",by.y="X2")
+  
+  ggplot(epic.organoid_plt, aes(sample.site,value, fill=sample.site))+th+theme_bw()+
+    geom_boxplot()+
+    geom_point(aes(fill=as.factor(sample.site)),shape=21, size=1.25)+
+    fillscale_sampsite+facet_wrap(~X1)+
+    ylab("DNAm Beta")+ylim(0,1)
+}
+
+plt_sample_site(sig_sample_site_CpG$CpG[1:4])
+
+
+
+
+
 #' ## c-DMR enrichment of passage CpGs
 #' c-DMRs are from # https://www.nature.com/articles/ng.298#Sec25
 #' supplementary data 2

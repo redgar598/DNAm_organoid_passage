@@ -1,5 +1,5 @@
 #'---
-#'title: Validation in E-MTAB-4957
+#'title: Validation in E-MTAB-4957 (Cohort 2)
 #'author: Rachel Edgar
 #'date: "`r Sys.Date()`"
 #'---
@@ -555,9 +555,9 @@ epic.organoid_beta_VeryVariable_paird<-organoid_beta_VeryVariable[,which(colname
 epic.organoid_beta_VeryVariable_paird<-epic.organoid_beta_VeryVariable_paird[,match(epic.organoid_paired$array.id,colnames(epic.organoid_beta_VeryVariable_paird))]
 identical(colnames(epic.organoid_beta_VeryVariable_paird), as.character(epic.organoid_paired$array.id))
 
-epic.organoid_paired$Study<-"Original Organoids"
+epic.organoid_paired$Study<-"Cohort 1 Organoids"
 
-sampleinfo_organoid_paired$Study<-"E-MTAB-4957"
+sampleinfo_organoid_paired$Study<-"Cohort 2"
 sampleinfo_organoid_paired$sample_ID<-gsub(" sigmoid colon", " SC",sampleinfo_organoid_paired$sample_ID)
 sampleinfo_organoid_paired$sample_ID<-gsub(" terminal ileum", " TI",sampleinfo_organoid_paired$sample_ID)
 colnames(sampleinfo_organoid_paired)[c(4,16)]<-c("case.no","array.id")
@@ -596,8 +596,8 @@ labels<-as.data.frame(tapply(samplinfo_paired_combined$passage.or.rescope.no_num
 labels$sample_ID<-rownames(labels)
 colnames(labels)<-c("MTAB","OG","sample_ID")
 
-labels$MTAB<-paste("E-MTAB-4957: ", labels$MTAB, sep="")
-labels$OG<-paste("Original Organoid: ", labels$OG, sep="")
+labels$MTAB<-paste("Cohort 2: ", labels$MTAB, sep="")
+labels$OG<-paste("Cohort 1 Organoid: ", labels$OG, sep="")
 
 
 
@@ -1007,7 +1007,7 @@ ggplot(plt_db_direction, aes(mean_db, db))+geom_point(aes(color=sig, alpha=sig),
   scale_color_manual(values=c("lightgrey", "cornflowerblue"), name="Significant\nWith Passage")+
   scale_alpha_manual(values=c(0.25,1), guide=F)+
   geom_hline(yintercept=c(-0.15,0.15), color="grey60")+geom_vline(xintercept=c(-0.15,0.15), color="grey60")+
-  ylim(-0.8,0.8)+xlim(-0.8,0.8)+xlab("Original Organoid\nPassage Delta Beta")+ylab("MTAB-4957 Organoid\nPassage Delta Beta")+
+  ylim(-0.8,0.8)+xlim(-0.8,0.8)+xlab("Cohort 1\nPassage Delta Beta")+ylab("Cohort 2 Organoid\nPassage Delta Beta")+
   stat_smooth(method="lm", se=F, color="black")
 
 
@@ -1020,10 +1020,10 @@ print(paste("Correlation of delta betas between cohorts: ", round(cor(plt_db_dir
 #' ### representative CpGs
 epic.organoid_minimal<-epic.organoid[,c(2, 14, 17)]
 colnames(epic.organoid_minimal)[1]<-"Assay.Name"
-epic.organoid_minimal$cohort<-"Original Organoids"
+epic.organoid_minimal$cohort<-"Cohort 1 Organoids"
 
 sampleinfo_organoid_notfetal_minimal<-sampleinfo_organoid_notfetal[,c(16,22,21)]
-sampleinfo_organoid_notfetal_minimal$cohort<-"MTAB-4957 Organoids"
+sampleinfo_organoid_notfetal_minimal$cohort<-"Cohort 2 Organoids"
 
 sample_info_both<-rbind(sampleinfo_organoid_notfetal_minimal,epic.organoid_minimal)
 
@@ -1116,7 +1116,7 @@ ggplot(plt_db_direction, aes(mean_db, db))+geom_point(aes(color=sig, alpha=sig),
   scale_color_manual(values=c("lightgrey", "cornflowerblue"), name="Significant\nWith Passage")+
   scale_alpha_manual(values=c(0.25,1), guide=F)+
   geom_hline(yintercept=c(-0.15,0.15), color="grey60")+geom_vline(xintercept=c(-0.15,0.15), color="grey60")+
-  ylim(-0.8,0.8)+xlim(-0.8,0.8)+xlab("Original Organoid\nPassage Delta Beta")+ylab("MTAB-4957 Fetal Organoid\nPassage Delta Beta")+
+  ylim(-0.8,0.8)+xlim(-0.8,0.8)+xlab("Cohort 1\nPassage Delta Beta")+ylab("Cohort 2 Fetal Organoid\nPassage Delta Beta")+
   stat_smooth(method="lm", se=F, color="black")
 
 
@@ -1128,7 +1128,7 @@ print(paste("Correlation of delta betas between cohorts: ", round(cor(plt_db_dir
 
 #' ### representative CpGs
 sampleinfo_organoid_fetal_minimal<-sampleinfo_organoid_fetal[,c(16,22,21)]
-sampleinfo_organoid_fetal_minimal$cohort<-"MTAB-4957 Fetal Organoids"
+sampleinfo_organoid_fetal_minimal$cohort<-"Cohort 2 Fetal Organoids"
 
 sample_info_both<-rbind(sampleinfo_organoid_fetal_minimal,epic.organoid_minimal)
 
