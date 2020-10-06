@@ -1143,7 +1143,7 @@ plt_hetero_MTAB<-function(CpGs, legend, axislab, title){
     scale_fill_manual(values=pass_col,name="Passage\nNumber", drop=T)+
     facet_grid(cohort~Var1)+
     ylab("DNAm Beta")+xlab("Passage Number")+ylim(0,1)+
-    theme(plot.margin = margin(0.5, 0.15, 0.5, 0.15, "cm"),plot.title = element_text(size=12))+
+    theme(plot.margin = margin(0.5, 0.15, 0.5, 0.15, "cm"),plot.title = element_text(size=12), legend.key.size = unit(0.4, "cm"))+
     xlim(1,23)
   
   if(missing(legend) & missing(axislab) & missing(title)){p}else{
