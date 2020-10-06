@@ -850,7 +850,7 @@ labels$sample_ID<-rownames(labels)
 ggplot()+
   geom_density(aes(Beta,color=hilo, group=ID),Beta_Plot, size=0.75)+theme_bw()+xlab("DNAm Beta Value")+ylab("Density")+
   scale_color_manual(values = c ("#9ecae1","#4292c6", "#225ea8", "#081d58"), name="Relative\nPassage\nLevel within\nPatient")+facet_wrap(~sample_ID, nrow=2)+
-  geom_text(aes(0.75, 2.75, label=passge), data=labels, color="grey20")+th+theme(strip.text = element_text(size = 10),
+  geom_text(aes(0.5, 2.75, label=passge), data=labels, color="grey20")+th+theme(strip.text = element_text(size = 10),
                                                                                  axis.text=element_text(size=4),
                                                                                  panel.spacing = unit(0.7, "lines"))+
   scale_x_continuous(breaks = c(0,0.5,1))
