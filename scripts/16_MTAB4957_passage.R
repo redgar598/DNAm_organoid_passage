@@ -590,22 +590,22 @@ colnames(Beta_Plot)<-c("ID","Beta")
 Beta_Plot<-merge(Beta_Plot,samplinfo_paired_combined, by.x="ID", by.y="array.id")
 
 Beta_Plot$hilo_epic<-paste(Beta_Plot$hilo,"\n", Beta_Plot$Study, sep="")
-Beta_Plot$hilo_epic<-factor(Beta_Plot$hilo_epic, levels=c("lower\nOriginal Organoids", "lower\nE-MTAB-4957", "higher\nE-MTAB-4957", "highest\nE-MTAB-4957"))
+Beta_Plot$hilo_epic[grep("lower\nCohort 1 Organoids", Beta_Plot$hilo_epic)]<-"lower\nCohort 1"
+Beta_Plot$hilo_epic<-factor(Beta_Plot$hilo_epic, levels=c("lower\nCohort 1", "lower\nCohort 2", "higher\nCohort 2", "highest\nCohort 2"))
 
 labels<-as.data.frame(tapply(samplinfo_paired_combined$passage.or.rescope.no_numeric, list(samplinfo_paired_combined$sample_ID,samplinfo_paired_combined$Study), function(x) paste(x, collapse=", ")))
 labels$sample_ID<-rownames(labels)
-colnames(labels)<-c("MTAB","OG","sample_ID")
 
-labels$MTAB<-paste("Cohort 2: ", labels$MTAB, sep="")
-labels$OG<-paste("Cohort 1 Organoid: ", labels$OG, sep="")
+labels$MTAB<-paste("Cohort 2: ", labels$`Cohort 2`, sep="")
+labels$OG<-paste("Cohort 1: ", labels$`Cohort 1 Organoids`, sep="")
 
 
 
 ggplot()+
   geom_density(aes(Beta,color=hilo_epic, group=ID),Beta_Plot, size=0.75)+theme_bw()+xlab("DNAm Beta Value")+ylab("Density")+
   scale_color_manual(values = c ("#ef3b2c", "#9ecae1","#225ea8","#081d58"), name="Relative\nPassage\nLevel within\nPatient")+facet_wrap(~sample_ID, nrow=3)+
-  geom_text(aes(0.5, 2.65, label=MTAB), data=labels, color="grey20", size=2.75)+
-  geom_text(aes(0.5, 2.35, label=OG), data=labels, color="grey20", size=2.75)+
+  geom_text(aes(0.5, 2.55, label=MTAB), data=labels, color="grey20", size=2.75)+
+  geom_text(aes(0.456, 2.25, label=OG), data=labels, color="grey20", size=2.75)+
   th+theme(strip.text = element_text(size = 12),
            axis.text=element_text(size=10),
            panel.spacing = unit(0.7, "lines"),
