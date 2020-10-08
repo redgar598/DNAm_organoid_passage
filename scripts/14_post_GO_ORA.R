@@ -9,6 +9,9 @@
 suppressMessages(library(here))
 options(stringsAsFactors = FALSE)
 
+#' #### Load Normalized Data
+load(here("data","beta_organoids.RData"))
+
 #' ### CpG to gene associations
 EPIC_genes<-read.csv(here("data","EPIC_ensembl_gene_annotation.csv")) # 1137194
 
