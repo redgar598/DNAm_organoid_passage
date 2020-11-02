@@ -291,18 +291,15 @@ epic.organoid$sentrix_ID<-as.factor(epic.organoid$sentrix_ID)
 epic.organoid$case.no<-as.factor(epic.organoid$case.no)
 epic.organoid$sex<-as.factor(epic.organoid$sex)
 epic.organoid$sample.site<-as.factor(epic.organoid$sample.site)
-epic.organoid$diagnosis<-as.factor(epic.organoid$diagnosis)
 
 epic.organoid$passage.or.rescope.no_numeric<-as.factor(as.character(epic.organoid$passage.or.rescope.no))
 levels(epic.organoid$passage.or.rescope.no_numeric)<-c(1,11,14,16,2,3,4,6,7,8,2)
 epic.organoid$passage.or.rescope.no_numeric<-as.numeric(as.character(epic.organoid$passage.or.rescope.no_numeric))
 
 #' #### Cohort distribution
-table(epic.organoid$diagnosis, epic.organoid$passage.or.rescope.no_numeric)
-
-meta_categorical <- epic.organoid[, c(1,5,4,9,11)]  # input column numbers in meta that contain categorical variables
+meta_categorical <- epic.organoid[, c(1,5,9,11)]  # input column numbers in meta that contain categorical variables
 meta_continuous <- as.data.frame(epic.organoid[, c(10, 17)] ) # input column numbers in meta that contain continuous variables
-colnames(meta_categorical) <- c("Case No.", "Sample Site","Diagnosis","Sex","Sentrix ID")
+colnames(meta_categorical) <- c("Case No.", "Sample Site","Sex","Sentrix ID")
 colnames(meta_continuous) <- c("Age", "Passage")
 
 ord<-1:length(c(colnames(meta_categorical),colnames(meta_continuous)))
@@ -324,12 +321,6 @@ ggplot(Loadings_meta, aes(PC1, PC2, fill=sample.site))+geom_point(shape=21,size=
 
 ggsave(here("figs","PC1_PC2_organoid.pdf"), width = 6.5, height = 5)
 ggsave(here("figs/jpeg","PC1_PC2_organoid.jpeg"), width = 6.5, height = 5)
-
-#' #### Diagnosis
-ggplot(Loadings_meta, aes(PC2, PC3, fill=as.factor(diagnosis)))+geom_line(aes(PC2,PC3, group=sample_ID), color="lightgrey")+#, color=sampling.time.point
-  geom_point(shape=21,size=3, color="black")+#
-  theme_bw()+xlab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+ylab(paste("PC3 (",round(Importance[3]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),axis.title = element_text(size=14))+
-  scale_fill_manual(values=c("firebrick3","cornflowerblue","lightblue"))
 
 
 #' #### Passage
@@ -369,10 +360,6 @@ ggplot(Loadings_meta, aes(passage.or.rescope.no_numeric, PC2))+geom_smooth(metho
 ggsave(here("figs","PC2_passage_organoid.pdf"), width = 7.5, height = 6)
 ggsave(here("figs/jpeg","PC2_passage_organoid.jpeg"), width = 7.5, height = 6)
 
-
-
-#' #### Sample Distribution Table 
-table(epic.organoid$diagnosis, epic.organoid$passage.or.rescope.no_numeric)
 
 
 #' ### Save intermediate object for further analysis
