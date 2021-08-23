@@ -60,6 +60,8 @@ pvals_long[,1]<-NULL
 colnames(pvals_long)<-c("BP_count","diff_count","mean_db","fdr_BP","fdr_diff")
 pvals_long$CpG<-rownames(organoid_beta)
 
+save(pvals_long, file=here("data","Heteroskedactiy_pvalues_FDR_1000iter_w_CpG.Rdata"))
+
 pvals_long$BP_pval<-((1000-pvals_long$BP_count)+1)/1001
 pvals_long$diff_pval<-((1000-pvals_long$diff_count)+1)/1001
 pvals_long$BP_fdr<-((1000-pvals_long$fdr_BP)+1)/1001
