@@ -4,7 +4,7 @@ export RNA_DATA_DIR2=/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/r
 export RNA_REFS_DIR=/nfs/research1/zerbino/redgar/ibd/data/public_rna_seq/refs
 export RNA_DATA_QUANT=/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/kallisto
 
-conda activate ibd_dnam_rnaseq
+#conda activate ibd_dnam_rnaseq
 
 #####################
 ## Kallisto pipeline
@@ -23,7 +23,7 @@ cd $RNA_DATA_QUANT
 
 awk 'NR>1{ print $2 }' ../sample_info_RNA_seq.txt | while read samplename 
 do
-	kallisto quant -b 100 -t 8 -i $RNA_REFS_DIR/human_transcriptome_index.idx -o ${samplename} ../run1_fastqs/${samplename}_R1_001.fastq.gz ../run2_fastqs/${samplename}_R1_001.fastq.gz
+	kallisto quant -b 100 -t 8 -i $RNA_REFS_DIR/human_transcriptome_index.idx -o ${samplename} $RNA_DATA_DIR1/${samplename}_R1_001.fastq.gz $RNA_DATA_DIR2/${samplename}_R1_001.fastq.gz
 done
 
 
