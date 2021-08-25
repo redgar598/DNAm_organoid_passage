@@ -130,3 +130,28 @@ bsub -M 80000 -R "rusage[mem=80000]" Rscript scripts/17_GSE141256_organoids.R
 
 
 bsub -M 40000 -R "rusage[mem=40000]" Rscript scripts/18_GSE142213_organoids.R
+
+
+
+######################
+# rnaseq pipeline
+######################
+cd /nfs/research1/zerbino/redgar/DNAm_organoid_passage
+conda activate ibd_dnam_rnaseq
+git pull
+
+
+bsub -M 10000 -R "rusage[mem=10000]" -n 8 bash scripts/validation/rnaseq/01_RNA_seq_processing.sh
+
+# bsub -M 10000 -R "rusage[mem=10000]" -n 8 bash RNAseq/rna_seq_quantification.sh
+# bsub -M 80000 -R "rusage[mem=40000]" Rscript RNAseq/sleuth_exploratory.R
+# bsub -M 80000 -R "rusage[mem=20000]" Rscript RNAseq/rna_seq_countadjustment.R
+
+
+# bsub -M 20000 -R "rusage[mem=20000]" Rscript RNAseq/testing.R
+
+scp redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/run1_fastqs/multiqc_report_raw.html /home/redgar/Documents/DNAm_organoid_passage/data/validation_dataset
+scp redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/run2_fastqs/multiqc_report_raw.html /home/redgar/Documents/DNAm_organoid_passage/data/validation_dataset
+
+scp redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/run1_fastqs/T317_SC_p12_D_S15_R1_001_fastqc.html /home/redgar/Documents/DNAm_organoid_passage/data/validation_dataset
+scp /home/redgar/Documents/DNAm_organoid_passage/data/validation_dataset/sample_info_RNA_seq.csv redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage

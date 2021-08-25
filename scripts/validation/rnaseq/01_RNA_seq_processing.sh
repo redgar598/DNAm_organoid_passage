@@ -19,24 +19,27 @@ fastqc *.fastq.gz
 multiqc --filename $RNA_DATA_DIR2/multiqc_report_raw.html $RNA_DATA_DIR2
 
 
-
-# ##adapter trimming
-# #http://emea.support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html
-# #mkdir trimmed
-
-# #cutadapt adapters from truseq illumina site and -quality filter 3' ends
-# ##http://emea.support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html
-
-# awk 'NR>1{ print $3 }' $RNA_DATA_DIR/Zerbino_RNASeq_SampleInfo.txt | while read samplename 
-# do
-# 	cutadapt --cores=0 -q 10 -m 1 -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT -o $RNA_DATA_DIR/trimmed/${samplename}_adapter_trimmed_1.fastq.gz -p $RNA_DATA_DIR/trimmed/${samplename}_adapter_trimmed_2.fastq.gz $RNA_DATA_DIR/${samplename}_1.fastq.gz $RNA_DATA_DIR/${samplename}_2.fastq.gz
-# done
+## NO adapter content found in this library
 
 
 
-# ##  QC
-# fastqc $RNA_DATA_DIR/trimmed/*.fastq.gz
-# multiqc -f --filename $RNA_DATA_DIR/trimmed/multiqc_report_trimmed.html $RNA_DATA_DIR/trimmed
+			# ##adapter trimming
+			# #http://emea.support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html
+			# #mkdir trimmed
+
+			# #cutadapt adapters from truseq illumina site and -quality filter 3' ends
+			# ##http://emea.support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html
+
+			# awk 'NR>1{ print $3 }' $RNA_DATA_DIR/Zerbino_RNASeq_SampleInfo.txt | while read samplename 
+			# do
+			# 	cutadapt --cores=0 -q 10 -m 1 -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT -o $RNA_DATA_DIR/trimmed/${samplename}_adapter_trimmed_1.fastq.gz -p $RNA_DATA_DIR/trimmed/${samplename}_adapter_trimmed_2.fastq.gz $RNA_DATA_DIR/${samplename}_1.fastq.gz $RNA_DATA_DIR/${samplename}_2.fastq.gz
+			# done
+
+
+
+			# ##  QC
+			# fastqc $RNA_DATA_DIR/trimmed/*.fastq.gz
+			# multiqc -f --filename $RNA_DATA_DIR/trimmed/multiqc_report_trimmed.html $RNA_DATA_DIR/trimmed
 
 
 
