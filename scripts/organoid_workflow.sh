@@ -156,3 +156,9 @@ scp redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/run2_fa
 
 scp redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/run1_fastqs/T317_SC_p12_D_S15_R1_001_fastqc.html /home/redgar/Documents/DNAm_organoid_passage/data/validation_dataset
 scp /home/redgar/Documents/DNAm_organoid_passage/data/validation_dataset/sample_info_RNA_seq.csv redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage
+
+scp -r redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/kallisto /home/redgar/Documents/DNAm_organoid_passage/data/validation_dataset
+
+
+
+				scp redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/run1_fastqs/T317_SC_p12_D_S15_R1_001* /home/redgar/Documents/DNAm_organoid_passage/data/validation_dataset/test

@@ -4,6 +4,8 @@ export RNA_DATA_DIR2=/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/r
 
 export RNA_REFS_DIR=/nfs/research1/zerbino/redgar/ibd/data/public_rna_seq/refs
 export RNA_DATA_QUANT=/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/kallisto
+export RNA_DATA_MERGED=/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/merged
+
 
 
 
@@ -24,17 +26,8 @@ cd $RNA_DATA_QUANT
 
 awk 'NR>1{ print $2 }' ../sample_info_RNA_seq.txt | while read samplename 
 do
-	kallisto quant -b 100 -t 8 -i $RNA_REFS_DIR/human_transcriptome_index.idx -o ${samplename} $RNA_DATA_DIR1/${samplename}_*_R1_001.fastq.gz $RNA_DATA_DIR2/${samplename}_*_R1_001.fastq.gz
+	kallisto quant -b 100 -t 8 -i $RNA_REFS_DIR/human_transcriptome_index.idx -o ${samplename} --single -l 75 -s 1.5 $RNA_DATA_MERGED/${samplename}_merged.fastq.gz
 done
 
 
-
-					# #cd $RNA_DATA_TRIM
-					# #mkdir $RNA_DATA_TRIM/kallisto
-					# cd $RNA_DATA_TRIM/kallisto
-
-					# awk 'NR>1{ print $3 }' ../../Zerbino_RNASeq_SampleInfo.txt | while read samplename 
-					# do
-					# 	kallisto quant -b 100 -t 8 -i ../../refs/human_transcriptome_index.idx -o ${samplename} ../${samplename}_adapter_trimmed_1.fastq.gz ../${samplename}_adapter_trimmed_2.fastq.gz
-					# done
 

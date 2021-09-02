@@ -16,28 +16,27 @@ suppressMessages({
   library(grid)
 })
 options(stringsAsFactors = FALSE)
-source(here("general_functions","00_pretty_plots.R"))
-source(here("general_functions","00_Heat_scree_plot_generic.R"))
+source(here("scripts","00_pretty_plots.R"))
+source(here("scripts","00_heat_scree_plot_generic.R"))
 
 
 #set input and output dirs
-datapath = here("../data/public_rna_seq/trimmed/kallisto")
-resultdir = here('../data/public_rna_seq/trimmed/kallisto/sleuth')
+datapath = "data/validation_dataset/kallisto"
+resultdir = here('data/validation_dataset/kallisto/sleuth')
 
-sampleinfo <- read.table(here("../data/public_rna_seq/Zerbino_RNASeq_SampleInfo.txt"), header=T, sep="\t")
-# ont need ftp location
-sampleinfo<-sampleinfo[,1:13]
+sampleinfo <- read.table("data/validation_dataset/sample_info_RNA_seq.txt", header=F, sep=" ", skip=1)
+sampleinfo<-sampleinfo[,c(2,7,8:10,12)]
+colnames(sampleinfo)<-c("sample","concentration","volume","quantity","ratio","well")
 
 #create a sample to condition metadata description
-sample_id = sampleinfo$ena.id
+sample_id = sampleinfo$sample
 kal_dirs <- file.path(datapath, sample_id)
 
 sampleinfo$path<-kal_dirs
-colnames(sampleinfo)[colnames(sampleinfo) =="ena.id"]<-"sample"
 
-sampleinfo$inflammation<-as.factor(sampleinfo$inflammation)
-sampleinfo$sex<-as.factor(sampleinfo$sex)
-sampleinfo$diagnosis<-as.factor(sampleinfo$diagnosis)
+# sampleinfo$inflammation<-as.factor(sampleinfo$inflammation)
+# sampleinfo$sex<-as.factor(sampleinfo$sex)
+# sampleinfo$diagnosis<-as.factor(sampleinfo$diagnosis)
 
 
 ###########

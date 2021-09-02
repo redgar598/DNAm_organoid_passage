@@ -1,12 +1,9 @@
 export RNA_DATA_DIR1=/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/run1_fastqs
 export RNA_DATA_DIR2=/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/run2_fastqs
 
-export RNA_REFS_DIR=../../data/public_rna_seq/refs
-
-conda activate ibd_dnam_rnaseq
+#conda activate ibd_dnam_rnaseq
 
 
-# ERR2270966 issues
 
 ##  QC
 cd $RNA_DATA_DIR1
