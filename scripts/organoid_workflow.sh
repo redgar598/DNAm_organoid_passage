@@ -142,7 +142,8 @@ git pull
 
 
 bsub -M 10000 -R "rusage[mem=10000]" -n 8 bash scripts/validation/rnaseq/01_RNA_seq_processing.sh
-bsub -M 10000 -R "rusage[mem=10000]" -n 8 bash scripts/validation/rnaseq/02_RNA_seq_quantification.sh
+bsub -M 10000 -R "rusage[mem=10000]" -n 8 bash scripts/validation/rnaseq/02_RNA_seq_runs_merge.sh
+bsub -M 10000 -R "rusage[mem=10000]" -n 8 bash scripts/validation/rnaseq/04_RNA_seq_quantification.sh
 
 # bsub -M 10000 -R "rusage[mem=10000]" -n 8 bash RNAseq/rna_seq_quantification.sh
 # bsub -M 80000 -R "rusage[mem=40000]" Rscript RNAseq/sleuth_exploratory.R
