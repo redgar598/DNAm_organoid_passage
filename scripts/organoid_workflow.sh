@@ -163,3 +163,6 @@ scp -r redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/kall
 
 
 				scp redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/run1_fastqs/T317_SC_p12_D_S15_R1_001* /home/redgar/Documents/DNAm_organoid_passage/data/validation_dataset/test
+
+scp redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/merged/multiqc_report_raw.html /home/redgar/Documents/DNAm_organoid_passage/data/validation_dataset/merged
+

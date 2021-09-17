@@ -32,41 +32,13 @@ ggsave("figs/jpeg/pseudoalignment_stats.jpeg",panel, w=10, h=5)
 
 
 
-### correlate to multipqc statistics
-overrepresented<-read.table("../../data/public_rna_seq/multiqc_report_raw_data/mqc_fastqc_overrepresented_sequencesi_plot_1.txt", sep="\t", header=T)
-overrepresented$all_over<-rowSums(overrepresented[,2:3])
-overrepresented$Sample_run<-gsub(".*_","",overrepresented$Sample)
-overrepresented$Sample<-gsub("_1|_2","",overrepresented$Sample)
-over_align<-merge(summary_stats,overrepresented, by.x="sample_id", by.y="Sample")
-ggplot(over_align, aes(all_over, p_pseudoaligned))+geom_point()+theme_bw()+xlim(0,50)+ylim(25,75)+xlab("Percent Overrepresented Sequences")
-
-ggsave("../../figs/pseudoalignment_overrepresented_stats.pdf",w=5.2, h=5)
-ggsave("../../figs/jpeg/pseudoalignment_overrepresented_stats.jpeg", w=5.2, h=5)
-
-
-##just the overrepresented bar plot
-ggplot(overrepresented, aes(reorder(Sample, all_over),all_over, fill=Sample_run))+geom_bar(position="dodge",stat="identity")+
-  theme_bw()+theme(axis.text.x=element_text(angle=-90))+
-  scale_fill_manual(values=c("#9ecae1","#6baed6"))+xlab("Sample")+ylim(0,50)
-  
-ggsave("../../figs/overrepresented_stats.pdf",w=10, h=5)
-ggsave("../../figs/jpeg/overrepresented_stats.jpeg", w=10, h=5)
-
-
-
-## number aligned also associated to over represented
-ggplot(over_align, aes(all_over, n_pseudoaligned))+geom_point()+theme_bw()
-
-
-
-
-counts<-read.table("../../data/public_rna_seq/multiqc_report_raw_data/mqc_fastqc_sequence_counts_plot_1.txt", sep="\t", header=T)
+counts<-read.table(here("data/validation_dataset/merged/fastqc_sequence_counts_plot.tsv"), sep="\t", header=T)
 counts$total<-rowSums(counts[,2:3])
 counts$perdup<-counts$Duplicate.Reads/counts$total
 
-counts$Sample<-gsub("_1|_2","",overrepresented$Sample)
+counts$sample_id<-gsub("_merged","",counts$Category)
 
-counts_align<-merge(summary_stats,counts, by.x="sample_id", by.y="Sample")
+counts_align<-merge(summary_stats,counts, by="sample_id")
 
 ggplot(counts_align, aes(total, p_pseudoaligned))+geom_point()+theme_bw()
 ggplot(counts_align, aes(perdup, p_pseudoaligned))+geom_point()+theme_bw()
