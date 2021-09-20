@@ -113,10 +113,10 @@ Beta_Plot<-merge(Beta_Plot,epic.organoid, by.x="ID", by.y="array.id")
 colnames(Beta_Plot_raw)<-c("CpG","ID","Beta")
 Beta_Plot_raw<-merge(Beta_Plot_raw,epic.organoid, by.x="ID", by.y="array.id")
 
-beta_dis_EPIC_raw<-ggplot(Beta_Plot_raw, aes(Beta, group=as.character(ID), color=as.character(sample.site)))+
+beta_dis_EPIC_raw<-ggplot(Beta_Plot_raw, aes(Beta, group=as.character(ID), color=as.character(Segment)))+
   geom_density()+theme_bw()+colscale_sampsite+xlab("DNAm Beta Value")
 
-beta_dis_EPIC<-ggplot(Beta_Plot, aes(Beta, group=as.character(ID), color=as.character(sample.site)))+
+beta_dis_EPIC<-ggplot(Beta_Plot, aes(Beta, group=as.character(ID), color=as.character(Segment)))+
   geom_density()+theme_bw()+colscale_sampsite+xlab("DNAm Beta Value")
 
 
