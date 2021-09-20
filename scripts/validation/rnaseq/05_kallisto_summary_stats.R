@@ -5,8 +5,8 @@ library(here)
 options(stringsAsFactors = FALSE)
 source("scripts/00_pretty_plots.R")
 
-datapath = "data/validation_dataset/kallisto"
-sampleinfo <- read.table("data/validation_dataset/sample_info_RNA_seq.txt", header=F, sep=" ", skip=1)
+datapath = "data/validation/kallisto"
+sampleinfo <- read.table("data/validation/sample_info_RNA_seq.txt", header=F, sep=" ", skip=1)
 sampleinfo<-sampleinfo[,c(2,7,8:10,12)]
 colnames(sampleinfo)<-c("sample","concentration","volume","quantity","ratio","well")
 sample_id = sampleinfo$sample
@@ -32,7 +32,7 @@ ggsave("figs/jpeg/pseudoalignment_stats.jpeg",panel, w=10, h=5)
 
 
 
-counts<-read.table(here("data/validation_dataset/merged/fastqc_sequence_counts_plot.tsv"), sep="\t", header=T)
+counts<-read.table(here("data/validation/merged/fastqc_sequence_counts_plot.tsv"), sep="\t", header=T)
 counts$total<-rowSums(counts[,2:3])
 counts$perdup<-counts$Duplicate.Reads/counts$total
 

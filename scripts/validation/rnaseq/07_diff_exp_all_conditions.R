@@ -22,10 +22,10 @@ source(here("scripts/00_pretty_plots.R"))
 num_cores=1
 
 #set input and output dirs
-datapath = "data/validation_dataset/kallisto"
-resultdir = here('data/validation_dataset/kallisto/sleuth')
+datapath = "data/validation/kallisto"
+resultdir = here('data/validation/kallisto/sleuth')
 
-sampleinfo <- read.table("data/validation_dataset/sample_info_RNA_seq.txt", header=F, sep=" ", skip=1)
+sampleinfo <- read.table("data/validation/sample_info_RNA_seq.txt", header=F, sep=" ", skip=1)
 sampleinfo<-sampleinfo[,c(2,7,8:10,12)]
 colnames(sampleinfo)<-c("sample","concentration","volume","quantity","ratio","well")
 

@@ -1,6 +1,6 @@
 
 
-rmarkdown::render("scripts/01_organoids_preprocessing.R", output_dir = "output")
+#rmarkdown::render("scripts/01_organoids_preprocessing.R", output_dir = "output")
 #rmarkdown::render("scripts/04_passage_CpGs.R", output_dir = "output")
 
 #rmarkdown::render("scripts/09_enrichment_heteroskedasticity_CpG.R", output_dir = "output")
@@ -16,3 +16,4 @@ rmarkdown::render("scripts/01_organoids_preprocessing.R", output_dir = "output")
 #rmarkdown::render("scripts/18_GSE142213_organoids.R", output_dir = "output")
 
 
+rmarkdown::render("scripts/validation/01_validation_organoids.R", output_dir = "output")

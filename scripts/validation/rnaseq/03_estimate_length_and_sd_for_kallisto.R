@@ -1,4 +1,4 @@
-length_reads<-read.table("data/validation_dataset/multiQC/run1/fastqc_sequence_length_distribution_plot.tsv", sep="\t", header=T)
+length_reads<-read.table("data/validation/multiQC/run1/fastqc_sequence_length_distribution_plot.tsv", sep="\t", header=T)
 
 # from https://math.stackexchange.com/questions/857566/how-to-get-the-standard-deviation-of-a-given-histogram-image
 run1<-do.call(rbind, lapply(2:ncol(length_reads), function(samp) {
@@ -7,7 +7,7 @@ run1<-do.call(rbind, lapply(2:ncol(length_reads), function(samp) {
   data.frame(sample=colnames(length_reads)[samp], mean_read_length=mean_read_length, sd=sqrt(sd_squrd))}))
 
 
-length_reads<-read.table("data/validation_dataset/multiQC/run2/fastqc_sequence_length_distribution_plot.tsv", sep="\t", header=T)
+length_reads<-read.table("data/validation/multiQC/run2/fastqc_sequence_length_distribution_plot.tsv", sep="\t", header=T)
 
 # from https://math.stackexchange.com/questions/857566/how-to-get-the-standard-deviation-of-a-given-histogram-image
 run2<-do.call(rbind, lapply(2:ncol(length_reads), function(samp) {
