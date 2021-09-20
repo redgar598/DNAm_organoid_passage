@@ -1,5 +1,5 @@
 #'---
-#'title: Validation in GSE141256
+#'title: Validation organoid data
 #'author: Rachel Edgar
 #'date: "`r Sys.Date()`"
 #'---
