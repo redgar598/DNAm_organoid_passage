@@ -54,6 +54,7 @@ epic.organoid<-epic.organoid[which(epic.organoid$Biobank.Rachel.Replicates=="Rac
 #' ### Normalize DNAm Arrays
 here(path)
 epic.organoid$array.id.path <- file.path(here(path,"Data"),epic.organoid$plate_path, epic.organoid$Sentrix_ID, paste(epic.organoid$Sentrix_ID, epic.organoid$Sentrix_Position, sep="_"))
+epic.organoid$array.id<-paste(epic.organoid$Sentrix_ID, epic.organoid$Sentrix_Position, sep="_")
 # multiple DMAP files common with epic so need to force https://support.bioconductor.org/p/97773/
 rgset_organoid <- read.metharray(epic.organoid$array.id.path, verbose = FALSE,force=TRUE)
 
@@ -68,63 +69,50 @@ print(paste("Samples available: ",ncol(organoid_beta),"; Probes available: ",nro
 avg_detPval <- colMeans(detectionP(rgset_organoid))
 epic.organoid$det_pval<-avg_detPval
 
-ggplot(epic.organoid)+geom_boxplot(aes(as.factor(sentrix_ID), det_pval, fill=as.factor(sentrix_ID)), outlier.shape = NA)+
-  geom_point(aes(as.factor(sentrix_ID), det_pval, group=sample_ID, fill=as.factor(sentrix_ID)), shape=21, color="black",
+ggplot(epic.organoid)+geom_boxplot(aes(as.factor(Sentrix_ID), det_pval, fill=as.factor(Sentrix_ID)), outlier.shape = NA)+
+  geom_point(aes(as.factor(Sentrix_ID), det_pval, group=Sample_Name, fill=as.factor(Sentrix_ID)), shape=21, color="black",
              position = position_jitter(w = 0.25))+theme_bw()+theme(axis.text.x=element_text(angle = 45, vjust = 1, hjust=1))+
   xlab("Sentrix ID")+ylab("Mean Detection P Value")+guides(fill=FALSE)
 
 ggsave(here("figs","validation_detection_pvalue_organoids.pdf"), width=6, height=5)
 ggsave(here("figs/jpeg","validation_detection_pvalue_organoids.jpeg"), width=6, height=5)
 
-#' 
-#' 
-#' 
-#' #' Beta distribution before and after normalization
-#' # 450K
-#' GSE141256_beta_450K_raw<-getBeta(rgset_450k)
-#' 
-#' Beta_melted<- melt(GSE141256_beta_450K)
-#' Beta_melted_raw<- melt(GSE141256_beta_450K_raw)
-#' 
-#' Beta_Plot<-Beta_melted[which(!(is.na(Beta_melted$value))),]
-#' Beta_Plot_raw<-Beta_melted_raw[which(!(is.na(Beta_melted_raw$value))),]
-#' 
-#' colnames(Beta_Plot)<-c("CpG","ID","Beta")
-#' Beta_Plot<-merge(Beta_Plot,GSE141256_meta_450K, by.x="ID", by.y="Assay.Name")
-#' colnames(Beta_Plot_raw)<-c("CpG","ID","Beta")
-#' Beta_Plot_raw<-merge(Beta_Plot_raw,GSE141256_meta_450K, by.x="ID", by.y="Assay.Name")
-#' beta_dis_450k<-ggplot(Beta_Plot, aes(Beta, group=as.character(geo_accession), color=as.character(description)))+
-#'   geom_density()+theme_bw()+xlab("DNAm Beta Value")
-#' beta_dis_450k_raw<-ggplot(Beta_Plot_raw, aes(Beta, group=as.character(geo_accession), color=as.character(description)))+
-#'   geom_density()+theme_bw()+xlab("DNAm Beta Value")
-#' 
-#' 
-#' 
-#' # EPIC
-#' GSE141256_beta_EPIC_raw<-getBeta(rgset_EPIC)
-#' 
-#' Beta_melted<- melt(GSE141256_beta_EPIC)
-#' Beta_melted_raw<- melt(GSE141256_beta_EPIC_raw)
-#' 
-#' Beta_Plot<-Beta_melted[which(!(is.na(Beta_melted$value))),]
-#' Beta_Plot_raw<-Beta_melted_raw[which(!(is.na(Beta_melted_raw$value))),]
-#' 
-#' colnames(Beta_Plot)<-c("CpG","ID","Beta")
-#' Beta_Plot<-merge(Beta_Plot,GSE141256_meta_EPIC, by.x="ID", by.y="Assay.Name")
-#' colnames(Beta_Plot_raw)<-c("CpG","ID","Beta")
-#' Beta_Plot_raw<-merge(Beta_Plot_raw,GSE141256_meta_EPIC, by.x="ID", by.y="Assay.Name")
-#' beta_dis_EPIC<-ggplot(Beta_Plot, aes(Beta, group=as.character(geo_accession), color=as.character(description)))+
-#'   geom_density()+theme_bw()+xlab("DNAm Beta Value")
-#' beta_dis_EPIC_raw<-ggplot(Beta_Plot_raw, aes(Beta, group=as.character(geo_accession), color=as.character(description)))+
-#'   geom_density()+theme_bw()+xlab("DNAm Beta Value")
-#' 
-#' grid.arrange(beta_dis_450k_raw,beta_dis_450k,beta_dis_EPIC_raw,beta_dis_EPIC)
-#' 
-#' ggsave(here("figs","GSE141256_beta_distribution.pdf"),grid.arrange(beta_dis_450k_raw,beta_dis_450k,beta_dis_EPIC_raw,beta_dis_EPIC),  w=10, h=5)
-#' ggsave(here("figs/jpeg","GSE141256_beta_distribution.jpeg"),grid.arrange(beta_dis_450k_raw,beta_dis_450k,beta_dis_EPIC_raw,beta_dis_EPIC), w=10, h=5)
-#' 
-#' 
-#' 
+
+
+
+#' Beta distribution before and after normalization
+
+# extract raw beta values for plotting
+beta_raw<-getBeta(rgset_organoid)
+identical(colnames(beta_raw),epic.organoid$array.id)
+
+Beta_melted<- melt(organoid_beta)
+Beta_melted_raw<- melt(beta_raw)
+
+# Remove NAs before plotting (otherwise get many non-inifnite warnings)
+Beta_Plot<-Beta_melted[which(!(is.na(Beta_melted$value))),]
+Beta_Plot_raw<-Beta_melted_raw[which(!(is.na(Beta_melted_raw$value))),]
+
+# Add meta data
+colnames(Beta_Plot)<-c("CpG","ID","Beta")
+Beta_Plot<-merge(Beta_Plot,epic.organoid, by.x="ID", by.y="array.id")
+colnames(Beta_Plot_raw)<-c("CpG","ID","Beta")
+Beta_Plot_raw<-merge(Beta_Plot_raw,epic.organoid, by.x="ID", by.y="array.id")
+
+beta_dis_EPIC_raw<-ggplot(Beta_Plot_raw, aes(Beta, group=as.character(ID), color=as.character(sample.site)))+
+  geom_density()+theme_bw()+colscale_sampsite+xlab("DNAm Beta Value")
+
+beta_dis_EPIC<-ggplot(Beta_Plot, aes(Beta, group=as.character(ID), color=as.character(sample.site)))+
+  geom_density()+theme_bw()+colscale_sampsite+xlab("DNAm Beta Value")
+
+
+grid.arrange(beta_dis_EPIC_raw,beta_dis_EPIC)
+
+ggsave(here("figs","validation_beta_distribution_organoid.pdf"),grid.arrange(beta_dis_EPIC_raw,beta_dis_EPIC),  w=10, h=5)
+ggsave(here("figs/jpeg","validation_beta_distribution_organoid.jpeg"),grid.arrange(beta_dis_EPIC_raw,beta_dis_EPIC), w=10, h=5)
+
+
+
 #' #' ### 450K QC and Probe Filtering 
 #' 
 #' #' #### Confirm ID with SNPs and cluster by DNAm
