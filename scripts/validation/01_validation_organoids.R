@@ -55,6 +55,20 @@ epic.organoid<-epic.organoid[which(epic.organoid$Biobank.Rachel.Replicates=="Rac
 here(path)
 epic.organoid$array.id.path <- file.path(here(path,"Data"),epic.organoid$plate_path, epic.organoid$Sentrix_ID, paste(epic.organoid$Sentrix_ID, epic.organoid$Sentrix_Position, sep="_"))
 epic.organoid$array.id<-paste(epic.organoid$Sentrix_ID, epic.organoid$Sentrix_Position, sep="_")
+epic.organoid$individual<-sapply(1:nrow(epic.organoid), function(x) strsplit(epic.organoid$Sample_Name[x]," ")[[1]][1])
+
+epic.organoid$passage<-as.numeric(sapply(1:nrow(epic.organoid), function(x) gsub("p","",strsplit(epic.organoid$Sample_Name[x]," ")[[1]][3])))
+epic.organoid$passage_hilo<-sapply(1:nrow(epic.organoid), function(x) if(epic.organoid$passage[x]<5){"low"}else{"high"})
+epic.organoid$condition<-sapply(1:nrow(epic.organoid), function(x) strsplit(epic.organoid$Sample_Name[x]," ")[[1]][4])
+epic.organoid$condition<-as.factor(epic.organoid$condition)
+levels(epic.organoid$condition)<-c("D","IFNg","IFNg","TNFa","UD","UT")
+epic.organoid$condition<-as.character(epic.organoid$condition)
+epic.organoid$comparison<-sapply(1:nrow(epic.organoid), function(x) if(epic.organoid$condition[x]%in%c("UD","D")){"differentiation"}else{"cytokine"})
+epic.organoid$treatment<-sapply(1:nrow(epic.organoid), function(x) if(epic.organoid$comparison[x]=="cytokine"){epic.organoid$condition[x]}else{"UT"})
+epic.organoid$differentiation<-sapply(1:nrow(epic.organoid), function(x) if(epic.organoid$comparison[x]=="differentiation"){epic.organoid$condition[x]}else{"UD"})
+
+
+
 # multiple DMAP files common with epic so need to force https://support.bioconductor.org/p/97773/
 rgset_organoid <- read.metharray(epic.organoid$array.id.path, verbose = FALSE,force=TRUE)
 
@@ -113,260 +127,178 @@ ggsave(here("figs/jpeg","validation_beta_distribution_organoid.jpeg"),grid.arran
 
 
 
-#' #' ### 450K QC and Probe Filtering 
-#' 
-#' #' #### Confirm ID with SNPs and cluster by DNAm
-#' # Clustering By sampling site
-#' # remove rows with NAs
-#' GSE141256_450K_betas_cluster<-GSE141256_beta_450K[complete.cases(GSE141256_beta_450K),]
-#' 
-#' d <- dist(t(GSE141256_450K_betas_cluster))
-#' hc <- hclust(d, method = "complete") #single, complete, average, ward
-#' 
-#' myplclust(hc, labels=GSE141256_meta_450K$geo_accession, lab.col=as.fumeric(GSE141256_meta_450K$description), cex=1.5)
-#' 
-#' pdf(here('figs','GSE141256_cluster_whole450K_organoid.pdf'), width=30)
-#' myplclust(hc, labels=GSE141256_meta_450K$geo_accession, lab.col=as.fumeric(GSE141256_meta_450K$description), cex=1.5)
-#' dev.off()
-#' 
-#' #' Genotyping Probes
-#' SNPs <- getSnpBeta(rgset_450k)
-#' SNPs<-SNPs[complete.cases(SNPs),]
-#' 
-#' SNPs<-SNPs[,which(colnames(SNPs)%in%GSE141256_meta_450K$Assay.Name)]
-#' identical(colnames(SNPs),GSE141256_meta_450K$Assay.Name)
-#' 
-#' d <- dist(t(SNPs))
-#' hc <- hclust(d, method = "complete") #single, complete, average, ward
-#' 
-#' myplclust(hc, labels=GSE141256_meta_450K$geo_accession, lab.col=as.fumeric(as.character(GSE141256_meta_450K$description)), cex=1.5)
-#' 
-#' pdf(here('figs','GSE141256_cluster_snps_450K.pdf'), width=30)
-#' myplclust(hc, labels=GSE141256_meta_450K$geo_accession, lab.col=as.fumeric(as.character(GSE141256_meta_450K$description)), cex=1.5)
-#' dev.off()
-#' 
-#' 
-#' 
-#' #' #### by sex too
-#' #' #### 450K annotation from illumina
-#' # https://emea.support.illumina.com/downloads/humanmethylation450_15017482_v1-2_product_files.html
-#' anno_450k<-read.csv(here("data","HumanMethylation450_15017482_v1-2.csv"), skip=7)
-#' anno_450k<-anno_450k[match(rownames(GSE141256_beta_450K),anno_450k$IlmnID),]
-#' 
-#' identical(rownames(GSE141256_beta_450K),anno_450k$IlmnID)
-#' 
-#' GSE141256_450K_sex<-GSE141256_beta_450K[which(anno_450k$CHR%in%c('X','Y')),]
-#' 
-#' d <- dist(t(GSE141256_450K_sex))
-#' hc <- hclust(d, method = "complete") #single, complete, average, ward
-#' 
-#' myplclust(hc, labels=GSE141256_meta_450K$geo_accession, lab.col=as.fumeric(GSE141256_meta_450K$characteristics_ch1.2), cex=1.5)
-#' 
-#' pdf(here('figs','GSE141256_cluster_sex_450K.pdf'), width=30)
-#' myplclust(hc, labels=GSE141256_meta_450K$geo_accession, lab.col=as.fumeric(GSE141256_meta_450K$characteristics_ch1.2), cex=1.5)
-#' dev.off()
-#' 
-#' 
-#' 
-#' 
-#' #' ### Probe Filtering 
-#' #' #### Sex Chromosomes 
-#' anno_450k<-anno_450k[match(rownames(GSE141256_beta_450K),anno_450k$IlmnID),]
-#' 
-#' GSE141256_beta_450K<-GSE141256_beta_450K[which(!(anno_450k$CHR%in%c('X','Y'))),] #485512
-#' filt_sex<-nrow(GSE141256_beta_450K)
-#' print(paste("Samples available: ",ncol(GSE141256_beta_450K),"Probes available: ",nrow(GSE141256_beta_450K),sep=""))
-#' 
-#' 
-#' #' #### Cross-hybridizing probes and polymorphic probes. 
-#' #' Some probes have been found to cross-hybridize with other chromosomes (Price et al. 2013 *Epigenetics*).
-#' #' https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GPL16304
-#' price<-read.table(here("data","GPL16304-47833.txt"), sep='\t', header=T, skip=22)
-#' price<-price[match(rownames(GSE141256_beta_450K),price$ID),]
-#' 
-#' cross_hyb<-price[which(price$XY_Hits=="XY_YES" | price$Autosomal_Hits=="A_YES"),]
-#' GSE141256_beta_450K<-GSE141256_beta_450K[which(!(rownames(GSE141256_beta_450K)%in%cross_hyb$ID)),]
-#' filt_cross<-nrow(GSE141256_beta_450K)
-#' print(paste("Samples available: ",ncol(GSE141256_beta_450K),"Probes available: ",nrow(GSE141256_beta_450K),sep=""))
-#' 
-#' #' Polymorphic probes
-#' SnpatCpG<-price[which(price$Target.CpG.SNP!=""),] # 20696
-#' GSE141256_beta_450K<-GSE141256_beta_450K[which(!(rownames(GSE141256_beta_450K)%in%SnpatCpG$ID)),]
-#' filt_poly<-nrow(GSE141256_beta_450K)
-#' print(paste("Samples available: ",ncol(GSE141256_beta_450K),"Probes available: ",nrow(GSE141256_beta_450K),sep=""))
-#' 
-#' 
-#' #' #### Probe filtering based on detection pvalue and detection over background (NA)
-#' #' Remove probes with high NA count
-#' na_count_probe <-sapply(1:nrow(GSE141256_beta_450K), function(y) length(which(is.na(GSE141256_beta_450K[y,]))))
-#' na_count_probe_good<-which(na_count_probe<(ncol(GSE141256_beta_450K)*0.05))
-#' GSE141256_beta_450K<-GSE141256_beta_450K[na_count_probe_good,]
-#' filt_bead<-nrow(GSE141256_beta_450K)
-#' print(paste("Samples available: ",ncol(GSE141256_beta_450K),"Probes available: ",nrow(GSE141256_beta_450K),sep=""))
-#' 
-#' 
-#' #' Remove probes with high detection p value across samples, and any samples with many high detection p value probes
-#' detP <- detectionP(rgset_450k)
-#' failed <- detP>0.05
-#' bad_det_p<-names(which(rowMeans(failed)>0.01))
-#' bad_det_psamp<-names(which(colMeans(failed)>0.01))
-#' 
-#' GSE141256_beta_450K<-GSE141256_beta_450K[which(!(rownames(GSE141256_beta_450K)%in%bad_det_p)),]
-#' GSE141256_beta_450K<-GSE141256_beta_450K[,which(!(colnames(GSE141256_beta_450K)%in%bad_det_psamp))]
-#' 
-#' filt_detp<-nrow(GSE141256_beta_450K)
-#' print(paste("Samples available: ",ncol(GSE141256_beta_450K),"Probes available: ",nrow(GSE141256_beta_450K),sep=""))
-#' 
-#' 
-#' 
-#' 
-#' 
-#' 
-#' #' ### EPIC QC and Probe Filtering 
-#' 
-#' #' #### Confirm ID with SNPs and cluster by DNAm
-#' # Clustering By sample site
-#' # remove rows with NAs
-#' GSE141256_EPIC_betas_cluster<-GSE141256_beta_EPIC[complete.cases(GSE141256_beta_EPIC),]
-#' 
-#' d <- dist(t(GSE141256_EPIC_betas_cluster))
-#' hc <- hclust(d, method = "complete") #single, complete, average, ward
-#' 
-#' myplclust(hc, labels=GSE141256_meta_EPIC$geo_accession, lab.col=as.fumeric(GSE141256_meta_EPIC$description), cex=1.5)
-#' 
-#' 
-#' pdf(here('figs','GSE141256_cluster_wholeEPIC_organoid.pdf'), width=30)
-#' myplclust(hc, labels=GSE141256_meta_EPIC$geo_accession, lab.col=as.fumeric(GSE141256_meta_EPIC$description), cex=1.5)
-#' dev.off()
-#' 
-#' #Genotyping Probes
-#' SNPs <- getSnpBeta(rgset_EPIC)
-#' SNPs<-SNPs[complete.cases(SNPs),]
-#' 
-#' SNPs<-SNPs[,which(colnames(SNPs)%in%GSE141256_meta_EPIC$Assay.Name)]
-#' identical(colnames(SNPs),GSE141256_meta_EPIC$Assay.Name)
-#' 
-#' d <- dist(t(SNPs))
-#' hc <- hclust(d, method = "complete") #single, complete, average, ward
-#' 
-#' myplclust(hc, labels=GSE141256_meta_EPIC$geo_accession, lab.col=as.fumeric(as.character(GSE141256_meta_EPIC$description)), cex=1.5)
-#' 
-#' pdf(here('figs','GSE141256_cluster_snps_EPIC.pdf'), width=30)
-#' myplclust(hc, labels=GSE141256_meta_EPIC$geo_accession, lab.col=as.fumeric(as.character(GSE141256_meta_EPIC$description)), cex=1.5)
-#' dev.off()
-#' 
-#' 
-#' 
-#' #' #### by sex too
-#' #' Using the cg ID to chromosome annotation from illumina 
-#' #' https://emea.support.illumina.com/downloads/infinium-methylationepic-v1-0-product-files.html
-#' anno_EPIC<-read.csv(here("data", "MethylationEPIC_v-1-0_B4.csv"), skip=7)
-#' GSE141256_beta_EPIC<-GSE141256_beta_EPIC[which(rownames(GSE141256_beta_EPIC)%in%anno_EPIC$IlmnID),]
-#' 
-#' anno_EPIC<-anno_EPIC[match(rownames(GSE141256_beta_EPIC),anno_EPIC$IlmnID),]
-#' identical(rownames(GSE141256_beta_EPIC),anno_EPIC$IlmnID)
-#' 
-#' GSE141256_EPIC_sex<-GSE141256_beta_EPIC[which(anno_EPIC$CHR%in%c('X','Y')),]
-#' 
-#' d <- dist(t(GSE141256_EPIC_sex))
-#' hc <- hclust(d, method = "complete") #single, complete, average, ward
-#' 
-#' myplclust(hc, labels=GSE141256_meta_EPIC$geo_accession, lab.col=as.fumeric(GSE141256_meta_EPIC$characteristics_ch1.2), cex=1.5)
-#' 
-#' pdf(here('figs','GSE141256_cluster_sex_EPIC.pdf'), width=30)
-#' myplclust(hc, labels=GSE141256_meta_EPIC$geo_accession, lab.col=as.fumeric(GSE141256_meta_EPIC$characteristics_ch1.2), cex=1.5)
-#' dev.off()
-#' 
-#' 
-#' #' ### Probe Filtering 
-#' # SNP probes should already be removed
-#' GSE141256_beta_EPIC <- GSE141256_beta_EPIC[!grepl("rs",rownames(GSE141256_beta_EPIC)), ]
-#' print(paste("Samples available: ",ncol(GSE141256_beta_EPIC),"\nProbes available: ",nrow(GSE141256_beta_EPIC),sep=""))
-#' 
-#' #' #### Sex Chromosomes
-#' anno_EPIC<-anno_EPIC[anno_EPIC$IlmnID%in%rownames(GSE141256_beta_EPIC),]
-#' identical(rownames(GSE141256_beta_EPIC),anno_EPIC$IlmnID)
-#' GSE141256_beta_EPIC <- GSE141256_beta_EPIC[!anno_EPIC$CHR%in%c("X", "Y"), ]
-#' filt_sex<-nrow(GSE141256_beta_EPIC)
-#' print(paste("Samples available: ",ncol(GSE141256_beta_EPIC),"\nProbes available: ",nrow(GSE141256_beta_EPIC),sep=""))
-#' 
-#' 
-#' #' #### Cross-hybridizing probes and polymorphic probes. 
-#' #' https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1066-1
-#' #' "43,254 cross-reactive probes with ≥ 47 bp homology with an off-target site, of which 15,782 (36.5 %) are new to the EPIC platform"
-#' #' They include this annotated list in their supplement.
-#' #' wget https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-016-1066-1/MediaObjects/13059_2016_1066_MOESM2_ESM.csv
-#' cross_reactive<-read.csv(here("data", "13059_2016_1066_MOESM2_ESM.csv"), stringsAsFactors = F)
-#' GSE141256_beta_EPIC<-GSE141256_beta_EPIC[which(!(rownames(GSE141256_beta_EPIC)%in%cross_reactive$PROBE)),]
-#' filt_cross<-nrow(GSE141256_beta_EPIC)
-#' print(paste("Samples available: ",ncol(GSE141256_beta_EPIC),"\nProbes available: ",nrow(GSE141256_beta_EPIC),sep=""))
-#' 
-#' 
-#' #'For polymorphic probes I will The Pidsley annotation aswell for "Probes overlapping genetic variants at targeted CpG sites." and "Probes overlapping genetic variants at single base extension sites for Infinium Type I probes" but NOT "Probes with genetic variants overlapping the body of the probe: 48 base pairs for Infinium Type I probes and 49 base pairs for Infinium Type II probes."
-#' 
-#' #wget https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-016-1066-1/MediaObjects/13059_2016_1066_MOESM4_ESM.csv
-#' #wget https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-016-1066-1/MediaObjects/13059_2016_1066_MOESM5_ESM.csv
-#' 
-#' polymorphic<-read.csv(here("data", "13059_2016_1066_MOESM4_ESM.csv"), stringsAsFactors = F)
-#' print(paste("Filtering ",length(unique(polymorphic$PROBE))," polymorphic probes (genetic variants at targeted CpG sites).", sep=""))
-#' 
-#' baseext<-read.csv(here("data", "13059_2016_1066_MOESM5_ESM.csv"), stringsAsFactors = F)
-#' print(paste("Filtering ",length(unique(baseext$PROBE))," polymorphic probes (single base extension sites for Infinium Type I probes).", sep=""))
-#' 
-#' GSE141256_beta_EPIC<-GSE141256_beta_EPIC[which(!(rownames(GSE141256_beta_EPIC)%in%c(polymorphic$PROBE, baseext$PROBE))),]
-#' filt_poly<-nrow(GSE141256_beta_EPIC)
-#' print(paste("Samples available: ",ncol(GSE141256_beta_EPIC),"\nProbes available: ",nrow(GSE141256_beta_EPIC),sep=""))
-#' 
-#' 
-#' #' #### Probe filtering based on detection pvalue and detection over background (NA)
-#' #' Remove probes with high NA count
-#' na_count_probe <-sapply(1:nrow(GSE141256_beta_EPIC), function(y) length(which(is.na(GSE141256_beta_EPIC[y,]))))
-#' na_count_probe_good<-which(na_count_probe<(ncol(GSE141256_beta_EPIC)*0.05))
-#' GSE141256_beta_EPIC<-GSE141256_beta_EPIC[na_count_probe_good,]
-#' filt_bead<-nrow(GSE141256_beta_EPIC)
-#' print(paste("Samples available: ",ncol(GSE141256_beta_EPIC),"\nProbes available: ",nrow(GSE141256_beta_EPIC),sep=""))
-#' 
-#' 
-#' #' Remove probes with high detection p value across samples, and any samples with many high detection p value probes
-#' detP <- detectionP(rgset_EPIC)
-#' detP<-detP[,which(colnames(detP)%in%GSE141256_meta_EPIC$Assay.Name)]
-#' identical(colnames(detP),GSE141256_meta_EPIC$Assay.Name)
-#' 
-#' failed <- detP>0.05
-#' bad_det_p<-names(which(rowMeans(failed)>0.01))
-#' bad_det_psamp<-names(which(colMeans(failed)>0.01))
-#' 
-#' GSE141256_beta_EPIC<-GSE141256_beta_EPIC[which(!(rownames(GSE141256_beta_EPIC)%in%bad_det_p)),]
-#' GSE141256_beta_EPIC<-GSE141256_beta_EPIC[,which(!(colnames(GSE141256_beta_EPIC)%in%bad_det_psamp))]
-#' filt_detp<-nrow(GSE141256_beta_EPIC)
-#' 
-#' print(paste("Samples available: ",ncol(GSE141256_beta_EPIC),"\nProbes available: ",nrow(GSE141256_beta_EPIC),sep=""))
-#' 
-#' 
-#' 
-#' 
-#' #' ### Combine the EPIC and 450K data
-#' GSE141256_beta_450K<-GSE141256_beta_450K[which(rownames(GSE141256_beta_450K)%in%rownames(GSE141256_beta_EPIC)),]
-#' GSE141256_beta_EPIC<-GSE141256_beta_EPIC[which(rownames(GSE141256_beta_EPIC)%in%rownames(GSE141256_beta_450K)),]
-#' GSE141256_beta_EPIC<-GSE141256_beta_EPIC[match(rownames(GSE141256_beta_450K),rownames(GSE141256_beta_EPIC)),]
-#' identical(rownames(GSE141256_beta_EPIC),rownames(GSE141256_beta_450K))
-#' GSE141256_beta_combo<-cbind(GSE141256_beta_450K,GSE141256_beta_EPIC)
-#' 
-#' identical(colnames(GSE141256_meta_EPIC),colnames(GSE141256_meta_450K))
-#' GSE141256_meta_combo<-rbind(GSE141256_meta_450K, GSE141256_meta_EPIC)
-#' 
-#' identical(colnames(GSE141256_beta_combo), GSE141256_meta_combo$Assay.Name)
-#' 
-#' print(paste("With combining the EPIC and 450K there are ",ncol(GSE141256_beta_combo)," samples and ",nrow(GSE141256_beta_combo)," CpGs",sep=""))
-#' 
-#' 
-#' #' Restructure meta
-#' GSE141256_meta_combo$cell_type<-sapply(1:nrow(GSE141256_meta_combo), function(x){strsplit(GSE141256_meta_combo$characteristics_ch1[x],": ")[[1]][[2]]})
-#' GSE141256_meta_combo$age<-sapply(1:nrow(GSE141256_meta_combo), function(x){strsplit(GSE141256_meta_combo$characteristics_ch1.1[x],": ")[[1]][[2]]})
-#' GSE141256_meta_combo$sex<-sapply(1:nrow(GSE141256_meta_combo), function(x){strsplit(GSE141256_meta_combo$characteristics_ch1.2[x],": ")[[1]][[2]]})
-#' GSE141256_meta_combo$batch<-sapply(1:nrow(GSE141256_meta_combo), function(x){strsplit(GSE141256_meta_combo$characteristics_ch1.3[x],": ")[[1]][[2]]})
-#' GSE141256_meta_combo<-GSE141256_meta_combo[,c(1:3,8,9,11,13:18)]
-#' 
+#'#### Confirm individuals ID with SNPs probes and clustering by DNAm
+
+# remove rows with NAs
+Betas_cluster<-organoid_beta[complete.cases(organoid_beta),]
+
+d <- dist(t(Betas_cluster))
+hc <- hclust(d, method = "complete") #single, complete, average, ward
+myplclust(hc, labels=epic.organoid$Sample_Name, lab.col=as.fumeric(epic.organoid$Segment), cex=1.5)
+
+pdf(here("figs","validation_cluster_wholeEPIC_organoid.pdf"), width=30)
+myplclust(hc, labels=epic.organoid$Sample_Name, lab.col=as.fumeric(epic.organoid$Segment), cex=1.5)
+dev.off()
+
+
+#' #### Genotyping Probes
+SNPs <- getSnpBeta(rgset_organoid)
+SNPs<-SNPs[complete.cases(SNPs),]# 65 cause one was all NA
+
+SNPs<-SNPs[,which(colnames(SNPs)%in%epic.organoid$array.id)]
+identical(colnames(SNPs),epic.organoid$array.id)
+
+d <- dist(t(SNPs))
+hc <- hclust(d, method = "complete") #single, complete, average, ward
+myplclust(hc, labels=epic.organoid$Sample_Name, lab.col=as.fumeric(as.character(epic.organoid$individual)), cex=1.5)
+
+pdf(here("figs","validation_cluster_snps_EPIC_organoid.pdf"), width=30)
+myplclust(hc, labels=epic.organoid$Sample_Name, lab.col=as.fumeric(as.character(epic.organoid$individual)), cex=1.5)
+dev.off()
+
+
+
+#' #### Sex clustering
+#' Using the cg ID to chromosome annotation from illumina 
+#' https://emea.support.illumina.com/downloads/infinium-methylationepic-v1-0-product-files.html
+anno_EPIC<-read.csv(here("data", "MethylationEPIC_v-1-0_B4.csv"), skip=7)
+
+organoid_beta<-organoid_beta[which(rownames(organoid_beta)%in%anno_EPIC$IlmnID),]
+anno_EPIC<-anno_EPIC[match(rownames(organoid_beta),anno_EPIC$IlmnID),]
+identical(rownames(organoid_beta),anno_EPIC$IlmnID)
+
+organoid_beta_sex<-organoid_beta[which(anno_EPIC$CHR%in%c('X','Y')),]
+
+d <- dist(t(organoid_beta_sex))
+hc <- hclust(d, method = "complete") #single, complete, average, ward
+myplclust(hc, labels=epic.organoid$Sample_Name, lab.col=as.fumeric(epic.organoid$Gender), cex=1.5)
+
+pdf(here("figs","validation_cluster_sex_EPIC_organoid.pdf"), width=30)
+myplclust(hc, labels=epic.organoid$Sample_Name, lab.col=as.fumeric(epic.organoid$Gender), cex=1.5)
+dev.off()
+
+
+
+          #' #' #### Remove samples which do not cluster correctly
+          #' #' Samples 287_SC and T036_SC do not cluster as expected based on meta data.  
+          #' #' 287_SC is likely a tissue mislabel the wrong tissue as it is labeled SC and clusters with TI. 
+          #' #' T036_SC (passage 10 sample) clusters with the wrong sex as labelled and clustering on the SNPs probes it does not cluster with T036_SC
+          #' 
+          #' epic.organoid<-epic.organoid[which(!(epic.organoid$array.id%in%c("203548970031_R03C01","203548970036_R03C01"))),]
+          #' organoid_beta<-organoid_beta[,which(!(colnames(organoid_beta)%in%c("203548970031_R03C01","203548970036_R03C01")))]
+          #' identical(colnames(organoid_beta), as.character(epic.organoid$array.id))
+          #' 
+          #' print(paste("Samples available: ",ncol(organoid_beta),"\nProbes available: ",nrow(organoid_beta),sep=""))
+          #' 
+
+
+#' ### Probe Filtering 
+# SNP probes should already be removed
+organoid_beta <- organoid_beta[!grepl("rs",rownames(organoid_beta)), ]
+print(paste("Samples available: ",ncol(organoid_beta),"\nProbes available: ",nrow(organoid_beta),sep=""))
+
+#' #### Sex Chromosomes 
+anno_EPIC<-anno_EPIC[anno_EPIC$IlmnID%in%rownames(organoid_beta),]
+identical(rownames(organoid_beta),anno_EPIC$IlmnID)
+organoid_beta <- organoid_beta[!anno_EPIC$CHR%in%c("X", "Y"), ]
+
+filt_sex<-nrow(organoid_beta)
+print(paste("Samples available: ",ncol(organoid_beta),"\nProbes available: ",nrow(organoid_beta),sep=""))
+
+
+#' #### Cross-hybridizing probes and polymorphic probes. 
+#' https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1066-1
+#' "43,254 cross-reactive probes with ≥ 47 bp homology with an off-target site, of which 15,782 (36.5 %) are new to the EPIC platform"
+#' They include this annotated list in their supplement.
+#' wget https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-016-1066-1/MediaObjects/13059_2016_1066_MOESM2_ESM.csv
+cross_reactive<-read.csv(here("data", "13059_2016_1066_MOESM2_ESM.csv"), stringsAsFactors = F)
+organoid_beta<-organoid_beta[which(!(rownames(organoid_beta)%in%cross_reactive$PROBE)),]
+
+filt_cross<-nrow(organoid_beta)
+print(paste("Samples available: ",ncol(organoid_beta),"\nProbes available: ",nrow(organoid_beta),sep=""))
+
+
+#'For polymorphic probes I will The Pidsley annotation aswell for "Probes overlapping genetic variants at targeted CpG sites." and "Probes overlapping genetic variants at single base extension sites for Infinium Type I probes" but NOT "Probes with genetic variants overlapping the body of the probe: 48 base pairs for Infinium Type I probes and 49 base pairs for Infinium Type II probes."
+
+#wget https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-016-1066-1/MediaObjects/13059_2016_1066_MOESM4_ESM.csv
+#wget https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-016-1066-1/MediaObjects/13059_2016_1066_MOESM5_ESM.csv
+
+polymorphic<-read.csv(here("data", "13059_2016_1066_MOESM4_ESM.csv"), stringsAsFactors = F)
+print(paste("Filtering ",length(unique(polymorphic$PROBE))," polymorphic probes (genetic variants at targeted CpG sites).", sep=""))
+
+baseext<-read.csv(here("data", "13059_2016_1066_MOESM5_ESM.csv"), stringsAsFactors = F)
+print(paste("Filtering ",length(unique(baseext$PROBE))," polymorphic probes (single base extension sites for Infinium Type I probes).", sep=""))
+
+organoid_beta<-organoid_beta[which(!(rownames(organoid_beta)%in%c(polymorphic$PROBE, baseext$PROBE))),]
+
+filt_poly<-nrow(organoid_beta)
+print(paste("Samples available: ",ncol(organoid_beta),"\nProbes available: ",nrow(organoid_beta),sep=""))
+
+
+
+#' #### Probe filtering based on detection pvalue and detection over background (NA)
+
+#' Remove probes with high NA count
+na_count_probe <-sapply(1:nrow(organoid_beta), function(y) length(which(is.na(organoid_beta[y,]))))
+na_count_probe_good<-which(na_count_probe<(ncol(organoid_beta)*0.05))
+organoid_beta<-organoid_beta[na_count_probe_good,]
+
+filt_bead<-nrow(organoid_beta)
+print(paste("Samples available: ",ncol(organoid_beta),"\nProbes available: ",nrow(organoid_beta),sep=""))
+
+
+#' Remove probes with high detection p value across samples, and any samples with many high detection p value probes
+detP <- detectionP(rgset_organoid)
+detP<-detP[,which(colnames(detP)%in%epic.organoid$array.id)]
+identical(colnames(detP),epic.organoid$array.id)
+
+failed <- detP>0.05
+bad_det_p<-names(which(rowMeans(failed)>0.01))
+bad_det_psamp<-names(which(colMeans(failed)>0.01))
+
+organoid_beta<-organoid_beta[which(!(rownames(organoid_beta)%in%bad_det_p)),]
+organoid_beta<-organoid_beta[,which(!(colnames(organoid_beta)%in%bad_det_psamp))]
+identical(colnames(organoid_beta), as.character(epic.organoid$array.id))
+
+filt_detp<-nrow(organoid_beta)
+print(paste("Samples available: ",ncol(organoid_beta),"\nProbes available: ",nrow(organoid_beta),sep=""))
+
+
+
+#' #### Probe attrition plot
+df<-data.frame(sample_num_remaining=c(866238,865918,865859,filt_sex,filt_cross,filt_poly,filt_bead,filt_detp),
+               filter=c("EPIC Probe Number","Missing Annotation Data","Removal of SNP Probes",
+                        "Removal of X and Y chromosome probes","Removal of Cross Reactive Probes",
+                        "Removal of Polymorphic Probes", "Removal of Probes with Beadcount <3\nin 5 % of Samples",
+                        "Removal of Probes with 1 % of samples\nwith a detection p-value greater than 0.05"))
+df$sample_num_lost<-c(0,sapply(2:nrow(df), function(x) df$sample_num_remaining[x-1]-df$sample_num_remaining[x]))
+
+df$filter<-factor(df$filter, rev(df$filter))
+
+ggplot(df)+
+  geom_bar(aes(filter,-sample_num_remaining), stat="identity", fill="grey70", color="black")+
+  geom_bar(aes(filter,sample_num_lost), stat="identity",fill="darkred", color="black")+
+  geom_text(aes(x=filter, y=-min(sample_num_remaining)/2,  label=comma(sample_num_remaining)))+
+  geom_text(aes(x=filter, y=max(sample_num_lost)/1.5,  label=comma(sample_num_lost)))+
+  geom_hline(yintercept=0)+
+  coord_flip()+theme_bw()+ylab("")+xlab("")+
+  theme(axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_text(colour = "grey20", size=12),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank()) +
+  scale_x_discrete(position = "top")
+
+ggsave(here("figs","validation_probe_attrition.pdf"), width = 8, height = 3)
+ggsave(here("figs/jpeg","validation_probe_attrition.jpeg"), width = 8, height = 3)
+
+epic.organoid<-epic.organoid[,which(!(colnames(epic.organoid)%in%c("array.id.path","plate_path","Biobank.Rachel.Replicates","GEPadGI","BOX","Source","Wnt.type","Sample_Group", "Pool_ID")))]
+
+save(organoid_beta, epic.organoid, file=here("data/validation/DNAm","validation_betas_normalized.RData"))
+
 #' 
 #' 
 #' #' ### Principal Component Analysis (PCA)
