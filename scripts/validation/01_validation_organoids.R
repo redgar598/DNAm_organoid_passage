@@ -39,9 +39,9 @@ path<-"data/validation/DNAm"
 epic.organoid1<-read.csv(here(path, "METH_K_Nayak_20035_SS_Plate1.csv"), skip=7)
 epic.organoid1$plate_path<-paste(epic.organoid1$Sample_Plate,"_96_Samples",sep="")
 epic.organoid2<-read.csv(here(path, "METH_K_Nayak_20035_SS_Plate2.csv"), skip=7)
-epic.organoid2$plate_path<-paste(epic.organoid2$Sample_Plate,"_96_Samples",sep="")
+epic.organoid2$plate_path<-paste(epic.organoid2$Sample_Plate,"_96_samples",sep="")
 epic.organoid3<-read.csv(here(path, "METH_K_Nayak_20035_SS_Plate3.csv"), skip=7)
-epic.organoid3$plate_path<-paste(epic.organoid3$Sample_Plate,"_16_Samples",sep="")
+epic.organoid3$plate_path<-paste(epic.organoid3$Sample_Plate,"_16_samples",sep="")
 
 epic.organoid<-rbind(epic.organoid1,epic.organoid2,epic.organoid3)
 
