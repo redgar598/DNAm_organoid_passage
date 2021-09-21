@@ -166,3 +166,16 @@ scp -r redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/kall
 
 scp redgar@ebi:/nfs/research1/zerbino/redgar/ibd/data/raw/RNAseq_passage/merged/multiqc_report_raw.html /home/redgar/Documents/DNAm_organoid_passage/data/validation_dataset/merged
 
+scp redgar@ebi:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/data/validation/DNAm/*.csv /home/redgar/Documents/DNAm_organoid_passage/data/validation/DNAm
+scp /home/redgar/Documents/DNAm_organoid_passage/data/validation/Final\ samples\ for\ submission\ 2021.csv redgar@ebi:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/data/validation
+
+scp redgar@ebi:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/figs/validation_detection_pvalue_organoids.pdf /home/redgar/Documents/DNAm_organoid_passage/figs
+scp redgar@ebi:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/figs/jpeg/validation_detection_pvalue_organoids.jpeg /home/redgar/Documents/DNAm_organoid_passage/figs/jpeg
+
+
+scp redgar@ebi:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/output/01_validation_organoids.html /home/redgar/Documents/DNAm_organoid_passage/output
+
+
+scp redgar@ebi:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/output/data/validation/DNAm/validation_betas_normalized.RData /home/redgar/Documents/DNAm_organoid_passage/data/validation/DNAm
+
+
