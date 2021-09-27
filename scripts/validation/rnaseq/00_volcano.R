@@ -4,7 +4,7 @@ library(scales)
 library(gridExtra)
 
 
-makeVolcano<-function(pvalue, deltabeta, dB_threshold, pval_threshold, legend_title, xlimit, ylimit){
+makeVolcano<-function(pvalue, deltabeta, dB_threshold, pval_threshold, legend_title, xlimit, ylimit, hist_y){
   #VOLCANO PLOT
   volcano<-data.frame(Pvalue=pvalue, Delta_Beta=deltabeta)
   
@@ -50,13 +50,13 @@ makeVolcano<-function(pvalue, deltabeta, dB_threshold, pval_threshold, legend_ti
     colscale+
     geom_vline(xintercept=c(-dB,dB), color="grey60")+
     geom_hline(yintercept=-log10(Pv), color="grey60")+
-    ylab("P Value (-log10)")+xlab("Delta Beta")+xlim(-xlimit, xlimit)+ylim(0,ylimit)+
+    ylab("P Value (-log10)")+xlab("Effect Size (fold change)")+xlim(-xlimit, xlimit)+ylim(0,ylimit)+
     theme(plot.margin=unit(c(1,1,1,2),"cm"))+ th+
     guides(color = guide_legend(override.aes = list(size = 4)))
   
   # p val dis
   pval_dis<-ggplot()+geom_histogram(aes(pvalue),fill="grey90", color="black",binwidth=0.025)+theme_bw()+xlab("Nominal P Value")+th+
-    theme(plot.margin=unit(c(1,8.75,-0.6,1.5),"cm"))+ylab("Gene Count")+ylim(0,9000)
+    theme(plot.margin=unit(c(1,8.75,-0.6,1.5),"cm"))+ylab("Gene Count")+ylim(0,hist_y)
   
   grid.arrange(pval_dis, volcano_plot, ncol=1,heights = c(2, 6))#
   

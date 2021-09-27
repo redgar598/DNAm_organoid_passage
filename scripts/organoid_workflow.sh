@@ -176,6 +176,6 @@ scp redgar@ebi:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/figs/jpeg/val
 scp redgar@ebi:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/output/01_validation_organoids.html /home/redgar/Documents/DNAm_organoid_passage/output
 
 
-scp redgar@ebi:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/output/data/validation/DNAm/validation_betas_normalized.RData /home/redgar/Documents/DNAm_organoid_passage/data/validation/DNAm
+scp redgar@ebi:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/data/validation/DNAm/validation_betas_normalized.RData /home/redgar/Documents/DNAm_organoid_passage/data/validation/DNAm
 
 

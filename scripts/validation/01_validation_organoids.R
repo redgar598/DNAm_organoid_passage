@@ -405,37 +405,6 @@ ggplot(Beta_Plot[which(Beta_Plot$differentiation=="UD" & Beta_Plot$treatment=="U
   scale_color_manual(values=rev(c("#D53E4F", "#F46D43", "#FEE08B", "#ABDDA4","#4CA5B1","#5E4FA2")), name="Passage\nNumber")
 
 
-#' ### Beta distributions paired by individual
-# GSE141256_meta_combo_spheroids_paired<-GSE141256_meta_combo_spheroids[grep("F|H",GSE141256_meta_combo_spheroids$Sample.ID),]
-# GSE141256_meta_combo_spheroids_paired$individual<-as.factor(as.character(GSE141256_meta_combo_spheroids_paired$Sample.ID))
-# levels(GSE141256_meta_combo_spheroids_paired$individual)<-c("F","F","H","H","J","K")
-# 
-# GSE141256.organoid_paired<-do.call(rbind,lapply(1:length(unique(GSE141256_meta_combo_spheroids_paired$individual)), function(x){
-#   sample<-as.character(unique(GSE141256_meta_combo_spheroids_paired$individual)[x])
-#   samp<-GSE141256_meta_combo_spheroids_paired[GSE141256_meta_combo_spheroids_paired$individual==sample,]
-#   samp<-samp[order(samp$passage_numeric),]
-#   samp$hilo<-as.factor(as.character(samp$passage_numeric))
-# 
-#   if(length(levels(samp$hilo))==2){levels(samp$hilo)<-c("lower","higher")}else{
-#     if(length(levels(samp$hilo))==3){levels(samp$hilo)<-c("lower","higher","highest")}else{
-#       if(length(levels(samp$hilo))==4){levels(samp$hilo)<-c("lowest","lower","higher","highest")}else{samp$hilo<-NA}
-#     }
-#   }
-#   samp
-# }))
-# 
-# GSE141256_beta_VeryVariable_paird<-GSE141256_beta_VeryVariable[,which(colnames(GSE141256_beta_VeryVariable)%in%GSE141256.organoid_paired$Assay.Name)]
-# 
-# Beta_melted<- melt(GSE141256_beta_VeryVariable_paird)
-# Beta_Plot<-Beta_melted[which(!(is.na(Beta_melted$value))),]
-# colnames(Beta_Plot)<-c("CpG","ID","Beta")
-# Beta_Plot<-merge(Beta_Plot,GSE141256.organoid_paired, by.x="ID", by.y="Assay.Name")
-# Beta_Plot$individual<-as.character(Beta_Plot$individual)
-# GSE141256.organoid_paired$individual<-as.character(GSE141256.organoid_paired$individual)
-# 
-# labels<-as.data.frame(tapply(GSE141256.organoid_paired$passage_numeric, GSE141256.organoid_paired$individual, function(x) paste(x, collapse=", ")))
-# colnames(labels)<-"passge"
-# labels$individual<-rownames(labels)
 
 ggplot()+
   geom_density(aes(Beta,color=passage_hilo, group=ID),Beta_Plot, size=0.75)+theme_bw()+xlab("DNAm Beta Value")+ylab("Density")+
@@ -443,12 +412,23 @@ ggplot()+
   th+theme(strip.text = element_text(size = 10), axis.text=element_text(size=4),panel.spacing = unit(0.7, "lines"))+th+
   scale_x_continuous(breaks = c(0,0.5,1))
 
+Beta_Plot$ID_nopass<-paste(Beta_Plot$individual, Beta_Plot$Segment,Beta_Plot$condition)
+ggplot()+
+  geom_density(aes(Beta,color=passage_hilo, group=ID),Beta_Plot, size=0.75)+theme_bw()+xlab("DNAm Beta Value")+ylab("Density")+
+  scale_color_manual(values = c ("#081d58","#9ecae1"), name="Relative\nPassage\nLevel within\nPatient")+facet_wrap(~ID_nopass)+
+  th+theme(strip.text = element_text(size = 10), axis.text=element_text(size=4),panel.spacing = unit(0.7, "lines"))+th+
+  scale_x_continuous(breaks = c(0,0.5,1))
 ggsave(here("figs","validation_paired_beta.pdf"),width = 5, height = 2.2)
-ggsave(here("figs/jpeg","validation_paired_beta.jpeg"),width = 5, height = 2.2)
+ggsave(here("figs/jpeg","validation_paired_beta.jpeg"),width = 10, height = 10)
 
+ggplot()+
+  geom_density(aes(Beta,color=passage.or.numeric.factor, group=ID),Beta_Plot, size=0.75)+theme_bw()+xlab("DNAm Beta Value")+ylab("Density")+
+  scale_color_manual(values=rev(c("#D53E4F", "#F46D43", "#FEE08B", "#ABDDA4","#4CA5B1","#5E4FA2")))+facet_wrap(~ID_nopass)+
+  th+theme(strip.text = element_text(size = 10), axis.text=element_text(size=4),panel.spacing = unit(0.7, "lines"))+th+
+  scale_x_continuous(breaks = c(0,0.5,1))
 
-
-
+  
+  
 
 #' # Thresholding Trimodality
 validation_epic.organoid$thresholded_prior_ratio<-sapply(1:nrow(validation_epic.organoid), function(x){
@@ -472,15 +452,6 @@ df$upper<-df$upper*100
 df$lower<-df$lower*100
 
 print(df)
-# 
-# ggplot(df, aes(as.numeric(as.character(passage)), passing))+
-#   geom_errorbar(aes(ymin=lower, ymax=upper), colour="grey70", width=.25)+
-#   geom_line(color="grey20")+geom_point(size=1.25,shape=21,color="black",aes(fill=passage))+xlab("Passage")+
-#   ylab("Samples with Trimodal\nDistribution (%)")+theme_bw()+theme(axis.title = element_text(size=10))+
-#   scale_fill_manual(values=c("#5E4FA2", "#D53E4F", "#F46D43", "#FEE08B", "#ABDDA4","#4CA5B1"),name="Passage\nNumber", guide=F)+
-#   scale_x_continuous(breaks=c(2,3,4,5,7,11))
-# 
-# ggsave(here("figs","validation_Mixture_model_ratio_threshold_maximize.pdf"), width=3, height=2)
 
 
 
@@ -528,9 +499,8 @@ passage_validation<-data.frame(p.value=ebfit$p.value[,"passage"], CpG=rownames(b
 passage_validation$p_adjusted<-p.adjust(passage_validation$p.value, method="BH")
 
 diff_CpG_dbvalidation<-passage_validation[which(passage_validation$p_adjusted<0.05 & abs(passage_validation$db)>0.15),] #25086
-diff_CpG_db_hypovalidation<-diff_CpG_dbvalidation$CpG[which((diff_CpG_dbvalidation$db)>=0.15)] #  17419
-diff_CpG_db_hypervalidation<-diff_CpG_dbvalidation$CpG[which((diff_CpG_dbvalidation$db)<=(-0.15))] #  7667
-
+diff_CpG_db_hypovalidation<-diff_CpG_dbvalidation$CpG[which((diff_CpG_dbvalidation$db)>=0.15)] #  30061
+diff_CpG_db_hypervalidation<-diff_CpG_dbvalidation$CpG[which((diff_CpG_dbvalidation$db)<=(-0.15))] #  2859
 
 #' ### load original organoid passage CpGs
 load(here("data","beta_organoids.RData"))
@@ -630,6 +600,22 @@ plt_hetero_validation(c("cg25402228","cg22009751"))
 ggsave(here("figs","Passage_differential_CpGs_validation.pdf"),width = 4.75, height = 4)
 ggsave(here("figs/jpeg","Passage_differential_CpGs_validation.jpeg"), width = 4.75, height = 4)
 
+
+
+#' ### CpG to gene associations
+EPIC_genes<-read.csv(here("data","EPIC_ensembl_gene_annotation.csv")) # 1137194
+
+diff_genes_db_hypovalidation<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%diff_CpG_db_hypovalidation)] ) #11442
+diff_genes_db_hypervalidation<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%diff_CpG_db_hypervalidation)] ) # 2084
+
+write.table(diff_genes_db_hypovalidation, file=here("data/validation/DNAm/","validation_genes_hypomethylation.txt"), quote=F, row.names = F, col.names = F)
+write.table(diff_genes_db_hypervalidation, file=here("data/validation/DNAm/","validation_genes_hypermethylation.txt"), quote=F, row.names = F, col.names = F)
+
+#'### Genes differential in original and validation
+diff_genes_db_hypovalidation_original<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%diff_CpG_db_hypo_overlap)] ) # 7875
+diff_genes_db_hypervalidation_original<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%diff_CpG_db_hyper_overlap)] ) # 4281
+write.table(diff_genes_db_hypovalidation_original, file=here("data/validation/DNAm/","validation_original_genes_hypomethylation.txt"), quote=F, row.names = F, col.names = F)
+write.table(diff_genes_db_hypervalidation_original, file=here("data/validation/DNAm/","validation_original_genes_hypermethylation.txt"), quote=F, row.names = F, col.names = F)
 
 
 #'## R Session Info
