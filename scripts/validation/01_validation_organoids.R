@@ -381,6 +381,11 @@ validation_organoid_beta_VeryVariable<-validation_organoid_beta[which(ref_range_
 
 print(paste("There are ",nrow(validation_organoid_beta_VeryVariable), " variable CpGs (10th-90th quantile range in M value >2.75)",sep=""))
 
+dim(validation_organoid_beta_VeryVariable<-validation_organoid_beta[rev(order(ref_range_dnam)),])
+#' Include the same number of vairable CpGs as organoids varible. So take the 71384 most variable
+dim(validation_organoid_beta_VeryVariable<-validation_organoid_beta_VeryVariable[1:71384 ,])
+
+
 
 # beta plot variable CpGs
 Beta_melted<- melt(validation_organoid_beta_VeryVariable)
@@ -394,7 +399,8 @@ ggplot(Beta_Plot, aes(Beta,  color=passage.or.numeric.factor))+
   scale_color_manual(values=rev(c("#D53E4F", "#F46D43", "#FEE08B", "#ABDDA4","#4CA5B1","#5E4FA2")), name="Passage\nNumber")
 
 ggsave(here("figs/validation_variable_CpGs.pdf"),width = 3.75, height = 2.5)
-ggsave(here("figs/jpeg","validation_variable_CpGs.jpeg"), width = 7.5, height = 5)
+ggsave(here("figs/jpeg","validation_variable_CpGs.jpeg"), width = 3.75, height = 2.5)
+
 
 ggplot(Beta_Plot, aes(Beta,  color=passage.or.numeric.factor, group=ID))+
   geom_density(size=0.75)+theme_bw()+xlab("DNAm Beta Value")+ylab("Density")+facet_grid(condition~passage.or.numeric.factor)+

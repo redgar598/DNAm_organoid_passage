@@ -150,7 +150,7 @@ ggplot(Beta_Plot, aes(Beta,color=passage.or.rescope.no_numeric.factor))+
 
 
 ggsave(here("figs","Passage_all_CpGs.pdf"),width = 3.75, height = 2.5)
-ggsave(here("figs/jpeg","Passage_all_CpGs.jpeg"), width = 3.75, height = 5)
+ggsave(here("figs/jpeg","Passage_all_CpGs.jpeg"), width = 3.75, height = 2.5)
 
 
 
@@ -183,7 +183,7 @@ ggplot(Beta_Plot, aes(Beta,color=passage.or.rescope.no_numeric.factor))+
                                                                   legend.key.size = unit(0.7,"line"))
 
 ggsave(here("figs","Passage_variable_CpGs.pdf"),width = 3.75, height = 2.5)
-ggsave(here("figs/jpeg","Passage_variable_CpGs.jpeg"), width = 3.75, height = 5)
+ggsave(here("figs/jpeg","Passage_variable_CpGs.jpeg"), width = 3.75, height = 2.5)
 
 
 
