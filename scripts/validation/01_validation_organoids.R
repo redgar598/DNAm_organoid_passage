@@ -510,9 +510,9 @@ passage_validation<-data.frame(p.value=ebfit$p.value[,"passage"], CpG=rownames(v
 # Adjust P values
 passage_validation$p_adjusted<-p.adjust(passage_validation$p.value, method="BH")
 
-diff_CpG_dbvalidation<-passage_validation[which(passage_validation$p_adjusted<0.05 & abs(passage_validation$db)>0.15),] #25086
-diff_CpG_db_hypovalidation<-diff_CpG_dbvalidation$CpG[which((diff_CpG_dbvalidation$db)>=0.15)] #  30061
-diff_CpG_db_hypervalidation<-diff_CpG_dbvalidation$CpG[which((diff_CpG_dbvalidation$db)<=(-0.15))] #  2859
+diff_CpG_dbvalidation<-passage_validation[which(passage_validation$p_adjusted<0.05 & abs(passage_validation$db)>0.15),] #19746
+diff_CpG_db_hypovalidation<-diff_CpG_dbvalidation$CpG[which((diff_CpG_dbvalidation$db)>=0.15)] #  19221
+diff_CpG_db_hypervalidation<-diff_CpG_dbvalidation$CpG[which((diff_CpG_dbvalidation$db)<=(-0.15))] #  525
 
 #' ### load original organoid passage CpGs
 load(here("data","beta_organoids.RData"))
@@ -579,7 +579,8 @@ epic.organoid_minimal<-epic.organoid[,c(2, 14, 17)]
 colnames(epic.organoid_minimal)[1]<-"Assay.Name"
 epic.organoid_minimal$cohort<-"Cohort 1 Organoids"
 
-validation_epic.organoid_minimal<-validation_epic.organoid[,c(10, 1, 12)]
+validation_epic.organoid_UT_UD$Sample_ID<-paste(validation_epic.organoid_UT_UD$individual, validation_epic.organoid_UT_UD$Segment, validation_epic.organoid_UT_UD$condition)
+validation_epic.organoid_minimal<-validation_epic.organoid_UT_UD[,c(10, 19, 12)]
 colnames(validation_epic.organoid_minimal)[1]<-"Assay.Name"
 validation_epic.organoid_minimal$cohort<-"Validation Organoids"
 colnames(validation_epic.organoid_minimal)[2:3]<-c("sample_ID","passage.or.rescope.no_numeric")
@@ -588,7 +589,7 @@ sample_info_both<-rbind(validation_epic.organoid_minimal,epic.organoid_minimal)
 sample_info_both$passage.or.rescope.no_numeric<-as.numeric(as.character(sample_info_both$passage.or.rescope.no_numeric))
 
 plt_hetero_validation<-function(CpGs, legend, axislab, title){
-  betas<-melt(cbind(validation_organoid_beta[CpGs,],organoid_beta[CpGs,]))
+  betas<-melt(cbind(validation_organoid_beta_UT_UD[CpGs,],organoid_beta[CpGs,]))
   organoid_plt<-merge(sample_info_both, betas, by.x="Assay.Name",by.y="Var2")
 
   p<-ggplot(organoid_plt, aes(passage.or.rescope.no_numeric,value))+
@@ -617,15 +618,15 @@ ggsave(here("figs/jpeg","Passage_differential_CpGs_validation.jpeg"), width = 4.
 #' ### CpG to gene associations
 EPIC_genes<-read.csv(here("data","EPIC_ensembl_gene_annotation.csv")) # 1137194
 
-diff_genes_db_hypovalidation<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%diff_CpG_db_hypovalidation)] ) #11442
-diff_genes_db_hypervalidation<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%diff_CpG_db_hypervalidation)] ) # 2084
+diff_genes_db_hypovalidation<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%diff_CpG_db_hypovalidation)] ) #8365
+diff_genes_db_hypervalidation<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%diff_CpG_db_hypervalidation)] ) # 454
 
 write.table(diff_genes_db_hypovalidation, file=here("data/validation/DNAm/","validation_genes_hypomethylation_UTUD.txt"), quote=F, row.names = F, col.names = F)
 write.table(diff_genes_db_hypervalidation, file=here("data/validation/DNAm/","validation_genes_hypermethylation_UTUD.txt"), quote=F, row.names = F, col.names = F)
 
 #'### Genes differential in original and validation
-diff_genes_db_hypovalidation_original<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%intersect(diff_CpG_db_hypovalidation_overlap, diff_CpG_db_hypo_overlap))] ) # 4789
-diff_genes_db_hypervalidation_original<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%intersect(diff_CpG_db_hypervalidation_overlap, diff_CpG_db_hyper_overlap))] ) # 410
+diff_genes_db_hypovalidation_original<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%intersect(diff_CpG_db_hypovalidation_overlap, diff_CpG_db_hypo_overlap))] ) # 4722
+diff_genes_db_hypervalidation_original<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%intersect(diff_CpG_db_hypervalidation_overlap, diff_CpG_db_hyper_overlap))] ) # 402
 write.table(diff_genes_db_hypovalidation_original, file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"), quote=F, row.names = F, col.names = F)
 write.table(diff_genes_db_hypervalidation_original, file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"), quote=F, row.names = F, col.names = F)
 
@@ -640,7 +641,7 @@ gene_DNAm<-function(gene){
   CpG_gene<-CpG_gene[!duplicated(CpG_gene[,c(3,7)]), c(3,7)]
   CpG_gene$label<-paste(CpG_gene$IlmnID, "\n(",CpG_gene$Gene.name, ")", sep="")
   
-  betas<-melt(cbind(validation_organoid_beta[CpGs,],organoid_beta[CpGs,]))
+  betas<-melt(cbind(validation_organoid_beta_UT_UD[CpGs,],organoid_beta[CpGs,]))
   organoid_plt<-merge(sample_info_both, betas, by.x="Assay.Name",by.y="Var2")
   organoid_plt<-merge(organoid_plt, CpG_gene, by.x="Var1",by.y="IlmnID")
   
