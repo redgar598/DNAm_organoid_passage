@@ -479,8 +479,9 @@ dev.off()
 
 
 
-
+###############
 #' ## Differential methylation with passage
+###############
 #' Only in UT UD
 validation_epic.organoid_UT_UD<-validation_epic.organoid[which(validation_epic.organoid$differentiation=="UD" & validation_epic.organoid$treatment=="UT"),]
 table(validation_epic.organoid_UT_UD$passage_hilo)
@@ -494,11 +495,11 @@ fit <- lmFit(validation_organoid_beta_UT_UD, mod)
 ebfit <- eBayes(fit)
 
 # covariate adjusted beta values
-passage_db<-sapply(1:nrow(beta), function(x){
+passage_db<-sapply(1:nrow(validation_organoid_beta), function(x){
   sampleinfo_cpg<-validation_epic.organoid
-  sampleinfo_cpg$validation_organoid_beta<-as.numeric(validation_organoid_beta[x,])
+  sampleinfo_cpg$beta<-as.numeric(validation_organoid_beta[x,])
 
-  fit<-lm(validation_organoid_beta ~ passage , data=sampleinfo_cpg)
+  fit<-lm(beta ~ passage + individual, data=sampleinfo_cpg)
   pval<-summary(fit)$coef["passage","Pr(>|t|)"]
   slope<-fit$coefficients[2]
 
