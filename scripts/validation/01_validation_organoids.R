@@ -367,7 +367,6 @@ ggsave(here("figs/jpeg","validation_PC23_condtion.jpeg"), width = 6, height = 4)
 
 
 
-
 #' ## Overall Variance Across most Variable CpGs with Passage
 Variation<-function(x) {quantile(x, c(0.9), na.rm=T)[[1]]-quantile(x, c(0.1), na.rm=T)[[1]]}
 Mval<-function(beta) log2(beta/(1-beta))
@@ -482,24 +481,30 @@ dev.off()
 
 
 #' ## Differential methylation with passage
-mod<-model.matrix(~ 0 + passage, data=validation_epic.organoid)
-fit <- lmFit(validation_organoid_beta, mod)
+#' Only in UT UD
+validation_epic.organoid_UT_UD<-validation_epic.organoid[which(validation_epic.organoid$differentiation=="UD" & validation_epic.organoid$treatment=="UT"),]
+table(validation_epic.organoid_UT_UD$passage_hilo)
+
+validation_organoid_beta_UT_UD<-validation_organoid_beta[,which(colnames(validation_organoid_beta)%in%validation_epic.organoid_UT_UD$array.id)]
+identical(validation_epic.organoid_UT_UD$array.id, colnames(validation_organoid_beta_UT_UD))
+
+
+mod<-model.matrix(~ 0 + passage + individual, data=validation_epic.organoid_UT_UD)
+fit <- lmFit(validation_organoid_beta_UT_UD, mod)
 ebfit <- eBayes(fit)
 
 # covariate adjusted beta values
-beta<-validation_organoid_beta
-
 passage_db<-sapply(1:nrow(beta), function(x){
   sampleinfo_cpg<-validation_epic.organoid
-  sampleinfo_cpg$beta<-as.numeric(beta[x,])
+  sampleinfo_cpg$validation_organoid_beta<-as.numeric(validation_organoid_beta[x,])
 
-  fit<-lm(beta ~ passage, data=sampleinfo_cpg)
+  fit<-lm(validation_organoid_beta ~ passage , data=sampleinfo_cpg)
   pval<-summary(fit)$coef["passage","Pr(>|t|)"]
   slope<-fit$coefficients[2]
 
   (min(validation_epic.organoid$passage)*slope) - (max(validation_epic.organoid$passage)*slope)})
 
-passage_validation<-data.frame(p.value=ebfit$p.value[,"passage"], CpG=rownames(beta), db=passage_db)
+passage_validation<-data.frame(p.value=ebfit$p.value[,"passage"], CpG=rownames(validation_organoid_beta), db=passage_db)
 
 # Adjust P values
 passage_validation$p_adjusted<-p.adjust(passage_validation$p.value, method="BH")
@@ -558,7 +563,7 @@ ggplot(plt_db_direction, aes(mean_db, db))+geom_point(aes(color=sig, alpha=sig),
   scale_color_manual(values=c("lightgrey", "cornflowerblue"), name="Significant\nWith Passage")+
   scale_alpha_manual(values=c(0.25,1), guide=F)+
   geom_hline(yintercept=c(-0.15,0.15), color="grey60")+geom_vline(xintercept=c(-0.15,0.15), color="grey60")+
-  ylim(-0.8,0.8)+xlim(-0.8,0.8)+xlab("Cohort 1 Organoid\nPassage Delta Beta")+ylab("Validation Organoid\nPassage Delta Beta")+
+  ylim(-0.9,0.9)+xlim(-0.9,0.9)+xlab("Cohort 1 Organoid\nPassage Delta Beta")+ylab("Validation Organoid\nPassage Delta Beta")+
   stat_smooth(method="lm", se=F, color="black")
 
 
@@ -614,14 +619,45 @@ EPIC_genes<-read.csv(here("data","EPIC_ensembl_gene_annotation.csv")) # 1137194
 diff_genes_db_hypovalidation<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%diff_CpG_db_hypovalidation)] ) #11442
 diff_genes_db_hypervalidation<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%diff_CpG_db_hypervalidation)] ) # 2084
 
-write.table(diff_genes_db_hypovalidation, file=here("data/validation/DNAm/","validation_genes_hypomethylation.txt"), quote=F, row.names = F, col.names = F)
-write.table(diff_genes_db_hypervalidation, file=here("data/validation/DNAm/","validation_genes_hypermethylation.txt"), quote=F, row.names = F, col.names = F)
+write.table(diff_genes_db_hypovalidation, file=here("data/validation/DNAm/","validation_genes_hypomethylation_UTUD.txt"), quote=F, row.names = F, col.names = F)
+write.table(diff_genes_db_hypervalidation, file=here("data/validation/DNAm/","validation_genes_hypermethylation_UTUD.txt"), quote=F, row.names = F, col.names = F)
 
 #'### Genes differential in original and validation
-diff_genes_db_hypovalidation_original<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%diff_CpG_db_hypo_overlap)] ) # 7875
-diff_genes_db_hypervalidation_original<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%diff_CpG_db_hyper_overlap)] ) # 4281
-write.table(diff_genes_db_hypovalidation_original, file=here("data/validation/DNAm/","validation_original_genes_hypomethylation.txt"), quote=F, row.names = F, col.names = F)
-write.table(diff_genes_db_hypervalidation_original, file=here("data/validation/DNAm/","validation_original_genes_hypermethylation.txt"), quote=F, row.names = F, col.names = F)
+diff_genes_db_hypovalidation_original<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%intersect(diff_CpG_db_hypovalidation_overlap, diff_CpG_db_hypo_overlap))] ) # 4789
+diff_genes_db_hypervalidation_original<-unique(EPIC_genes$Gene.name[which(EPIC_genes$IlmnID%in%intersect(diff_CpG_db_hypervalidation_overlap, diff_CpG_db_hyper_overlap))] ) # 410
+write.table(diff_genes_db_hypovalidation_original, file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"), quote=F, row.names = F, col.names = F)
+write.table(diff_genes_db_hypervalidation_original, file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"), quote=F, row.names = F, col.names = F)
+
+
+
+#'### DNAm plot of differenitally expressed genes
+gene_DNAm<-function(gene){
+  CpG_goi<-EPIC_genes[which(EPIC_genes$Gene.name%in%gene),]
+  CpG_gene<-CpG_goi[which(CpG_goi$IlmnID%in%c(diff_CpG_db_hypovalidation_overlap, diff_CpG_db_hypervalidation_overlap)),]
+  CpGs<-unique(CpG_gene$IlmnID)
+  
+  CpG_gene<-CpG_gene[!duplicated(CpG_gene[,c(3,7)]), c(3,7)]
+  CpG_gene$label<-paste(CpG_gene$IlmnID, "\n(",CpG_gene$Gene.name, ")", sep="")
+  
+  betas<-melt(cbind(validation_organoid_beta[CpGs,],organoid_beta[CpGs,]))
+  organoid_plt<-merge(sample_info_both, betas, by.x="Assay.Name",by.y="Var2")
+  organoid_plt<-merge(organoid_plt, CpG_gene, by.x="Var1",by.y="IlmnID")
+  
+  ggplot(organoid_plt, aes(passage.or.rescope.no_numeric,value))+
+    geom_line(aes(group=sample_ID),color="lightgrey")+
+    stat_smooth(method="lm", color="grey30", size=0.7, se=F)+th+theme_bw()+
+    geom_point(aes(fill=as.factor(passage.or.rescope.no_numeric)),shape=21, size=1.25)+
+    scale_fill_manual(values=pass_col,name="Passage\nNumber", drop=T)+
+    facet_grid(cohort~label)+
+    ylab("DNAm Beta")+xlab("Passage Number")+ylim(0,1)+
+    theme(plot.margin = margin(0.5, 0.15, 0.5, 0.15, "cm"),plot.title = element_text(size=12))+
+    xlim(1,16)
+  }
+
+gene_DNAm(c("EDAR","RNASE4","EIF4G1","LRRC59"))
+ggsave(here("figs","validation_differenital_DNAm_passage.pdf"),width = 9, height = 4)
+ggsave(here("figs/jpeg","validation_differenital_DNAm_passage.jpeg"), width = 9, height = 4)
+
 
 
 #'## R Session Info

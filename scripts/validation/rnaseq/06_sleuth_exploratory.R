@@ -89,7 +89,7 @@ Importance<-vars/sum(vars)
 Loadings_meta$sample<-rownames(Loadings_meta)
 Loadings_meta<-merge(Loadings_meta, sampleinfo, by="sample")
 
-ggplot(Loadings_meta, aes(PC1, PC2, fill=sample.site))+geom_point(shape=21,size=3, color="black")+theme_bw()+fillscale_sampsite+th+xlab("PC1 (38%)")+ylab("PC2 (12%)")
+ggplot(Loadings_meta, aes(PC1, PC2, fill=sample.site))+geom_point(shape=21,size=3, color="black")+theme_bw()+fillscale_sampsite+th+xlab("PC1")+ylab("PC2")
 ggsave(here("figs","RNAseq_PC1_PC2_samplesite.pdf"), width = 7.5, height = 6)
 ggsave(here("figs/jpeg","RNAseq_PC1_PC2_samplesite.jpeg"), width = 7.5, height = 6)
 

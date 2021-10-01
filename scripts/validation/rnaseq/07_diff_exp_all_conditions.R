@@ -15,6 +15,7 @@ suppressMessages({
   library(reshape2)
   library(gridExtra)
   library(here)
+  library(dplyr)
 })
 options(stringsAsFactors = FALSE)
 source(here("scripts/00_pretty_plots.R"))
@@ -65,119 +66,129 @@ ttg <- dplyr::rename(ttg, target_id = ensembl_transcript_id,
 ttg <- dplyr::select(ttg, c('target_id', 'ens_gene', 'ext_gene'))
 head(ttg)
 
-        #' #############
-        #' #'# run sleuth on passage high low all undifferentiated
-        #' #############
-        #' sampleinfo_UD_hilo<-sampleinfo[which(sampleinfo$differentiation=="UD" & sampleinfo$treatment=="UT"),]
-        #' table(sampleinfo_UD_hilo$passage_hilo)
-        #' 
-        #' #'## TI
-        #' so_UD_hilo <- sleuth_prep(sampleinfo_UD_hilo, target_mapping = ttg, aggregation_column = 'ens_gene', extra_bootstrap_summary = TRUE, gene_mode = TRUE)
-        #' 
-        #' 
-        #' so_UD_hilo <- sleuth_fit(so_UD_hilo, ~passage_hilo, 'full')
-        #' #so_UD_hilo <- sleuth_fit(so_UD_hilo, ~passage, 'full')
-        #' 
-        #' so_UD_hilo <- sleuth_fit(so_UD_hilo, ~1, 'reduced')
-        #' so_UD_hilo <- sleuth_lrt(so_UD_hilo, 'reduced', 'full')
-        #' models(so_UD_hilo)
-        #' tests(so_UD_hilo)
-        #' 
-        #' 
-        #' #' ### summarize the sleuth results and view 20 most significant DE transcripts
-        #' sleuth_table <- sleuth_results(so_UD_hilo, 'reduced:full', 'lrt', show_all = FALSE)
-        #' sleuth_significant <- dplyr::filter(sleuth_table, qval <= 0.05)
-        #' head(sleuth_significant, 20)
-        #' 
-        #' sleuth_significant <- dplyr::filter(sleuth_table, pval <= 0.05)
-        #' dim(sleuth_significant)
-        #' head(sleuth_significant, 20)
-        #' head(sleuth_significant[order(sleuth_significant$pval),])
-        #' 
-        #' sleuth_table[grep("WNT",sleuth_table$ext_gene),]
-        #' sleuth_table[grep("LGR",sleuth_table$ext_gene),]
-        #' sleuth_table[grep("NOTCH",sleuth_table$ext_gene),]
-        #' 
-        #' sleuth_table[grep("SOX9",sleuth_table$ext_gene),]
-        #' 
-        #' 
-        #' plot_bootstrap(so_UD_hilo, 
-        #'                target_id = "ENSG00000159884", 
-        #'                units = "scaled_reads_per_base", 
-        #'                color_by = "passage_hilo")
-        #' 
-        #' plot_bootstrap(so_UD_hilo, #lgr5
-        #'                target_id = "ENSG00000139292", 
-        #'                units = "scaled_reads_per_base", 
-        #'                color_by = "passage_hilo")
-        #' 
-        #' plot_bootstrap(so_UD_hilo, #sox9
-        #'                target_id = "ENSG00000125398", 
-        #'                units = "scaled_reads_per_base", 
-        #'                color_by = "passage_hilo")
-        #' 
-        #' #'### plot an example DE gene result
-        #' plot_bootstrap(so_TI, target_id ="ENSG00000140853", units = "scaled_reads_per_base", color_by = "diagnosis")+fillscale_diagnosis
-        #' plot_bootstrap(so_TI, target_id ="ENSG00000159212", units = "scaled_reads_per_base", color_by = "diagnosis")+fillscale_diagnosis
-        #' 
-        #' sleuth_table_TI[which(sleuth_table_TI$target_id=="ENSG00000140853"),]
-        #' sleuth_table_TI[which(sleuth_table_TI$ext_gene=="TAP1"),]
-        #' MHCI_NLRC5 = c("TAP1","TAP2","PSMB9","PSMB8","B2M","IRF1","NLRC5")
-        #' 
-        #' sleuth_table_TI[which(sleuth_table_TI$ext_gene%in%MHCI_NLRC5),]
-        #' sleuth_significant_TI[which(sleuth_significant_TI$ext_gene%in%MHCI_NLRC5),]
-        #' 
-        #' mat <- sleuth:::spread_abundance_by(so_UD_hilo$obs_norm, "scaled_reads_per_base",  so_UD_hilo$sample_to_covariates$sample)
-        #' 
-        #' 
-        #' #'## gene plots
-        #' gene_exp_plot<-function(gene){
-        #'   goi<-as.data.frame(mat[which(rownames(mat)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
-        #'   if(ncol(goi)==1){
-        #'     goi$sample_ID<-rownames(goi)
-        #'     colnames(goi)[1]<-"scaled_reads_per_base"
-        #'     plt<-merge(sampleinfo_UD_hilo,goi, by.x="sample",by.y="sample_ID")
-        #'     ggplot(plt, aes(passage_hilo, scaled_reads_per_base,fill=passage_hilo))+geom_boxplot()+geom_point(aes(fill=passage_hilo), shape=21, color="black")+theme_bw()+th
-        #'   }else{
-        #'     goi$gene_ID<-rownames(goi)
-        #'     goi<-melt(goi)
-        #'     colnames(goi)[3]<-"scaled_reads_per_base"
-        #'     plt<-merge(sampleinfo_UD_hilo,goi, by.x="sample",by.y="variable")
-        #'     ggplot(plt, aes(passage_hilo, scaled_reads_per_base,fill=passage_hilo))+geom_boxplot()+geom_point(aes(fill=passage_hilo), shape=21, color="black")+facet_wrap(~gene_ID)+theme_bw()+th
-        #'     }}
-        #' 
-        #' # gene level sumary
-        #' gene_exp_plot("LGR5")
-        #' gene_exp_plot("SOX9")
-        #' 
-        #' 
-        #' 
-        #'           # geneID_exp_plot<-function(gene_ID){
-        #'           #   goi<-as.data.frame(mat[which(rownames(mat)%in%(unique(ttg$ens_gene[which(ttg$ens_gene==gene_ID)]))),])
-        #'           #   goi$sample_ID<-rownames(goi)
-        #'           #   colnames(goi)[1]<-"scaled_reads_per_base"
-        #'           #   plt<-merge(sampleinfo_UD_hilo,goi, by.x="sample",by.y="sample_ID")
-        #'           #   label<-unique(ttg$ext_gene[which(ttg$ens_gene==gene_ID)])
-        #'           #   ggplot(plt, aes(passage_hilo, scaled_reads_per_base,fill=passage_hilo))+geom_boxplot()+
-        #'           #     geom_point(shape=21, size=2, color="black")+theme_bw()+th+ggtitle(label)}
-        #'           #     
-        #'           # grid.arrange(geneID_exp_plot("ENSG00000001626"),
-        #'           #   geneID_exp_plot("ENSG00000001630"))
-        #' 
-        #' 
-        #' #' ## DNAm passage genes
-        #' diff_genes_db_hypovalidation<-read.table(file=here("data/validation/DNAm/","validation_genes_hypomethylation_hilo.txt"))
-        #' diff_genes_db_hypervalidation<-read.table(file=here("data/validation/DNAm/","validation_genes_hypermethylation_hilo.txt"))
-        #' 
-        #' hypo_diffexp<-sleuth_significant[which(sleuth_significant$ext_gene%in%diff_genes_db_hypovalidation$V1),]
-        #' hyper_diffexp<-sleuth_significant[which(sleuth_significant$ext_gene%in%diff_genes_db_hypervalidation$V1),]
-        #' 
-        #' head(hypo_diffexp[order(hypo_diffexp$pval),])
-        #' head(hyper_diffexp[order(hyper_diffexp$pval),])
-        #' 
-        #' gene_exp_plot("KANK1")
-        #' gene_exp_plot("AQP1")
-        #' gene_exp_plot("NOTCH1")
+
+
+
+#############
+#'# run sleuth on passage high low all undifferentiated
+#############
+sampleinfo_UD_hilo<-sampleinfo[which(sampleinfo$differentiation=="UD" & sampleinfo$treatment=="UT"),]
+table(sampleinfo_UD_hilo$passage_hilo)
+
+#'## TI
+so_UD_hilo <- sleuth_prep(sampleinfo_UD_hilo, target_mapping = ttg, aggregation_column = 'ens_gene', extra_bootstrap_summary = TRUE, gene_mode = TRUE)
+so_UD_hilo <- sleuth_fit(so_UD_hilo, ~passage + individual , 'full')
+so_UD_hilo <- sleuth_fit(so_UD_hilo, ~1 + individual, 'reduced')
+so_UD_hilo <- sleuth_lrt(so_UD_hilo, 'reduced', 'full')
+models(so_UD_hilo)
+tests(so_UD_hilo)
+
+
+#' ### summarize the sleuth results and view 20 most significant DE transcripts
+sleuth_table_UD <- sleuth_results(so_UD_hilo, 'reduced:full', 'lrt', show_all = FALSE)
+sleuth_significant_UD <- dplyr::filter(sleuth_table_UD, qval <= 0.05)
+head(sleuth_significant_UD, 20)
+
+sleuth_table_UD[grep("WNT",sleuth_table_UD$ext_gene),]
+sleuth_table_UD[grep("LGR",sleuth_table_UD$ext_gene),]
+sleuth_table_UD[grep("NOTCH",sleuth_table_UD$ext_gene),]
+
+sleuth_table_UD[grep("SOX9",sleuth_table_UD$ext_gene),]
+
+
+
+#'## gene plots
+mat <- sleuth:::spread_abundance_by(so_UD_hilo$obs_norm, "scaled_reads_per_base",  so_UD_hilo$sample_to_covariates$sample)
+
+gene_exp_plot<-function(gene){
+  if(length(gene)==1){
+    goi<-as.data.frame(mat[which(rownames(mat)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
+    goi$sample_ID<-rownames(goi)
+    colnames(goi)[1]<-"scaled_reads_per_base"
+    plt<-merge(sampleinfo,goi, by.x="sample",by.y="sample_ID")
+    ggplot(plt, aes(passage, scaled_reads_per_base))+geom_point(aes(fill=passage_hilo), shape=21, color="black")+theme_bw()+th+
+      stat_smooth(method="lm", se=F, color="grey70")+
+      scale_fill_manual(values=c("#3288BD","#D53E4F"), name="Passage")
+  }else{
+    goi<-as.data.frame(mat[which(rownames(mat)%in%(unique(ttg$ens_gene[which(ttg$ext_gene%in%gene)]))),])
+    gene_ID<-ttg[which(ttg$ext_gene%in%gene),2:3]
+    gene_ID<-gene_ID[!duplicated(gene_ID),]
+    goi$gene_ID<-rownames(goi)
+    goi<-melt(goi)
+    colnames(goi)[3]<-"scaled_reads_per_base"
+    goi<-merge(goi, gene_ID, by.x="gene_ID", by.y="ens_gene")
+    goi$label<-paste(goi$ext_gene, "\n(",goi$gene_ID, ")",sep="")
+    plt<-merge(sampleinfo,goi, by.x="sample",by.y="variable")
+    ggplot(plt, aes(passage, scaled_reads_per_base,fill=passage))+geom_point(aes(fill=passage_hilo), shape=21, color="black")+facet_wrap(~ext_gene, scale="free_y")+theme_bw()+th+
+      stat_smooth(method="lm", se=F, color="grey70")+
+      scale_fill_manual(values=c("#3288BD","#D53E4F"), name="Passage")
+  }}
+
+# gene level sumary
+gene_exp_plot("SOX9")
+gene_exp_plot("MFSD2A")
+gene_exp_plot("ISG15")
+
+       
+#' ## DNAm passage genes
+diff_genes_db_hypovalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"))
+diff_genes_db_hypervalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"))
+
+hypo_diffexp_original<-sleuth_significant_UD[which(sleuth_significant_UD$ext_gene%in%diff_genes_db_hypovalidation_original$V1),]
+hyper_diffexp_original<-sleuth_significant_UD[which(sleuth_significant_UD$ext_gene%in%diff_genes_db_hypervalidation_original$V1),]
+
+head(hypo_diffexp_original[order(hypo_diffexp_original$pval),])
+head(hyper_diffexp_original[order(hyper_diffexp_original$pval),])
+
+length(unique(c(hyper_diffexp_original$ext_gene, hypo_diffexp_original$ext_gene)))
+
+gene_exp_plot(c(hypo_diffexp_original$ext_gene))
+gene_exp_plot(c("EDAR","RNASE4","EIF4G1","LRRC59"))
+
+gene_exp_plot(c(hyper_diffexp_original$ext_gene))
+gene_exp_plot(c("PLEC","CLTB","EDAR","LRRC59"))
+
+
+## wnt genes
+wnt_genes<-read.table(file="/home/redgar/Documents/ibd/data/GO_0060070.txt", header=T, sep="\t")
+hypo_diffexp_original[which(hypo_diffexp_original$ext_gene%in%wnt_genes$Symbol),]
+hyper_diffexp_original[which(hyper_diffexp_original$ext_gene%in%wnt_genes$Symbol),]
+
+sleuth_significant_UD[which(sleuth_significant_UD$ext_gene%in%wnt_genes$Symbol),]
+gene_exp_plot("SDC1")
+
+gene_exp_plot(c("EDAR","RNASE4","EIF4G1","LRRC59"))
+ggsave(here("figs","validation_differenital_expression_passage_UDUT.pdf"),width = 6, height = 4)
+ggsave(here("figs/jpeg","validation_differenital_expression_passage_UDUT.jpeg"), width = 6, height = 4)
+
+
+#'### more overlapping than chance?
+EPIC_genes<-read.csv(here("data","EPIC_ensembl_gene_annotation.csv")) # 1137194
+
+hypo_rnd<-nrow(diff_genes_db_hypovalidation_original)
+EPIC_genes_unique<-unique(EPIC_genes$Gene.name)
+
+rnd_overlap_hypo<-sapply(1:100, function(x){
+  set.seed(x)
+  rnd_genes<-EPIC_genes_unique[sample(1:length(EPIC_genes_unique), hypo_rnd)]
+  length(intersect(rnd_genes, sleuth_significant_UD$ext_gene))})
+
+nrow(hypo_diffexp_original)
+
+(length(which(rnd_overlap_hypo>nrow(hypo_diffexp_original)))+1)/(100+1)
+(length(which(rnd_overlap_hypo<nrow(hypo_diffexp_original)))+1)/(100+1)
+
+hyper_rnd<-nrow(diff_genes_db_hypervalidation_original)
+
+rnd_overlap_hyper<-sapply(1:100, function(x){
+  set.seed(x)
+  rnd_genes<-EPIC_genes_unique[sample(1:length(EPIC_genes_unique), hyper_rnd)]
+  length(intersect(rnd_genes, sleuth_significant_UD$ext_gene))})
+
+nrow(hyper_diffexp_original)
+
+(length(which(rnd_overlap_hyper>nrow(hyper_diffexp_original)))+1)/(100+1)
+(length(which(rnd_overlap_hyper<nrow(hyper_diffexp_original)))+1)/(100+1)
 
         #' ##################
         #' #'# Gene expression varibility in each group
@@ -257,8 +268,9 @@ gene_exp_plot<-function(gene){
     goi$sample_ID<-rownames(goi)
     colnames(goi)[1]<-"scaled_reads_per_base"
     plt<-merge(sampleinfo,goi, by.x="sample",by.y="sample_ID")
-    ggplot(plt, aes(passage, scaled_reads_per_base,fill=passage))+geom_point(aes(fill=passage_hilo), shape=21, color="black")+theme_bw()+th+
-      stat_smooth(method="lm", se=F, color="grey70")
+    ggplot(plt, aes(passage, scaled_reads_per_base))+geom_point(aes(fill=passage_hilo), shape=21, color="black")+theme_bw()+th+
+      stat_smooth(method="lm", se=F, color="grey70")+
+      scale_fill_manual(values=c("#3288BD","#D53E4F"), name="Passage")
   }else{
     goi$gene_ID<-rownames(goi)
     goi<-melt(goi)
@@ -271,13 +283,13 @@ gene_exp_plot<-function(gene){
 # gene level sumary
 gene_exp_plot("SPART")
 gene_exp_plot("FASTKD5")
-
+gene_exp_plot("FASN")
 
 
 
 #' ## DNAm passage genes original 80 and validation
-diff_genes_db_hypovalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypomethylation.txt"))
-diff_genes_db_hypervalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypermethylation.txt"))
+diff_genes_db_hypovalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"))
+diff_genes_db_hypervalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"))
 
 hypo_diffexp_original<-sleuth_significant[which(sleuth_significant$ext_gene%in%diff_genes_db_hypovalidation_original$V1),]
 hyper_diffexp_original<-sleuth_significant[which(sleuth_significant$ext_gene%in%diff_genes_db_hypervalidation_original$V1),]
@@ -412,10 +424,9 @@ mat_high <- sleuth:::spread_abundance_by(so_diff_high$obs_norm, "scaled_reads_pe
 mat_low <- sleuth:::spread_abundance_by(so_diff_low$obs_norm, "scaled_reads_per_base",  so_diff_low$sample_to_covariates$sample)
 
 gene_exp_plot_differentiation<-function(gene){
-  goi_low<-as.data.frame(mat_low[which(rownames(mat_low)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
-  goi_high<-as.data.frame(mat_high[which(rownames(mat_high)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
-  
-  if(ncol(goi_high)==1){
+  if(length(gene)==1){
+    goi_low<-as.data.frame(mat_low[which(rownames(mat_low)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
+    goi_high<-as.data.frame(mat_high[which(rownames(mat_high)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
     goi_low$passage<-"low"
     goi_low$sample_ID<-rownames(goi_low)
     colnames(goi_low)[1]<-"scaled_reads_per_base"
@@ -424,8 +435,17 @@ gene_exp_plot_differentiation<-function(gene){
     colnames(goi_high)[1]<-"scaled_reads_per_base"
     goi<-rbind(goi_low, goi_high)
     plt<-merge(sampleinfo,goi, by.x="sample",by.y="sample_ID")
-    ggplot(plt, aes(differentiation, scaled_reads_per_base,fill=differentiation))+geom_boxplot()+geom_point(aes(fill=differentiation), shape=21, color="black")+theme_bw()+th+facet_wrap(~passage_hilo)
+    plt$passage_hilo<-factor(plt$passage_hilo, levels=c("low","high"))
+    plt$differentiation<-factor(plt$differentiation, levels=c("UD","D"))
+    ggplot(plt, aes(differentiation, scaled_reads_per_base,fill=differentiation))+geom_boxplot()+
+      geom_point(aes(fill=differentiation), shape=21, color="black")+theme_bw()+th+facet_wrap(~passage_hilo)+
+      scale_fill_manual(values=c("#abd9e9","#a1d99b"), name="Differentiation")
     }else{
+      goi_low<-as.data.frame(mat_low[which(rownames(mat_low)%in%(unique(ttg$ens_gene[which(ttg$ext_gene%in%gene)]))),])
+      goi_high<-as.data.frame(mat_high[which(rownames(mat_high)%in%(unique(ttg$ens_gene[which(ttg$ext_gene%in%gene)]))),])
+      gene_ID<-ttg[which(ttg$ext_gene%in%gene),2:3]
+      gene_ID<-gene_ID[!duplicated(gene_ID),]
+      gene_ID$label<-paste(gene_ID$ext_gene,"\n(",gene_ID$ens_gene,")",sep="")
       goi_high$gene_ID<-rownames(goi_high)
       goi_low$gene_ID<-rownames(goi_low)
       goi_high<-melt(goi_high)
@@ -434,22 +454,41 @@ gene_exp_plot_differentiation<-function(gene){
       goi_high$passage<-"high"
       
       goi<-rbind(goi_low, goi_high)
+      goi<-merge(goi,gene_ID, by.x="gene_ID", by.y="ens_gene")
       plt<-merge(sampleinfo,goi, by.x="sample",by.y="variable")
-      ggplot(plt, aes(differentiation, value,fill=differentiation))+geom_boxplot()+geom_point(aes(fill=differentiation), shape=21, color="black")+theme_bw()+th+facet_grid(gene_ID~passage_hilo)
+      plt$passage_hilo<-factor(plt$passage_hilo, levels=c("low","high"))
+      plt$differentiation<-factor(plt$differentiation, levels=c("UD","D"))
+      ggplot(plt, aes(passage_hilo, value,fill=differentiation))+geom_boxplot(outlier.shape=NA)+
+        geom_point(aes(fill=differentiation), shape=21, color="black",position = position_dodge(width=0.75))+theme_bw()+th+
+        facet_wrap(~label, scales="free_y")+
+        scale_fill_manual(values=c("#abd9e9","#a1d99b"), name="Differentiation")
       }}
 
 
 gene_exp_plot_differentiation("LYZ")
-gene_exp_plot_differentiation("LGR5")
+gene_exp_plot_differentiation(diff_genes)
+gene_exp_plot_differentiation(c("LYZ","LGR5","FABP1","HELLS","PLA2G2A","KRT19"))
+ggsave(here("figs","differenital_expression_differentiation_genes.pdf"),width = 10, height = 5)
+ggsave(here("figs/jpeg","differenital_expression_differentiation_genes.jpeg"), width = 10, height = 5)
+
+
 gene_exp_plot_differentiation("ASCL2")
 gene_exp_plot_differentiation("FABP1")
 gene_exp_plot_differentiation("KRT19")
 gene_exp_plot_differentiation("TOP2A")
 
-
+## differential between passage and DNAm diff with passage
 low_not_high_diff<-sleuth_significant_low[which(!(sleuth_significant_low$ext_gene%in%sleuth_significant_high$ext_gene)),]
-gene_exp_plot_differentiation("GPR135")
-gene_exp_plot_differentiation("KATNAL2")
+#' ## DNAm passage genes original 80 and validation
+diff_genes_db_hypovalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"))
+diff_genes_db_hypervalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"))
+sleuth_sig_DNAm<-low_not_high_diff[which(low_not_high_diff$ext_gene%in%c(diff_genes_db_hypovalidation_original$V1, diff_genes_db_hypervalidation_original$V1)),]
+
+gene_exp_plot_differentiation(c("DISC1","BCL3","NR1D1","LYZ"))
+ggsave(here("figs","differenital_expression_differentiation_genes_difflowhigh.pdf"),width = 8, height = 5)
+ggsave(here("figs/jpeg","differenital_expression_differentiation_genes_difflowhigh.jpeg"), width = 8, height = 5)
+
+
 
 write.table(unique(low_not_high_diff$ext_gene), file=here("data/validation","low_not_high_differentiationgenes.txt"), quote=F, row.names = F, col.names = F)
 
@@ -480,7 +519,7 @@ gene_exp_plot_differentiation("AMER1")
 gene_exp_plot_differentiation("FZD8")
 gene_exp_plot_differentiation("DISC1")
 
-
+gene_exp_plot_differentiation(wnt_low[which(!(wnt_low$ext_gene%in%wnt_high$ext_gene)),]$ext_gene)
 
 
 #############
@@ -491,13 +530,13 @@ source(here("scripts/validation/rnaseq/00_volcano.R"))
 so_diff_high <- sleuth_wt(so_diff_high, paste0('differentiationUD'))
 sleuth_table_high_wt <- sleuth_results(so_diff_high, 'differentiationUD', 'wt', show_all = FALSE)
 
-vol_high<-makeVolcano(sleuth_table_high$pval, sleuth_table_high_wt$b, 2,0.015, "Difference Between\nDifferentiated and \nUndifferentiated", 5,11,9000)
+vol_high<-makeVolcano(sleuth_table_high$pval, sleuth_table_high_wt$b, 2,0.015, "Difference Between\nDifferentiated and \nUndifferentiated", 6,13,11000)
 
 
 so_diff_low <- sleuth_wt(so_diff_low, paste0('differentiationUD'))
 sleuth_table_low_wt <- sleuth_results(so_diff_low, 'differentiationUD', 'wt', show_all = FALSE)
 
-vol_low<-makeVolcano(sleuth_table_low$pval, sleuth_table_low_wt$b, 2,0.015, "Difference Between\nDifferentiated and \nUndifferentiated", 5,11,9000)
+vol_low<-makeVolcano(sleuth_table_low$pval, sleuth_table_low_wt$b, 2,0.015, "Difference Between\nDifferentiated and \nUndifferentiated", 6,13,11000)
 
 grid.arrange(vol_low, vol_high, ncol=2)
 ggsave("figs/jpeg/RNAseq_volcano_differentiation.jpeg",grid.arrange(vol_low, vol_high, ncol=2),  width = 15, height = 6)
@@ -507,38 +546,38 @@ ggsave("figs/jpeg/RNAseq_volcano_differentiation.jpeg",grid.arrange(vol_low, vol
 
 
 
-
-
-#############################
-#'# run sleuth on differentiation interaction terms
-#############################
-diff_genes<-c("ASCL2","MKI67","LGR5","CA2","OLFM4","LYZ","MUC2","MUC1","CYP3A4","PLA2G2A","FABP1","KRT19","HELLS","SPINK4","FCGBP","NEAT1","TOP2A")#"TTF3",
-
-#'## low
-sampleinfo_diff<-sampleinfo[which(sampleinfo$comparison=="differentiation"),]
-table(sampleinfo_diff$differentiation)
-
-so_diff <- sleuth_prep(sampleinfo_diff, target_mapping = ttg, aggregation_column = 'ens_gene', extra_bootstrap_summary = TRUE, gene_mode = TRUE)
-
-so_diff <- sleuth_fit(so_diff, ~differentiation + passage_hilo + differentiation:passage_hilo +individual, 'full')
-so_diff <- sleuth_fit(so_diff, ~differentiation + passage_hilo +individual, 'reduced')
-so_diff <- sleuth_lrt(so_diff, 'reduced', 'full')
-models(so_diff)
-tests(so_diff)
-
-sleuth_table <- sleuth_results(so_diff, 'reduced:full', 'lrt', show_all = FALSE)
-sleuth_significant <- dplyr::filter(sleuth_table, qval <= 0.05)
-head(sleuth_significant, 20)
-
-#sleuth_table[which(sleuth_table$ext_gene%in%diff_genes),]
-sleuth_significant[which(sleuth_significant$ext_gene%in%diff_genes),]
-
-sleuth_significant <- dplyr::filter(sleuth_table, pval <= 0.01)
-head(sleuth_significant, 20)
-
-
-gene_exp_plot_differentiation("SEMA3B")
-
+#' 
+#' 
+#' #############################
+#' #'# run sleuth on differentiation interaction terms
+#' #############################
+#' diff_genes<-c("ASCL2","MKI67","LGR5","CA2","OLFM4","LYZ","MUC2","MUC1","CYP3A4","PLA2G2A","FABP1","KRT19","HELLS","SPINK4","FCGBP","NEAT1","TOP2A")#"TTF3",
+#' 
+#' #'## low
+#' sampleinfo_diff<-sampleinfo[which(sampleinfo$comparison=="differentiation"),]
+#' table(sampleinfo_diff$differentiation)
+#' 
+#' so_diff <- sleuth_prep(sampleinfo_diff, target_mapping = ttg, aggregation_column = 'ens_gene', extra_bootstrap_summary = TRUE, gene_mode = TRUE)
+#' 
+#' so_diff <- sleuth_fit(so_diff, ~differentiation + passage_hilo + differentiation:passage_hilo +individual, 'full')
+#' so_diff <- sleuth_fit(so_diff, ~differentiation + passage_hilo +individual, 'reduced')
+#' so_diff <- sleuth_lrt(so_diff, 'reduced', 'full')
+#' models(so_diff)
+#' tests(so_diff)
+#' 
+#' sleuth_table <- sleuth_results(so_diff, 'reduced:full', 'lrt', show_all = FALSE)
+#' sleuth_significant <- dplyr::filter(sleuth_table, qval <= 0.05)
+#' head(sleuth_significant, 20)
+#' 
+#' #sleuth_table[which(sleuth_table$ext_gene%in%diff_genes),]
+#' sleuth_significant[which(sleuth_significant$ext_gene%in%diff_genes),]
+#' 
+#' sleuth_significant <- dplyr::filter(sleuth_table, pval <= 0.01)
+#' head(sleuth_significant, 20)
+#' 
+#' 
+#' gene_exp_plot_differentiation("SEMA3B")
+#' 
 
 
 
@@ -601,11 +640,10 @@ MHCI_low[which(!(MHCI_low$ext_gene%in%MHCI_high$ext_gene)),]
 mat_high <- sleuth:::spread_abundance_by(so_IFNg_high$obs_norm, "scaled_reads_per_base",  so_IFNg_high$sample_to_covariates$sample)
 mat_low <- sleuth:::spread_abundance_by(so_IFNg_low$obs_norm, "scaled_reads_per_base",  so_IFNg_low$sample_to_covariates$sample)
 
-gene_exp_plot_treatment<-function(gene){
-  goi_low<-as.data.frame(mat_low[which(rownames(mat_low)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
-  goi_high<-as.data.frame(mat_high[which(rownames(mat_high)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
-  
-  if(ncol(goi_high)==1){
+gene_exp_plot_treatment<-function(gene, sig){
+  if(length(gene)==1){
+    goi_low<-as.data.frame(mat_low[which(rownames(mat_low)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
+    goi_high<-as.data.frame(mat_high[which(rownames(mat_high)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
     goi_low$passage<-"low"
     goi_low$sample_ID<-rownames(goi_low)
     colnames(goi_low)[1]<-"scaled_reads_per_base"
@@ -614,8 +652,20 @@ gene_exp_plot_treatment<-function(gene){
     colnames(goi_high)[1]<-"scaled_reads_per_base"
     goi<-rbind(goi_low, goi_high)
     plt<-merge(sampleinfo,goi, by.x="sample",by.y="sample_ID")
-    ggplot(plt, aes(treatment, scaled_reads_per_base,fill=treatment))+geom_boxplot()+geom_point(aes(fill=treatment), shape=21, color="black")+theme_bw()+th+facet_wrap(~passage_hilo)
+    plt$passage_hilo<-factor(plt$passage_hilo, levels=c("low","high"))
+    plt$treatment<-factor(plt$treatment, levels=c("UT","IFNg"))
+    ggplot(plt, aes(treatment, scaled_reads_per_base,fill=treatment))+geom_boxplot()+
+      geom_point(aes(fill=treatment), shape=21, color="black")+theme_bw()+th+facet_wrap(~passage_hilo)+
+      scale_fill_manual(values=c("grey80","cornflowerblue"), name="Treatment")
   }else{
+    goi_low<-as.data.frame(mat_low[which(rownames(mat_low)%in%(unique(ttg$ens_gene[which(ttg$ext_gene%in%gene)]))),])
+    goi_high<-as.data.frame(mat_high[which(rownames(mat_high)%in%(unique(ttg$ens_gene[which(ttg$ext_gene%in%gene)]))),])
+    gene_ID<-ttg[which(ttg$ext_gene%in%gene),2:3]
+    if(missing(sig)){}else{
+      gene_ID<-gene_ID[which(gene_ID$ens_gene%in%sig),]
+    }
+    gene_ID<-gene_ID[!duplicated(gene_ID),]
+    gene_ID$label<-paste(gene_ID$ext_gene,"\n(",gene_ID$ens_gene,")",sep="")
     goi_high$gene_ID<-rownames(goi_high)
     goi_low$gene_ID<-rownames(goi_low)
     goi_high<-melt(goi_high)
@@ -624,27 +674,47 @@ gene_exp_plot_treatment<-function(gene){
     goi_high$passage<-"high"
     
     goi<-rbind(goi_low, goi_high)
+    goi<-merge(goi,gene_ID, by.x="gene_ID", by.y="ens_gene")
     plt<-merge(sampleinfo,goi, by.x="sample",by.y="variable")
-    ggplot(plt, aes(treatment, value,fill=treatment))+geom_boxplot()+geom_point(aes(fill=treatment), shape=21, color="black")+theme_bw()+th+facet_grid(gene_ID~passage_hilo)
+    plt$passage_hilo<-factor(plt$passage_hilo, levels=c("low","high"))
+    plt$treatment<-factor(plt$treatment, levels=c("UT","IFNg"))
+    ggplot(plt, aes(passage_hilo, value,fill=treatment))+geom_boxplot(outlier.shape=NA)+
+      geom_point(aes(fill=treatment), shape=21, color="black",position = position_dodge(width=0.75))+theme_bw()+th+
+      facet_wrap(~label, scales="free_y")+
+      scale_fill_manual(values=c("grey80","cornflowerblue"), name="Treatment")
   }}
 
+gene_exp_plot_treatment(MHCI)
+gene_exp_plot_treatment(c("NLRC5","TAP1"))
 
-gene_exp_plot_treatment("HLA-B")
-gene_exp_plot_treatment("NLRC5")
-gene_exp_plot_treatment("TAP1")
-gene_exp_plot_treatment("MR1")
-gene_exp_plot_treatment("PSMB8")
-gene_exp_plot_treatment("CD1D")
+top_sig<-sleuth_significant_low %>% group_by(ext_gene) %>% slice(which.min(pval))
+gene_exp_plot_treatment(MHCI,top_sig$target_id)
+gene_exp_plot_treatment(c("NLRC5","TAP1","PSMB9","PSMB8","B2M","HLA-A"),top_sig$target_id)
+ggsave(here("figs","differenital_expression_MHCI_genes_treatmentlowhigh.pdf"),width = 10, height = 5)
+ggsave(here("figs/jpeg","differenital_expression_MHCI_genes_treatmentlowhigh.jpeg"), width = 10, height = 5)
+
 
 
 
 
 low_not_high_treatment<-sleuth_significant_low[which(!(sleuth_significant_low$ext_gene%in%sleuth_significant_high$ext_gene)),]
+low_not_high_treatment[which(low_not_high_treatment$ext_gene%in%MHCI),]
+
 gene_exp_plot_treatment("NDUFA8")
 gene_exp_plot_treatment("NDUFA7")
 gene_exp_plot_treatment("SEC24B")
 
 write.table(unique(low_not_high_treatment$ext_gene), file=here("data/validation","low_not_high_treatmentgenes.txt"), quote=F, row.names = F, col.names = F)
+
+#' ## DNAm passage genes original 80 and validation
+diff_genes_db_hypovalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"))
+diff_genes_db_hypervalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"))
+sleuth_sig_DNAm<-low_not_high_treatment[which(low_not_high_treatment$ext_gene%in%c(diff_genes_db_hypovalidation_original$V1, diff_genes_db_hypervalidation_original$V1)),]
+
+gene_exp_plot_treatment(c("IDH1","TGFB1","LYZ","MSH2"))
+ggsave(here("figs","differenital_expression_treatment_genes_treatmentlowhigh.pdf"),width = 8, height = 5)
+ggsave(here("figs/jpeg","differenital_expression_treatment_genes_treatmentlowhigh.jpeg"), width = 8, height = 5)
+
 
 
 ######
@@ -759,10 +829,9 @@ mat_high <- sleuth:::spread_abundance_by(so_TNFa_high$obs_norm, "scaled_reads_pe
 mat_low <- sleuth:::spread_abundance_by(so_TNFa_low$obs_norm, "scaled_reads_per_base",  so_TNFa_low$sample_to_covariates$sample)
 
 gene_exp_plot_treatment<-function(gene){
-  goi_low<-as.data.frame(mat_low[which(rownames(mat_low)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
-  goi_high<-as.data.frame(mat_high[which(rownames(mat_high)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
-  
-  if(ncol(goi_high)==1){
+  if(length(gene)==1){
+    goi_low<-as.data.frame(mat_low[which(rownames(mat_low)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
+    goi_high<-as.data.frame(mat_high[which(rownames(mat_high)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
     goi_low$passage<-"low"
     goi_low$sample_ID<-rownames(goi_low)
     colnames(goi_low)[1]<-"scaled_reads_per_base"
@@ -771,8 +840,17 @@ gene_exp_plot_treatment<-function(gene){
     colnames(goi_high)[1]<-"scaled_reads_per_base"
     goi<-rbind(goi_low, goi_high)
     plt<-merge(sampleinfo,goi, by.x="sample",by.y="sample_ID")
-    ggplot(plt, aes(treatment, scaled_reads_per_base,fill=treatment))+geom_boxplot()+geom_point(aes(fill=treatment), shape=21, color="black")+theme_bw()+th+facet_wrap(~passage_hilo)
+    plt$passage_hilo<-factor(plt$passage_hilo, levels=c("low","high"))
+    plt$treatment<-factor(plt$treatment, levels=c("UT","TNFa"))
+    ggplot(plt, aes(treatment, scaled_reads_per_base,fill=treatment))+geom_boxplot()+
+      geom_point(aes(fill=treatment), shape=21, color="black")+theme_bw()+th+facet_wrap(~passage_hilo)+
+      scale_fill_manual(values=c("grey80","firebrick4"), name="Treatment")
   }else{
+    goi_low<-as.data.frame(mat_low[which(rownames(mat_low)%in%(unique(ttg$ens_gene[which(ttg$ext_gene%in%gene)]))),])
+    goi_high<-as.data.frame(mat_high[which(rownames(mat_high)%in%(unique(ttg$ens_gene[which(ttg$ext_gene%in%gene)]))),])
+    gene_ID<-ttg[which(ttg$ext_gene%in%gene),2:3]
+    gene_ID<-gene_ID[!duplicated(gene_ID),]
+    gene_ID$label<-paste(gene_ID$ext_gene,"\n(",gene_ID$ens_gene,")",sep="")
     goi_high$gene_ID<-rownames(goi_high)
     goi_low$gene_ID<-rownames(goi_low)
     goi_high<-melt(goi_high)
@@ -781,8 +859,14 @@ gene_exp_plot_treatment<-function(gene){
     goi_high$passage<-"high"
     
     goi<-rbind(goi_low, goi_high)
+    goi<-merge(goi,gene_ID, by.x="gene_ID", by.y="ens_gene")
     plt<-merge(sampleinfo,goi, by.x="sample",by.y="variable")
-    ggplot(plt, aes(treatment, value,fill=treatment))+geom_boxplot()+geom_point(aes(fill=treatment), shape=21, color="black")+theme_bw()+th+facet_grid(gene_ID~passage_hilo)
+    plt$passage_hilo<-factor(plt$passage_hilo, levels=c("low","high"))
+    plt$treatment<-factor(plt$treatment, levels=c("UT","TNFa"))
+    ggplot(plt, aes(passage_hilo, value,fill=treatment))+geom_boxplot(outlier.shape=NA)+
+      geom_point(aes(fill=treatment), shape=21, color="black",position = position_dodge(width=0.75))+theme_bw()+th+
+      facet_wrap(~label, scales="free_y")+
+      scale_fill_manual(values=c("grey80","firebrick4"), name="Treatment")
   }}
 
 
@@ -799,6 +883,17 @@ gene_exp_plot_treatment("CXCL5")
 gene_exp_plot_treatment("LTF")
 gene_exp_plot_treatment("BCL3")
 gene_exp_plot_treatment("GSN")
+
+
+#' ## DNAm passage genes original 80 and validation
+diff_genes_db_hypovalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"))
+diff_genes_db_hypervalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"))
+sleuth_sig_DNAm<-low_not_high_treatment[which(low_not_high_treatment$ext_gene%in%c(diff_genes_db_hypovalidation_original$V1, diff_genes_db_hypervalidation_original$V1)),]
+
+gene_exp_plot_treatment(c("FOXO1","ENPP6","PDK2","CNTNAP1"))
+ggsave(here("figs","differenital_expression_treatment_genes_treatmentlowhigh_TNFa.pdf"),width = 8, height = 5)
+ggsave(here("figs/jpeg","differenital_expression_treatment_genes_treatmentlowhigh_TNFa.jpeg"), width = 8, height = 5)
+
 
 
 ######
