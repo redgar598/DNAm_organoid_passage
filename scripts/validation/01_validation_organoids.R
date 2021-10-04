@@ -511,6 +511,9 @@ passage_validation<-data.frame(p.value=ebfit$p.value[,"passage"], CpG=rownames(v
 passage_validation$p_adjusted<-p.adjust(passage_validation$p.value, method="BH")
 
 diff_CpG_dbvalidation<-passage_validation[which(passage_validation$p_adjusted<0.05 & abs(passage_validation$db)>0.15),] #19746
+save(diff_CpG_dbvalidation, file=here("data","validation_passage_CpGs_UTUD.RData"))
+
+load(here("data","validation_passage_CpGs_UTUD.RData"))
 diff_CpG_db_hypovalidation<-diff_CpG_dbvalidation$CpG[which((diff_CpG_dbvalidation$db)>=0.15)] #  19221
 diff_CpG_db_hypervalidation<-diff_CpG_dbvalidation$CpG[which((diff_CpG_dbvalidation$db)<=(-0.15))] #  525
 
@@ -645,6 +648,9 @@ gene_DNAm<-function(gene){
   organoid_plt<-merge(sample_info_both, betas, by.x="Assay.Name",by.y="Var2")
   organoid_plt<-merge(organoid_plt, CpG_gene, by.x="Var1",by.y="IlmnID")
   
+  uni_gene<-organoid_plt[!duplicated(organoid_plt[,c("Gene.name","label")]),]
+  organoid_plt$label<-factor(organoid_plt$label, levels=uni_gene$label[order(uni_gene$Gene.name)])
+  
   ggplot(organoid_plt, aes(passage.or.rescope.no_numeric,value))+
     geom_line(aes(group=sample_ID),color="lightgrey")+
     stat_smooth(method="lm", color="grey30", size=0.7, se=F)+th+theme_bw()+
@@ -656,10 +662,24 @@ gene_DNAm<-function(gene){
     xlim(1,16)
   }
 
-gene_DNAm(c("EDAR","RNASE4","EIF4G1","LRRC59"))
+gene_DNAm(c("EDAR","CEP68","EIF4G1","LRRC59"))
 ggsave(here("figs","validation_differenital_DNAm_passage.pdf"),width = 9, height = 4)
 ggsave(here("figs/jpeg","validation_differenital_DNAm_passage.jpeg"), width = 9, height = 4)
 
+gene_DNAm(c("LYZ","LGR5","FABP1","HELLS","PLA2G2A","KRT19"))
+
+gene_DNAm(c("FKBP5","STK39","COL1A1","WNT11"))
+ggsave(here("figs","validation_differenital_DNAm_passage_differentiation_differential.pdf"),width = 18, height = 4)
+ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_differentiation_differential.jpeg"), width = 18, height = 4)
+
+
+gene_DNAm(c("LNX1","MSH2","CLK3","CADM1"))
+ggsave(here("figs","validation_differenital_DNAm_passage_IFNg.pdf"),width = 27, height = 4)
+ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_IFNg.jpeg"), width = 27, height = 4)
+
+gene_DNAm(c("FOXO1","CIITA","JAZF1","UNC5D"))
+ggsave(here("figs","validation_differenital_DNAm_passage_TNFa.pdf"),width = 18, height = 4)
+ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_TNFa.jpeg"), width = 18, height = 4)
 
 
 #'## R Session Info
