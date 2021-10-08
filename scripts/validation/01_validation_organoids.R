@@ -419,12 +419,13 @@ ggplot()+
 
 Beta_Plot$ID_nopass<-paste(Beta_Plot$individual, Beta_Plot$Segment,Beta_Plot$condition)
 ggplot()+
-  geom_density(aes(Beta,color=passage_hilo, group=ID),Beta_Plot, size=0.75)+theme_bw()+xlab("DNAm Beta Value")+ylab("Density")+
+  geom_density(aes(Beta,color=passage_hilo, group=ID),Beta_Plot[which(Beta_Plot$passage_hilo=="high"),], size=0.75)+theme_bw()+xlab("DNAm Beta Value")+ylab("Density")+
+  geom_density(aes(Beta,color=passage_hilo, group=ID),Beta_Plot[which(Beta_Plot$passage_hilo=="low"),], size=0.75)+theme_bw()+xlab("DNAm Beta Value")+ylab("Density")+
   scale_color_manual(values = c ("#081d58","#9ecae1"), name="Relative\nPassage\nLevel within\nPatient")+facet_wrap(~ID_nopass)+
   th+theme(strip.text = element_text(size = 10), axis.text=element_text(size=4),panel.spacing = unit(0.7, "lines"))+th+
   scale_x_continuous(breaks = c(0,0.5,1))
-ggsave(here("figs","validation_paired_beta.pdf"),width = 5, height = 2.2)
-ggsave(here("figs/jpeg","validation_paired_beta.jpeg"),width = 10, height = 10)
+ggsave(here("figs","validation_paired_beta.pdf"),width = 10, height = 8)
+ggsave(here("figs/jpeg","validation_paired_beta.jpeg"),width = 10, height = 8)
 
 ggplot()+
   geom_density(aes(Beta,color=passage.or.numeric.factor, group=ID),Beta_Plot, size=0.75)+theme_bw()+xlab("DNAm Beta Value")+ylab("Density")+
@@ -455,8 +456,36 @@ df<-data.frame(passage=names(percent_passing), passing=percent_passing, pro_pass
 df<-cbind(df,(binom.confint(df$passed_num, df$count, method="exact", conf.level=0.95)))
 df$upper<-df$upper*100
 df$lower<-df$lower*100
+print(df)
+
+
+percent_passing<-round((tapply(validation_epic.organoid$thresholded_ratio_max, validation_epic.organoid$passage, sum)/tapply(validation_epic.organoid$array.id, validation_epic.organoid$passage, length))*100,2)
+passed_num<-tapply(validation_epic.organoid$thresholded_ratio_max, validation_epic.organoid$passage, sum)
+org_numer<-tapply(validation_epic.organoid$array.id, validation_epic.organoid$passage, length)
+
+df<-data.frame(passage=names(percent_passing), passing=percent_passing, pro_passing=percent_passing/100, count=org_numer, passed_num=passed_num)
+df$vjust<-c(1.75,1.75,1.75,-0.75,1.75,-0.75)
+df$hjust<-c(0.5,0.5,0.5,0.5,0.5,2)# for the text label you removed anyway
+
+df$passage.factor <- factor(df$passage, levels = c(12,9,8,4,3,2))
+
+df<-cbind(df,(binom.confint(df$passed_num, df$count, method="exact", conf.level=0.95)))
+df$upper<-df$upper*100
+df$lower<-df$lower*100
 
 print(df)
+
+ggplot(df, aes(as.numeric(as.character(passage)), passing))+
+  geom_errorbar(aes(ymin=lower, ymax=upper), colour="grey70", width=.25)+
+  geom_line(color="grey20")+geom_point(size=1.25,shape=21,color="black",aes(fill=passage.factor))+xlab("Passage")+
+  ylab("Samples with Trimodal\nDistribution (%)")+theme_bw()+theme(axis.title = element_text(size=10))+
+  #geom_text(aes(label=count, vjust=vjust, hjust=hjust), color="grey40", size=3)+
+  scale_x_continuous(breaks=c(2,3,4,8,9,12))+ scale_fill_manual(values=pass_col,name="Passage\nNumber", guide=F)
+
+ggsave(here("figs","validation_Mixture_model_ratio_threshold_maximize.pdf"), width=3, height=2)
+ggsave(here("figs/jpeg","validation_Mixture_model_ratio_threshold_maximize.jpeg"), width=3, height=2)
+
+
 
 
 
@@ -552,8 +581,8 @@ print(paste("Of the ",length(diff_CpG_db_hypo_overlap)," hypo CpGs also on the 4
             length(intersect(diff_CpG_db_hypovalidation_overlap, diff_CpG_db_hypo_overlap))," are also hypo in the validation cohort (",
             round((length(intersect(diff_CpG_db_hypovalidation_overlap, diff_CpG_db_hypo_overlap))/length(diff_CpG_db_hypo_overlap))*100,2),"%)",sep=""))
 
-print(paste("Of the ",length(diff_CpG_db_hyper_overlap)," hypo CpGs also on the 450K ",
-            length(intersect(diff_CpG_db_hypervalidation_overlap, diff_CpG_db_hyper_overlap))," are also hypo in the validation cohort (",
+print(paste("Of the ",length(diff_CpG_db_hyper_overlap)," hyper CpGs also on the 450K ",
+            length(intersect(diff_CpG_db_hypervalidation_overlap, diff_CpG_db_hyper_overlap))," are also hyper in the validation cohort (",
             round((length(intersect(diff_CpG_db_hypervalidation_overlap, diff_CpG_db_hyper_overlap))/length(diff_CpG_db_hyper_overlap))*100,2),"%)",sep=""))
 
 

@@ -505,6 +505,8 @@ gene_exp_plot_differentiation(c("DISC1","BCL3","NR1D1","LYZ"))
 write.table(unique(low_not_high_diff$ext_gene), file=here("data/validation","low_not_high_differentiationgenes.txt"), quote=F, row.names = F, col.names = F)
 
 low_not_high_diff[which(low_not_high_diff$ext_gene%in%diff_genes),]
+low_not_high_diff[grep("DNMT|TET|TLR",low_not_high_diff$ext_gene),]
+
 
 gene_exp_plot_differentiation("HSPA1A")
 gene_exp_plot_differentiation("LYZ")
@@ -760,6 +762,7 @@ ggsave(here("figs/jpeg","differenital_expression_MHCI_genes_treatmentlowhigh.jpe
 
 low_not_high_treatment<-sleuth_significant_low[which(!(sleuth_significant_low$ext_gene%in%sleuth_significant_high$ext_gene)),]
 low_not_high_treatment[which(low_not_high_treatment$ext_gene%in%MHCI),]
+low_not_high_treatment[grep("DNMT|TET|TLR",low_not_high_treatment$ext_gene),]
 
 gene_exp_plot_treatment("NDUFA8")
 gene_exp_plot_treatment("NDUFA7")
@@ -939,6 +942,8 @@ gene_exp_plot_treatment<-function(gene){
 
 
 low_not_high_treatment<-sleuth_significant_low[which(!(sleuth_significant_low$ext_gene%in%sleuth_significant_high$ext_gene)),]
+low_not_high_treatment[grep("DNMT|TET|TLR",low_not_high_treatment$ext_gene),]
+
 gene_exp_plot_treatment("PGLYRP4")
 gene_exp_plot_treatment("ARRDC3")
 gene_exp_plot_treatment("DUOXA2")
