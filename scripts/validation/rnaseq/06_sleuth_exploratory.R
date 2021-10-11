@@ -89,21 +89,27 @@ Importance<-vars/sum(vars)
 Loadings_meta$sample<-rownames(Loadings_meta)
 Loadings_meta<-merge(Loadings_meta, sampleinfo, by="sample")
 
-ggplot(Loadings_meta, aes(PC1, PC2, fill=sample.site))+geom_point(shape=21,size=3, color="black")+theme_bw()+fillscale_sampsite+th+xlab("PC1")+ylab("PC2")
+ggplot(Loadings_meta, aes(PC1, PC2, fill=sample.site))+geom_point(shape=21,size=3, color="black")+theme_bw()+
+  fillscale_sampsite+th+xlab("PC1 (42%)")+ylab("PC2 (22%)")
 ggsave(here("figs","RNAseq_PC1_PC2_samplesite.pdf"), width = 7.5, height = 6)
 ggsave(here("figs/jpeg","RNAseq_PC1_PC2_samplesite.jpeg"), width = 7.5, height = 6)
 
 ggplot(Loadings_meta, aes(PC1, PC2, fill=passage_hilo))+geom_point(shape=21,size=3)+theme_bw()+
-  th+scale_fill_manual(values=c("#3288BD","#D53E4F"), name="Passage")
+  th+scale_fill_manual(values=c("#3288BD","#D53E4F"), name="Passage")+xlab("PC1 (42%)")+ylab("PC2 (22%)")
 ggsave(here("figs","RNAseq_PC1_PC2_passage.pdf"), width = 7.5, height = 6)
 ggsave(here("figs/jpeg","RNAseq_PC1_PC2_passage.jpeg"), width = 7.5, height = 6)
 
 ggplot(Loadings_meta, aes(PC2, PC3, fill=passage_hilo))+geom_point(shape=21,size=3)+theme_bw()+
-  th+scale_fill_manual(values=c("#3288BD","#D53E4F"), name="Passage")
+  th+scale_fill_manual(values=c("#3288BD","#D53E4F"), name="Passage")+
+  xlab("PC2 (22%)")+ylab("PC3 (12%)")
+ggsave(here("figs","RNAseq_PC2_PC3_passage.pdf"), width = 7.5, height = 6)
+ggsave(here("figs/jpeg","RNAseq_PC2_PC3_passage.jpeg"), width = 7.5, height = 6)
+
 
 
 ggplot(Loadings_meta, aes(PC1, PC2, fill=treatment, color=differentiation))+geom_point(shape=21,size=3)+theme_bw()+th+
-  scale_color_manual(values=c("black","white"))+scale_fill_manual(values=c("cornflowerblue","firebrick4","grey80"), name="Treatment")
+  scale_color_manual(values=c("black","white"))+
+  scale_fill_manual(values=c("cornflowerblue","firebrick4","grey80"), name="Treatment")+xlab("PC1 (42%)")+ylab("PC2 (22%)")
 ggsave(here("figs","RNAseq_PC1_PC2_condtions.pdf"), width = 7.5, height = 6)
 ggsave(here("figs/jpeg","RNAseq_PC1_PC2_conditions.jpeg"), width = 7.5, height = 6)
 
