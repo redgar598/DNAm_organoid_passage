@@ -148,10 +148,18 @@ head(hyper_diffexp_original[order(hyper_diffexp_original$pval),])
 length(unique(c(hyper_diffexp_original$ext_gene, hypo_diffexp_original$ext_gene)))
 
 gene_exp_plot(c(hypo_diffexp_original$ext_gene))
+ggsave(here("figs","validation_differenital_expression_passage_UDUT_allhypo.pdf"),width = 12, height = 2.5)
+ggsave(here("figs/jpeg","validation_differenital_expression_passage_UDUT_allhypo.jpeg"), width = 18, height = 2.5)
+
 gene_exp_plot(c("EDAR","RNASE4","EIF4G1","LRRC59"))
 
 gene_exp_plot(c(hyper_diffexp_original$ext_gene))
+ggsave(here("figs","validation_differenital_expression_passage_UDUT_allhyper.pdf"),width = 5.5, height = 2.5)
+ggsave(here("figs/jpeg","validation_differenital_expression_passage_UDUT_allhyper.jpeg"), width = 5.5, height = 2.5)
+
 gene_exp_plot(c("PLEC","CLTB","EDAR","LRRC59"))
+
+gene_exp_plot(c(hypo_diffexp_original$ext_gene, hyper_diffexp_original$ext_gene))
 
 
 ## wnt genes
@@ -386,7 +394,7 @@ sleuth_table_wt[which(sleuth_table_wt$ext_gene%in%c(hyper_diffexp_original$ext_g
 #############################
 #'# run sleuth on differentiation
 #############################
-diff_genes<-c("ASCL2","MKI67","LGR5","CA2","OLFM4","LYZ","MUC2","MUC1","CYP3A4","PLA2G2A","FABP1","KRT19","HELLS","SPINK4","FCGBP","NEAT1","TOP2A")#"TTF3",
+diff_genes<-c("ASCL2","MKI67","LGR5","CA2","OLFM4","LYZ","MUC2","MUC1","CYP3A4","PLA2G2A","FABP1","KRT19","HELLS","SPINK4","FCGBP","NEAT1","TOP2A","DEFA5","DEFA6")#"TTF3",
 
 #'## low
 sampleinfo_diff_low<-sampleinfo[which(sampleinfo$passage_hilo=="low" & sampleinfo$comparison=="differentiation"),]
@@ -438,7 +446,7 @@ diff_markers_low[which(!(diff_markers_low$target_id%in%diff_markers_high$target_
 mat_high <- sleuth:::spread_abundance_by(so_diff_high$obs_norm, "scaled_reads_per_base",  so_diff_high$sample_to_covariates$sample)
 mat_low <- sleuth:::spread_abundance_by(so_diff_low$obs_norm, "scaled_reads_per_base",  so_diff_low$sample_to_covariates$sample)
 
-gene_exp_plot_differentiation<-function(gene){
+gene_exp_plot_differentiation<-function(gene, pltrows, dupens_rm, ordered){
   if(length(gene)==1){
     goi_low<-as.data.frame(mat_low[which(rownames(mat_low)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
     goi_high<-as.data.frame(mat_high[which(rownames(mat_high)%in%(unique(ttg$ens_gene[which(ttg$ext_gene==gene)]))),])
@@ -460,6 +468,14 @@ gene_exp_plot_differentiation<-function(gene){
       goi_high<-as.data.frame(mat_high[which(rownames(mat_high)%in%(unique(ttg$ens_gene[which(ttg$ext_gene%in%gene)]))),])
       gene_ID<-ttg[which(ttg$ext_gene%in%gene),2:3]
       gene_ID<-gene_ID[!duplicated(gene_ID),]
+      
+      if(missing(dupens_rm)){}else{if(dupens_rm==T){
+        dup_genes<-names(table(gene_ID$ext_gene))[which(table(gene_ID$ext_gene)>1)]
+        pval_dup<-sleuth_table_low[which(sleuth_table_low$ext_gene%in%dup_genes),]
+        pval_dup<-pval_dup %>% group_by(ext_gene) %>% slice(which.min(pval))
+        gene_ID<-gene_ID[which(!gene_ID$ext_gene%in%dup_genes | gene_ID$ens_gene%in%pval_dup$target_id),]
+      }}
+
       gene_ID$label<-paste(gene_ID$ext_gene,"\n(",gene_ID$ens_gene,")",sep="")
       goi_high$gene_ID<-rownames(goi_high)
       goi_low$gene_ID<-rownames(goi_low)
@@ -473,24 +489,30 @@ gene_exp_plot_differentiation<-function(gene){
       plt<-merge(sampleinfo,goi, by.x="sample",by.y="variable")
       plt$passage_hilo<-factor(plt$passage_hilo, levels=c("low","high"))
       plt$differentiation<-factor(plt$differentiation, levels=c("UD","D"))
+      
+      if(missing(ordered)){}else{if(ordered==T){
+        uni_gene<-plt[!duplicated(plt[,c("ext_gene","label")]),]
+        plt$label<-factor(plt$label, levels=uni_gene$label[match(gene,uni_gene$ext_gene)])
+        }}
+      
       ggplot(plt, aes(passage_hilo, value,fill=differentiation))+geom_boxplot(outlier.shape=NA)+
         geom_point(aes(fill=differentiation), shape=21, color="black",position = position_dodge(width=0.75))+theme_bw()+th+
-        facet_wrap(~label, scales="free_y", nrow=1)+ylab("Scaled reads per base")+xlab("Passage")+
+        facet_wrap(~label, scales="free_y", nrow=pltrows)+ylab("Scaled reads per base")+xlab("Passage")+
         scale_fill_manual(values=c("#abd9e9","#a1d99b"), name="Differentiation")
       }}
+gene_exp_plot_differentiation(c("LGR5","ASCL2","HELLS","FABP1","KRT19","MUC2"),2,T,T)
 
-
-gene_exp_plot_differentiation("LYZ")
-gene_exp_plot_differentiation(diff_genes)
-gene_exp_plot_differentiation(c("LYZ","LGR5","FABP1","HELLS","PLA2G2A","KRT19"))
+gene_exp_plot_differentiation("LYZ",1)
+gene_exp_plot_differentiation(diff_genes,4)
+gene_exp_plot_differentiation(c("LGR5","ASCL2","HELLS","FABP1","KRT19","MUC2"),2,T,T)
 ggsave(here("figs","differenital_expression_differentiation_genes.pdf"),width = 10, height = 5)
 ggsave(here("figs/jpeg","differenital_expression_differentiation_genes.jpeg"), width = 10, height = 5)
 
 
-gene_exp_plot_differentiation("ASCL2")
-gene_exp_plot_differentiation("FABP1")
-gene_exp_plot_differentiation("KRT19")
-gene_exp_plot_differentiation("TOP2A")
+gene_exp_plot_differentiation("ASCL2",1)
+gene_exp_plot_differentiation("FABP1",1)
+gene_exp_plot_differentiation("KRT19",1)
+gene_exp_plot_differentiation("TOP2A",1)
 
 ## differential between passage and DNAm diff with passage
 low_not_high_diff<-sleuth_significant_low[which(!(sleuth_significant_low$ext_gene%in%sleuth_significant_high$ext_gene)),]
@@ -508,12 +530,12 @@ low_not_high_diff[which(low_not_high_diff$ext_gene%in%diff_genes),]
 low_not_high_diff[grep("DNMT|TET|TLR",low_not_high_diff$ext_gene),]
 
 
-gene_exp_plot_differentiation("HSPA1A")
-gene_exp_plot_differentiation("LYZ")
+gene_exp_plot_differentiation("HSPA1A",1)
+gene_exp_plot_differentiation("LYZ",1)
 ### different in low and high LYZ 
 
 ## interesting for GO enrichment
-gene_exp_plot_differentiation("FUS")
+gene_exp_plot_differentiation("FUS",1)
 
 
 
@@ -527,16 +549,11 @@ wnt_low<-sleuth_significant_low[which(sleuth_significant_low$ext_gene%in%wnt_gen
 
 wnt_low[which(!(wnt_low$ext_gene%in%wnt_high$ext_gene)),]
 
-gene_exp_plot_differentiation("WNT8B")
-gene_exp_plot_differentiation("RECK")
-gene_exp_plot_differentiation("AMER1")
-gene_exp_plot_differentiation("FZD8")
-gene_exp_plot_differentiation("DISC1")
 
-gene_exp_plot_differentiation(wnt_lowsleuth_sig_DNAm[which(!(wnt_low$ext_gene%in%wnt_high$ext_gene)),]$ext_gene)
+gene_exp_plot_differentiation(wnt_lowsleuth_sig_DNAm[which(!(wnt_low$ext_gene%in%wnt_high$ext_gene)),]$ext_gene,2)
 
 sleuth_sig_DNAm[which(sleuth_sig_DNAm$ext_gene%in%wnt_genes$Element),]
-gene_exp_plot_differentiation(c("DISC1","WNT11"))
+gene_exp_plot_differentiation(c("DISC1","WNT11"),1)
 
 #############
 #'## volcano
@@ -589,21 +606,21 @@ low_not_high_topb<-sleuth_table_low_wt_sig[which(sleuth_table_low_wt_sig$b<0),]
 intersect(low_not_high_topb$ext_gene, not_induced$ext_gene)
 gene_exp_plot_differentiation(intersect(low_not_high_topb$ext_gene, not_induced$ext_gene))
 
-gene_exp_plot_differentiation(c("RC3H2","TAOK1","OR10AH1P","PEAR1","SGMS1","ZNF321P","VEGFB","STK39"))
+gene_exp_plot_differentiation(c("RC3H2","TAOK1","OR10AH1P","PEAR1","SGMS1","ZNF321P","VEGFB","STK39"),4)
 
-gene_exp_plot_differentiation(c("RC3H2","PEAR1","ZNF321P","VEGFB"))
+gene_exp_plot_differentiation(c("RC3H2","PEAR1","ZNF321P","VEGFB"),2)
 
 # but also diff DNAm with passage
 intersect(intersect(low_not_high_topb$ext_gene, not_induced$ext_gene),sleuth_sig_DNAm$ext_gene)
 gene_exp_plot_differentiation(intersect(intersect(low_not_high_topb$ext_gene, not_induced$ext_gene),sleuth_sig_DNAm$ext_gene))
 
 ## representaive genes
-gene_exp_plot_differentiation(unique(sleuth_sig_DNAm$ext_gene)[151:175])
-gene_exp_plot_differentiation(c("SP3","RAB3B","DISC1","STK39","FAM13A","ZNF702P","BEGAIN","COL1A1","THRB","FKBP5", "WNT11"))
+gene_exp_plot_differentiation(unique(sleuth_sig_DNAm$ext_gene)[151:175],5)
+gene_exp_plot_differentiation(c("SP3","RAB3B","DISC1","STK39","FAM13A","ZNF702P","BEGAIN","COL1A1","THRB","FKBP5", "WNT11"),4)
 
 
 
-gene_exp_plot_differentiation(c("FKBP5","STK39","COL1A1","WNT11"))
+gene_exp_plot_differentiation(c("FKBP5","STK39","COL1A1","WNT11"),1)
 ggsave(here("figs","differenital_expression_differentiation_genes_difflowhigh.pdf"),width = 10, height = 2.5)
 ggsave(here("figs/jpeg","differenital_expression_differentiation_genes_difflowhigh.jpeg"), width = 10, height = 2.5)
 

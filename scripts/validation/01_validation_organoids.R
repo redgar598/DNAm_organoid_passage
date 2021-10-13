@@ -667,7 +667,7 @@ write.table(diff_genes_db_hypervalidation_original, file=here("data/validation/D
 #'### DNAm plot of differenitally expressed genes
 gene_DNAm<-function(gene){
   CpG_goi<-EPIC_genes[which(EPIC_genes$Gene.name%in%gene),]
-  CpG_gene<-CpG_goi[which(CpG_goi$IlmnID%in%c(diff_CpG_db_hypovalidation_overlap, diff_CpG_db_hypervalidation_overlap)),]
+  CpG_gene<-CpG_goi[which(CpG_goi$IlmnID%in%c(intersect(diff_CpG_db_hypovalidation_overlap, diff_CpG_db_hypo_overlap), intersect(diff_CpG_db_hypervalidation_overlap, diff_CpG_db_hyper_overlap))),]
   CpGs<-unique(CpG_gene$IlmnID)
   
   CpG_gene<-CpG_gene[!duplicated(CpG_gene[,c(3,7)]), c(3,7)]
@@ -695,20 +695,28 @@ gene_DNAm(c("EDAR","CEP68","EIF4G1","LRRC59"))
 ggsave(here("figs","validation_differenital_DNAm_passage.pdf"),width = 9, height = 4)
 ggsave(here("figs/jpeg","validation_differenital_DNAm_passage.jpeg"), width = 9, height = 4)
 
+gene_DNAm(c("EDAR","SCARB1"))
+ggsave(here("figs","validation_differenital_DNAm_passage_allhyper.pdf"),width = 6, height = 4)
+ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_allhyper.jpeg"), width = 6, height = 4)
+gene_DNAm(c("LRRC59" , "UNC5B"  , "UGT1A8" , "UGT1A10", "CEP68" ,  "EIF4G1",  "SLC20A1", "NDN" ))
+ggsave(here("figs","validation_differenital_DNAm_passage_allhypo.pdf"),width = 18, height = 4)
+ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_allhypo.jpeg"), width = 18, height = 4)
+
+
 gene_DNAm(c("LYZ","LGR5","FABP1","HELLS","PLA2G2A","KRT19"))
 
 gene_DNAm(c("FKBP5","STK39","COL1A1","WNT11"))
-ggsave(here("figs","validation_differenital_DNAm_passage_differentiation_differential.pdf"),width = 18, height = 4)
-ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_differentiation_differential.jpeg"), width = 18, height = 4)
+ggsave(here("figs","validation_differenital_DNAm_passage_differentiation_differential.pdf"),width = 10, height = 4)
+ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_differentiation_differential.jpeg"), width = 10, height = 4)
 
 
 gene_DNAm(c("LNX1","MSH2","CLK3","CADM1"))
-ggsave(here("figs","validation_differenital_DNAm_passage_IFNg.pdf"),width = 27, height = 4)
-ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_IFNg.jpeg"), width = 27, height = 4)
+ggsave(here("figs","validation_differenital_DNAm_passage_IFNg.pdf"),width = 18, height = 4)
+ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_IFNg.jpeg"), width = 18, height = 4)
 
 gene_DNAm(c("FOXO1","CIITA","JAZF1","UNC5D"))
-ggsave(here("figs","validation_differenital_DNAm_passage_TNFa.pdf"),width = 18, height = 4)
-ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_TNFa.jpeg"), width = 18, height = 4)
+ggsave(here("figs","validation_differenital_DNAm_passage_TNFa.pdf"),width = 10, height = 4)
+ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_TNFa.jpeg"), width = 10, height = 4)
 
 
 #'## R Session Info

@@ -54,7 +54,7 @@ identical(validation_epic.organoid_low$array.id, colnames(validation_organoid_be
 
 validation_epic.organoid_low$individual<-as.factor(validation_epic.organoid_low$individual)
 
-mod<-model.matrix(~ differentiation + Segment + individual, data=validation_epic.organoid_low)
+mod<-model.matrix(~ differentiation + individual, data=validation_epic.organoid_low)
 fit <- lmFit(validation_organoid_beta_low, mod)
 ebfit <- eBayes(fit)
 
@@ -89,7 +89,7 @@ identical(validation_epic.organoid_high$array.id, colnames(validation_organoid_b
 
 validation_epic.organoid_high$individual<-as.factor(validation_epic.organoid_high$individual)
 
-mod<-model.matrix(~ differentiation + Segment + individual, data=validation_epic.organoid_high)
+mod<-model.matrix(~ differentiation  + individual, data=validation_epic.organoid_high)
 fit <- lmFit(validation_organoid_beta_high, mod)
 ebfit <- eBayes(fit)
 
