@@ -719,5 +719,36 @@ ggsave(here("figs","validation_differenital_DNAm_passage_TNFa.pdf"),width = 10, 
 ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_TNFa.jpeg"), width = 10, height = 4)
 
 
+
+##########
+#'## heatmap
+#########
+pvals_long_validatedhypo<-pvals_long[which(pvals_long$CpG%in%diff_CpG_db_hypovalidation),]
+
+diff_CpG_db_top<-pvals_long_validatedhypo[which(pvals_long_validatedhypo$diff_fdr<0.005 & abs(pvals_long_validatedhypo$mean_db)>0.15),]
+
+diff_CpG_db_hypo_top<-diff_CpG_db_top[which((diff_CpG_db_top$mean_db)>=0.15),] #  8322
+diff_CpG_db_hypo_top<-diff_CpG_db_hypo_top[order(diff_CpG_db_hypo_top$diff_fdr),][1:10,]
+
+CpGs<-diff_CpG_db_hypo_top$CpG
+
+betas<-cbind(validation_organoid_beta_UT_UD[CpGs,],organoid_beta[CpGs,])
+betas_mns<-rowMeans(betas)
+betas_sds<-rowSds(betas)
+
+betas_norm<-apply(betas, 2, function(x) (x-betas_mns)/betas_sds)
+
+betas_norm<-melt(betas_norm)
+organoid_plt<-merge(sample_info_both, betas_norm, by.x="Assay.Name",by.y="Var2")
+
+hm.palette <- colorRampPalette((brewer.pal(9, 'Blues')), space='Lab')
+ggplot(organoid_plt, aes(reorder(sample_ID,passage.or.rescope.no_numeric),Var1, fill=value))+
+  geom_tile()+scale_fill_gradientn(colours = hm.palette(100))
+
+
+
 #'## R Session Info
 sessionInfo()
+
+
+
