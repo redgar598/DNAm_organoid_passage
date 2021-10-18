@@ -23,6 +23,8 @@ suppressMessages(library(lmtest))
 suppressMessages(library(gridExtra))
 suppressMessages(library(gtools))
 suppressMessages(library(rafalib))
+suppressMessages(library(cowplot))
+
 
 
 options(stringsAsFactors = FALSE)
@@ -335,7 +337,7 @@ ggplot(Loadings_meta, aes(PC1, PC2, fill=Segment))+geom_point(shape=21,size=3, c
   xlab("PC1 (42%)")+ylab("PC2 (12%)")+th+theme(axis.text = element_text(size=12),
                                                axis.title = element_text(size=14),
                                                plot.margin = margin(1, 0.1, 1, 1, "cm"))+
-  scale_fill_manual(values=c("#1a9850", "cornflowerblue","#e1e1ff","#1347a4","#000192"))
+  fillscale_sampsite
 ggsave(here("figs","validation_PC12_site.pdf"), width = 5, height = 4)
 ggsave(here("figs/jpeg","validation_PC12_site.jpeg"), width = 5, height = 4)
 
@@ -349,10 +351,11 @@ ggplot(Loadings_meta, aes(PC2, PC3, fill=passage_hilo))+
   scale_fill_manual(values=c("#3288BD","#D53E4F"), name="Passage")+
   xlab("PC2 (12%)")+ylab("PC3 (11%)")+th+theme(axis.text = element_text(size=12),
                                                axis.title = element_text(size=14),
-                                               plot.margin = margin(1, 1, 1, 1, "cm"))
+                                               plot.margin = margin(0.6, 1, 0.6, 1, "cm"))
 ggsave(here("figs","validation_PC23_passage.pdf"), width = 5.5, height = 4)
 ggsave(here("figs/jpeg","validation_PC23_passage.jpeg"), width = 5.5, height = 4)
 
+cor(Loadings_meta$PC2, Loadings_meta$passage, method="spearman")
 
 
 ggplot(Loadings_meta, aes(PC2, PC3, fill=treatment, color=differentiation))+geom_point(shape=21,size=3)+
@@ -585,6 +588,10 @@ print(paste("Of the ",length(diff_CpG_db_hyper_overlap)," hyper CpGs also on the
             length(intersect(diff_CpG_db_hypervalidation_overlap, diff_CpG_db_hyper_overlap))," are also hyper in the validation cohort (",
             round((length(intersect(diff_CpG_db_hypervalidation_overlap, diff_CpG_db_hyper_overlap))/length(diff_CpG_db_hyper_overlap))*100,2),"%)",sep=""))
 
+CpG_hypo_validated<-intersect(diff_CpG_db_hypovalidation_overlap, diff_CpG_db_hypo_overlap)
+CpG_hyper_validated<-intersect(diff_CpG_db_hypervalidation_overlap, diff_CpG_db_hyper_overlap)
+
+save(CpG_hypo_validated,CpG_hyper_validated, file=here("data/validation/CpG_validated.RData"))
 
 #' ### delta beta directionality plot
 plt_db_direction<-merge(pvals_long[,c(3,6)], passage_validation, by="CpG")# 380776
@@ -665,7 +672,7 @@ write.table(diff_genes_db_hypervalidation_original, file=here("data/validation/D
 
 
 #'### DNAm plot of differenitally expressed genes
-gene_DNAm<-function(gene){
+gene_DNAm<-function(gene, ordered){
   CpG_goi<-EPIC_genes[which(EPIC_genes$Gene.name%in%gene),]
   CpG_gene<-CpG_goi[which(CpG_goi$IlmnID%in%c(intersect(diff_CpG_db_hypovalidation_overlap, diff_CpG_db_hypo_overlap), intersect(diff_CpG_db_hypervalidation_overlap, diff_CpG_db_hyper_overlap))),]
   CpGs<-unique(CpG_gene$IlmnID)
@@ -679,6 +686,12 @@ gene_DNAm<-function(gene){
   
   uni_gene<-organoid_plt[!duplicated(organoid_plt[,c("Gene.name","label")]),]
   organoid_plt$label<-factor(organoid_plt$label, levels=uni_gene$label[order(uni_gene$Gene.name)])
+  
+  if(missing(ordered)){}else{if(ordered==T){
+    uni_gene$Gene.name<-factor(uni_gene$Gene.name, levels=gene)
+    uni_gene<-uni_gene[order(uni_gene$Gene.name),]
+    organoid_plt$label<-factor(organoid_plt$label, levels=uni_gene$label)
+  }}
   
   ggplot(organoid_plt, aes(passage.or.rescope.no_numeric,value))+
     geom_line(aes(group=sample_ID),color="lightgrey")+
@@ -717,6 +730,29 @@ ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_IFNg.jpeg"), width
 gene_DNAm(c("FOXO1","CIITA","JAZF1","UNC5D"))
 ggsave(here("figs","validation_differenital_DNAm_passage_TNFa.pdf"),width = 10, height = 4)
 ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_TNFa.jpeg"), width = 10, height = 4)
+
+# grid.arrange(gene_DNAm(c("COL1A1","WNT11"), T),
+#              gene_DNAm(c("LNX1"), T),
+#              gene_DNAm(c("MSH2"), T),
+#              gene_DNAm(c("CIITA","FOXO1"), T), ncol=1, widths=c(2,2,4,3))
+# 
+# 
+
+
+get_leg = function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  legend}
+
+leg_scatter = get_leg(gene_DNAm(c("MSH2"), T)+guides(fill=guide_legend(ncol=2)))
+
+plot_grid(gene_DNAm(c("COL1A1","WNT11","LNX1"), T)+theme(legend.position = "none"),
+          gene_DNAm(c("MSH2"), T)+theme(legend.position = "none"),
+          plot_grid(gene_DNAm(c("CIITA","FOXO1"), T)+theme(legend.position = "none"), leg_scatter, rel_widths = c(3,1)), ncol=1)
+
+ggsave(here("figs","validation_differenital_DNAm_passage_representative_genes.pdf"),width = 7, height = 11)
+ggsave(here("figs/jpeg","validation_differenital_DNAm_passage_representative_genes.jpeg"), width = 7, height = 11)
 
 
 

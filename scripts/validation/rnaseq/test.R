@@ -1,26 +1,35 @@
-#' ## DNAm passage genes
-diff_genes_db_hypovalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"))
-diff_genes_db_hypervalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"))
+###########
+#' Table of genes
+###########
+library(dplyr)
 
-hypo_diffexp_original<-sleuth_significant_UD[which(sleuth_significant_UD$ext_gene%in%diff_genes_db_hypovalidation_original$V1),]
-hyper_diffexp_original<-sleuth_significant_UD[which(sleuth_significant_UD$ext_gene%in%diff_genes_db_hypervalidation_original$V1),]
-
-head(hypo_diffexp_original[order(hypo_diffexp_original$pval),])
-head(hyper_diffexp_original[order(hyper_diffexp_original$pval),])
-
-length(unique(c(hyper_diffexp_original$ext_gene, hypo_diffexp_original$ext_gene)))
+genes<-c(diff_genes_db_hypovalidation_original$V1[1:150],"HHAT")
+stats_table<-sleuth_significant_low
 
 
-diff_genes_db_hypovalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"))
-diff_genes_db_hypervalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"))
-
-sleuth_sig_DNAm<-low_not_high_diff[which(low_not_high_diff$ext_gene%in%c(diff_genes_db_hypovalidation_original$V1, diff_genes_db_hypervalidation_original$V1)),]
+load(here("data/validation/CpG_validated.RData"))
+EPIC_genes<-read.csv(here("data","EPIC_ensembl_gene_annotation.csv")) # 1137194
 
 
+stats<-stats_table[which(stats_table$ext_gene%in%genes),c("ext_gene","target_id","pval","qval")]
 
-low_not_high_treatment<-sleuth_significant_low[which(!(sleuth_significant_low$ext_gene%in%sleuth_significant_high$ext_gene)),]
+EPIC_genes_CpGs<-EPIC_genes[which(EPIC_genes$Gene.name%in%stats$ext_gene),]
+EPIC_genes_CpGs_hypo<-EPIC_genes_CpGs[which(EPIC_genes_CpGs$IlmnID%in%CpG_hypo_validated),]
+EPIC_genes_CpGs_hypo<-as.data.frame(EPIC_genes_CpGs_hypo %>% 
+  group_by(Gene.name) %>% 
+  mutate(hypo_DNAm_CpG = paste0(unique(IlmnID), collapse = ", ")) )
+EPIC_genes_CpGs_hypo<-EPIC_genes_CpGs_hypo[,c("Gene.name","hypo_DNAm_CpG")]
+EPIC_genes_CpGs_hypo<-EPIC_genes_CpGs_hypo[!duplicated(EPIC_genes_CpGs_hypo),]
+EPIC_genes_CpGs_hypo
 
-#' ## DNAm passage genes original 80 and validation
-diff_genes_db_hypovalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"))
-diff_genes_db_hypervalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"))
-sleuth_sig_DNAm<-low_not_high_treatment[which(low_not_high_treatment$ext_gene%in%c(diff_genes_db_hypovalidation_original$V1, diff_genes_db_hypervalidation_original$V1)),]
+EPIC_genes_CpGs_hyper<-EPIC_genes_CpGs[which(EPIC_genes_CpGs$IlmnID%in%CpG_hyper_validated),]
+EPIC_genes_CpGs_hyper<-as.data.frame(EPIC_genes_CpGs_hyper %>% 
+                                      group_by(Gene.name) %>% 
+                                      mutate(hyper_DNAm_CpG = paste0(unique(IlmnID), collapse = ", ")) )
+EPIC_genes_CpGs_hyper<-EPIC_genes_CpGs_hyper[,c("Gene.name","hyper_DNAm_CpG")]
+EPIC_genes_CpGs_hyper<-EPIC_genes_CpGs_hyper[!duplicated(EPIC_genes_CpGs_hyper),]
+EPIC_genes_CpGs_hyper
+
+EPIC_genes_CpGs<-merge(EPIC_genes_CpGs_hyper, EPIC_genes_CpGs_hypo, by="Gene.name", all=T)
+
+stats_cpgs<-merge(stats, EPIC_genes_CpGs, by.x="ext_gene", by.y="Gene.name")

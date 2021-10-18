@@ -89,22 +89,31 @@ Importance<-vars/sum(vars)
 Loadings_meta$sample<-rownames(Loadings_meta)
 Loadings_meta<-merge(Loadings_meta, sampleinfo, by="sample")
 
-ggplot(Loadings_meta, aes(PC1, PC2, fill=sample.site))+geom_point(shape=21,size=3, color="black")+theme_bw()+
+ggplot(Loadings_meta, aes(PC1, PC2, fill=sample.site))+geom_point(shape=21,size=3, color="black")+
+  theme_bw()+theme(axis.text = element_text(size=12),
+                   axis.title = element_text(size=14),
+                   plot.margin = margin(1, 0.1, 1, 0.5, "cm"))+
   fillscale_sampsite+th+xlab("PC1 (42%)")+ylab("PC2 (22%)")
-ggsave(here("figs","RNAseq_PC1_PC2_samplesite.pdf"), width = 7.5, height = 6)
-ggsave(here("figs/jpeg","RNAseq_PC1_PC2_samplesite.jpeg"), width = 7.5, height = 6)
+ggsave(here("figs","RNAseq_PC1_PC2_samplesite.pdf"), width = 5, height = 4)
+ggsave(here("figs/jpeg","RNAseq_PC1_PC2_samplesite.jpeg"), width = 5, height = 4)
 
 ggplot(Loadings_meta, aes(PC1, PC2, fill=passage_hilo))+geom_point(shape=21,size=3)+theme_bw()+
   th+scale_fill_manual(values=c("#3288BD","#D53E4F"), name="Passage")+xlab("PC1 (42%)")+ylab("PC2 (22%)")
 ggsave(here("figs","RNAseq_PC1_PC2_passage.pdf"), width = 7.5, height = 6)
 ggsave(here("figs/jpeg","RNAseq_PC1_PC2_passage.jpeg"), width = 7.5, height = 6)
 
-ggplot(Loadings_meta, aes(PC2, PC3, fill=passage_hilo))+geom_point(shape=21,size=3)+theme_bw()+
+ggplot(Loadings_meta, aes(PC2, PC3, fill=passage_hilo))+
+  geom_line(aes(PC2,PC3, group=individual, color=individual))+theme_bw()+
+  geom_point(shape=21,size=3)+
+  scale_color_manual(values=c("#d9d9d9","#525252","#969696","#737373","#bdbdbd"),name="Individual")+
   th+scale_fill_manual(values=c("#3288BD","#D53E4F"), name="Passage")+
-  xlab("PC2 (22%)")+ylab("PC3 (12%)")
-ggsave(here("figs","RNAseq_PC2_PC3_passage.pdf"), width = 7.5, height = 6)
-ggsave(here("figs/jpeg","RNAseq_PC2_PC3_passage.jpeg"), width = 7.5, height = 6)
+  xlab("PC2 (22%)")+ylab("PC3 (12%)")+theme(axis.text = element_text(size=12),
+                                            axis.title = element_text(size=14),
+                                            plot.margin = margin(0.6, 1, 0.6, 0.6, "cm"))
+ggsave(here("figs","RNAseq_PC2_PC3_passage.pdf"), width = 5.5, height = 4)
+ggsave(here("figs/jpeg","RNAseq_PC2_PC3_passage.jpeg"), width = 5.5, height = 4)
 
+cor(Loadings_meta$PC2, Loadings_meta$passage, method="spearman")
 
 
 ggplot(Loadings_meta, aes(PC1, PC2, fill=treatment, color=differentiation))+geom_point(shape=21,size=3)+theme_bw()+th+

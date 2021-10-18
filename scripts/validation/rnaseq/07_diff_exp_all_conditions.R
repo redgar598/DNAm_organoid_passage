@@ -171,8 +171,8 @@ sleuth_significant_UD[which(sleuth_significant_UD$ext_gene%in%wnt_genes$Symbol),
 gene_exp_plot("SDC1")
 
 gene_exp_plot(c("EDAR","CEP68","EIF4G1","LRRC59"))
-ggsave(here("figs","validation_differenital_expression_passage_UDUT.pdf"),width = 9, height = 2.5)
-ggsave(here("figs/jpeg","validation_differenital_expression_passage_UDUT.jpeg"), width = 9, height = 2.5)
+ggsave(here("figs","validation_differenital_expression_passage_UDUT.pdf"),width = 10, height = 2.5)
+ggsave(here("figs/jpeg","validation_differenital_expression_passage_UDUT.jpeg"), width = 10, height = 2.5)
 
 
 #'### more overlapping than chance?
