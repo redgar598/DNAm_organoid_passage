@@ -175,6 +175,42 @@ ggsave(here("figs","validation_differenital_expression_passage_UDUT.pdf"),width 
 ggsave(here("figs/jpeg","validation_differenital_expression_passage_UDUT.jpeg"), width = 10, height = 2.5)
 
 
+#'## Gene tables
+load(here("data/validation/CpG_validated.RData"))
+EPIC_genes<-read.csv(here("data","EPIC_ensembl_gene_annotation.csv")) # 1137194
+
+genes<-unique(c(hyper_diffexp_original$ext_gene, hypo_diffexp_original$ext_gene))
+stats_table<-sleuth_significant_UD
+
+stats<-stats_table[which(stats_table$ext_gene%in%genes),c("ext_gene","target_id","pval","qval")]
+
+EPIC_genes_CpGs<-EPIC_genes[which(EPIC_genes$Gene.name%in%stats$ext_gene),]
+EPIC_genes_CpGs_hypo<-EPIC_genes_CpGs[which(EPIC_genes_CpGs$IlmnID%in%CpG_hypo_validated),]
+EPIC_genes_CpGs_hypo<-as.data.frame(EPIC_genes_CpGs_hypo %>% 
+                                      group_by(Gene.name) %>% 
+                                      mutate(hypo_DNAm_CpG = paste0(unique(IlmnID), collapse = ", ")) )
+EPIC_genes_CpGs_hypo<-EPIC_genes_CpGs_hypo[,c("Gene.name","hypo_DNAm_CpG")]
+EPIC_genes_CpGs_hypo<-EPIC_genes_CpGs_hypo[!duplicated(EPIC_genes_CpGs_hypo),]
+EPIC_genes_CpGs_hypo
+
+EPIC_genes_CpGs_hyper<-EPIC_genes_CpGs[which(EPIC_genes_CpGs$IlmnID%in%CpG_hyper_validated),]
+EPIC_genes_CpGs_hyper<-as.data.frame(EPIC_genes_CpGs_hyper %>% 
+                                       group_by(Gene.name) %>% 
+                                       mutate(hyper_DNAm_CpG = paste0(unique(IlmnID), collapse = ", ")) )
+EPIC_genes_CpGs_hyper<-EPIC_genes_CpGs_hyper[,c("Gene.name","hyper_DNAm_CpG")]
+EPIC_genes_CpGs_hyper<-EPIC_genes_CpGs_hyper[!duplicated(EPIC_genes_CpGs_hyper),]
+EPIC_genes_CpGs_hyper
+
+EPIC_genes_CpGs<-merge(EPIC_genes_CpGs_hyper, EPIC_genes_CpGs_hypo, by="Gene.name", all=T)
+
+stats_cpgs<-merge(stats, EPIC_genes_CpGs, by.x="ext_gene", by.y="Gene.name")
+stats_cpgs$pval<-signif(stats_cpgs$pval, 2)
+stats_cpgs$qval<-signif(stats_cpgs$qval, 2)
+colnames(stats_cpgs)<-c("Gene","Ensembl gene name","p value","q value","Hypermethylated CpGs", "Hypomethylated CpGs")
+stats_cpgs
+write.csv(stats_cpgs, file="reports_figs/validation_update/Supplementary_Table4_Passage_genes.csv", row.names = F)
+
+
 #'### more overlapping than chance?
 EPIC_genes<-read.csv(here("data","EPIC_ensembl_gene_annotation.csv")) # 1137194
 
@@ -515,11 +551,29 @@ gene_exp_plot_differentiation("KRT19",1)
 gene_exp_plot_differentiation("TOP2A",1)
 
 ## differential between passage and DNAm diff with passage
-low_not_high_diff<-sleuth_significant_low[which(!(sleuth_significant_low$ext_gene%in%sleuth_significant_high$ext_gene)),]
+# but actually tested in high
+length(unique(sleuth_significant_high$ext_gene))
+length(unique(sleuth_significant_low$ext_gene))
+
+sleuth_significant_low_tested<-sleuth_significant_low[which(sleuth_significant_low$target_id%in%sleuth_table_high$target_id),]
+sleuth_significant_high_tested<-sleuth_significant_high[which(sleuth_significant_high$target_id%in%sleuth_table_low$target_id),]
+
+length(unique(sleuth_significant_high_tested$ext_gene))
+length(unique(sleuth_significant_low_tested$ext_gene))
+
+length(unique(sleuth_table_high$ext_gene))
+length(unique(sleuth_table_low$ext_gene))
+
+low_not_high_diff<-sleuth_significant_low_tested[which(!(sleuth_significant_low_tested$ext_gene%in%sleuth_significant_high_tested$ext_gene)),]
+length(unique(low_not_high_diff$ext_gene))
+
+
 #' ## DNAm passage genes original 80 and validation
 diff_genes_db_hypovalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"))
 diff_genes_db_hypervalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"))
 sleuth_sig_DNAm<-low_not_high_diff[which(low_not_high_diff$ext_gene%in%c(diff_genes_db_hypovalidation_original$V1, diff_genes_db_hypervalidation_original$V1)),]
+length(unique(sleuth_sig_DNAm$ext_gene))
+
 
 gene_exp_plot_differentiation(c("DISC1","BCL3","NR1D1","LYZ"))
 
@@ -537,6 +591,52 @@ gene_exp_plot_differentiation("LYZ",1)
 ## interesting for GO enrichment
 gene_exp_plot_differentiation("FUS",1)
 
+
+#'### Gene Table
+load(here("data/validation/CpG_validated.RData"))
+EPIC_genes<-read.csv(here("data","EPIC_ensembl_gene_annotation.csv")) # 1137194
+
+
+table_low_not_high<-function(genes, stats_table_low, stats_table_high){
+  stats_low<-stats_table_low[which(stats_table_low$ext_gene%in%genes),c("ext_gene","target_id","pval","qval")]
+  stats_high<-stats_table_high[which(stats_table_high$ext_gene%in%genes),c("ext_gene","target_id","pval","qval")]
+
+  EPIC_genes_CpGs<-EPIC_genes[which(EPIC_genes$Gene.name%in%genes),]
+  
+  EPIC_genes_CpGs_hypo<-EPIC_genes_CpGs[which(EPIC_genes_CpGs$IlmnID%in%CpG_hypo_validated),]
+  EPIC_genes_CpGs_hypo<-as.data.frame(EPIC_genes_CpGs_hypo %>% 
+                                        group_by(Gene.name) %>% 
+                                        mutate(hypo_DNAm_CpG = paste0(unique(IlmnID), collapse = ", ")) )
+  EPIC_genes_CpGs_hypo<-EPIC_genes_CpGs_hypo[,c("Gene.name","hypo_DNAm_CpG")]
+  EPIC_genes_CpGs_hypo<-EPIC_genes_CpGs_hypo[!duplicated(EPIC_genes_CpGs_hypo),]
+  EPIC_genes_CpGs_hypo
+  
+  EPIC_genes_CpGs_hyper<-EPIC_genes_CpGs[which(EPIC_genes_CpGs$IlmnID%in%CpG_hyper_validated),]
+  EPIC_genes_CpGs_hyper<-as.data.frame(EPIC_genes_CpGs_hyper %>% 
+                                         group_by(Gene.name) %>% 
+                                         mutate(hyper_DNAm_CpG = paste0(unique(IlmnID), collapse = ", ")) )
+  EPIC_genes_CpGs_hyper<-EPIC_genes_CpGs_hyper[,c("Gene.name","hyper_DNAm_CpG")]
+  EPIC_genes_CpGs_hyper<-EPIC_genes_CpGs_hyper[!duplicated(EPIC_genes_CpGs_hyper),]
+  EPIC_genes_CpGs_hyper
+  
+  EPIC_genes_CpGs<-merge(EPIC_genes_CpGs_hyper, EPIC_genes_CpGs_hypo, by="Gene.name", all=T)
+  
+  colnames(stats_low)<-c("Gene","Ensembl gene name","Low Passage p value","Low Passage q value")
+  colnames(stats_high)<-c("Gene","Ensembl gene name","High Passage p value","High Passage q value")
+  
+  stats<-merge(stats_low, stats_high, by=c("Gene","Ensembl gene name"))
+  stats_cpgs<-merge(stats, EPIC_genes_CpGs, by.x="Gene", by.y="Gene.name")
+  colnames(stats_cpgs)<-c("Gene","Ensembl gene name", "Low Passage p value","Low Passage q value",
+                          "High Passage p value", "High Passage q value","Hypermethylated CpGs", "Hypomethylated CpGs")
+  stats_cpgs$`High Passage q value`<-signif(stats_cpgs$`High Passage q value`, 2)
+  stats_cpgs$`High Passage p value`<-signif(stats_cpgs$`High Passage p value`, 2)
+  stats_cpgs$`Low Passage q value`<-signif(stats_cpgs$`Low Passage q value`, 2)
+  stats_cpgs$`Low Passage p value`<-signif(stats_cpgs$`Low Passage p value`, 2)
+  stats_cpgs[order(stats_cpgs$`Low Passage p value`),]}
+  
+stats_cpgs_diff<-table_low_not_high(unique(sleuth_sig_DNAm$ext_gene), sleuth_sig_DNAm,sleuth_table_high)
+head(stats_cpgs_diff)
+write.csv(stats_cpgs_diff, file="reports_figs/validation_update/Supplement_Table5_differentiation_genes.csv", row.names = F)
 
 
 ########
@@ -774,10 +874,24 @@ ggsave(here("figs","differenital_expression_MHCI_genes_treatmentlowhigh.pdf"),wi
 ggsave(here("figs/jpeg","differenital_expression_MHCI_genes_treatmentlowhigh.jpeg"), width = 10, height = 5)
 
 
+## differential between passage and DNAm diff with passage
+# but actually tested in high
+length(unique(sleuth_significant_high$ext_gene))
+length(unique(sleuth_significant_low$ext_gene))
+
+sleuth_significant_low_tested<-sleuth_significant_low[which(sleuth_significant_low$target_id%in%sleuth_table_high$target_id),]
+sleuth_significant_high_tested<-sleuth_significant_high[which(sleuth_significant_high$target_id%in%sleuth_table_low$target_id),]
+
+length(unique(sleuth_significant_high_tested$ext_gene))
+length(unique(sleuth_significant_low_tested$ext_gene))
+
+length(unique(sleuth_table_high$ext_gene))
+length(unique(sleuth_table_low$ext_gene))
 
 
+low_not_high_treatment<-sleuth_significant_low_tested[which(!(sleuth_significant_low_tested$ext_gene%in%sleuth_significant_high_tested$ext_gene)),]
+length(unique(low_not_high_treatment$ext_gene))
 
-low_not_high_treatment<-sleuth_significant_low[which(!(sleuth_significant_low$ext_gene%in%sleuth_significant_high$ext_gene)),]
 low_not_high_treatment[which(low_not_high_treatment$ext_gene%in%MHCI),]
 low_not_high_treatment[grep("DNMT|TET|TLR",low_not_high_treatment$ext_gene),]
 
@@ -787,10 +901,14 @@ gene_exp_plot_treatment("SEC24B")
 
 write.table(unique(low_not_high_treatment$ext_gene), file=here("data/validation","low_not_high_treatmentgenes.txt"), quote=F, row.names = F, col.names = F)
 
+
+
+
 #' ## DNAm passage genes original 80 and validation
 diff_genes_db_hypovalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"))
 diff_genes_db_hypervalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"))
 sleuth_sig_DNAm<-low_not_high_treatment[which(low_not_high_treatment$ext_gene%in%c(diff_genes_db_hypovalidation_original$V1, diff_genes_db_hypervalidation_original$V1)),]
+length(unique(sleuth_sig_DNAm$ext_gene))
 
 gene_exp_plot_treatment(c("IDH1","TGFB1","LYZ","MSH2"))
 
@@ -801,6 +919,11 @@ gene_exp_plot_treatment(c("ARHGAP19","CADM1","CDKN1A","LNX1","MSH2","ACSL6","DPY
 gene_exp_plot_treatment(c("LNX1","MSH2","CLK3","CADM1"))
 ggsave(here("figs","differenital_expression_treatment_genes_treatmentlowhigh.pdf"),width = 10, height = 2.5)
 ggsave(here("figs/jpeg","differenital_expression_treatment_genes_treatmentlowhigh.jpeg"), width = 10, height = 2.5)
+
+#'### Gene Table
+stats_cpgs_IFNg<-table_low_not_high(unique(sleuth_sig_DNAm$ext_gene), sleuth_sig_DNAm,sleuth_table_high)
+head(stats_cpgs_IFNg)
+write.csv(stats_cpgs_IFNg, file="reports_figs/validation_update/Supplement_Table6_IFNg_genes.csv", row.names = F)
 
 
 
@@ -957,8 +1080,24 @@ gene_exp_plot_treatment<-function(gene){
   }}
 
 
+## differential between passage and DNAm diff with passage
+# but actually tested in high
+length(unique(sleuth_significant_high$ext_gene))
+length(unique(sleuth_significant_low$ext_gene))
 
-low_not_high_treatment<-sleuth_significant_low[which(!(sleuth_significant_low$ext_gene%in%sleuth_significant_high$ext_gene)),]
+sleuth_significant_low_tested<-sleuth_significant_low[which(sleuth_significant_low$target_id%in%sleuth_table_high$target_id),]
+sleuth_significant_high_tested<-sleuth_significant_high[which(sleuth_significant_high$target_id%in%sleuth_table_low$target_id),]
+
+length(unique(sleuth_significant_high_tested$ext_gene))
+length(unique(sleuth_significant_low_tested$ext_gene))
+
+length(unique(sleuth_table_high$ext_gene))
+length(unique(sleuth_table_low$ext_gene))
+
+low_not_high_treatment<-sleuth_significant_low_tested[which(!(sleuth_significant_low_tested$ext_gene%in%sleuth_significant_high_tested$ext_gene)),]
+length(unique(low_not_high_treatment$ext_gene))
+
+
 low_not_high_treatment[grep("DNMT|TET|TLR",low_not_high_treatment$ext_gene),]
 
 gene_exp_plot_treatment("PGLYRP4")
@@ -978,6 +1117,7 @@ gene_exp_plot_treatment("GSN")
 diff_genes_db_hypovalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypomethylation_UTUD.txt"))
 diff_genes_db_hypervalidation_original<-read.table(file=here("data/validation/DNAm/","validation_original_genes_hypermethylation_UTUD.txt"))
 sleuth_sig_DNAm<-low_not_high_treatment[which(low_not_high_treatment$ext_gene%in%c(diff_genes_db_hypovalidation_original$V1, diff_genes_db_hypervalidation_original$V1)),]
+length(unique(sleuth_sig_DNAm$ext_gene))
 
 gene_exp_plot_treatment(c("FOXO1","ENPP6","PDK2","CNTNAP1"))
 gene_exp_plot_treatment(unique(sleuth_sig_DNAm$ext_gene)[50:59])
@@ -1025,6 +1165,12 @@ low_not_high_treatment_fc<-sleuth_significant_low_fc[which(!(sleuth_significant_
 gene_exp_plot_treatment("DUOX2")
 gene_exp_plot_treatment("SLC2A6")
 gene_exp_plot_treatment("IL1A")
+
+
+#'### Gene Table
+stats_cpgs_TNFa<-table_low_not_high(unique(sleuth_sig_DNAm$ext_gene), sleuth_sig_DNAm,sleuth_table_high)
+head(stats_cpgs_TNFa)
+write.csv(stats_cpgs_TNFa, file="reports_figs/validation_update/Supplement_Table7_TNFa_genes.csv", row.names = F)
 
 
 

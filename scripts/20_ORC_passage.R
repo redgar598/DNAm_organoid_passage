@@ -23,6 +23,8 @@ suppressMessages(library(lmtest))
 suppressMessages(library(gridExtra))
 suppressMessages(library(gtools))
 suppressMessages(library(rafalib))
+suppressMessages(library(cowplot))
+
 
 
 options(stringsAsFactors = FALSE)
@@ -114,7 +116,7 @@ dis_means<-function(background_CpGs, original_list, perm){
     rnd_distance<-anno_EPIC_minimal$distance_to_ORC[which(anno_EPIC_minimal$IlmnID%in%rnd_cpg)]
     mean(rnd_distance)})}
 
-perm=10000
+perm=1000
 hypo_rnd<-dis_means(background_hypo, hypo_distance, perm)
 (length(which(hypo_rnd>mean(hypo_distance)))+1)/(perm+1)
 (length(which(hypo_rnd<mean(hypo_distance)))+1)/(perm+1)
@@ -127,12 +129,229 @@ hetero_rnd<-dis_means(background, hetero_distance, perm)
 (length(which(hetero_rnd>mean(hetero_distance)))+1)/(perm+1)
 (length(which(hetero_rnd<mean(hetero_distance)))+1)/(perm+1)
 
-plt_df<-data.frame(distance=c(hypo_rnd,hyper_rnd,hetero_rnd), list_cpg=rep(c("hypo", "hyper","hetero"), each = perm))
+plt_df_background<-data.frame(distance=c(hypo_rnd,hyper_rnd,hetero_rnd), list_cpg=rep(c("hypo", "hyper","hetero"), each = perm))
 plt_lines<-data.frame(distance=c(mean(hypo_distance), mean(hyper_distance), mean(hetero_distance)), list_cpg=c("hypo", "hyper","hetero"))
 
-ggplot()+geom_density(aes(distance),plt_df, fill="lightgrey", color="grey40")+
+plt_df_passage<-data.frame(distance=c(hypo_distance,hyper_distance,hetero_distance), list_cpg=rep(c("hypo", "hyper","hetero"), times = c(length(hypo_distance),length(hyper_distance),length(hetero_distance))))
+
+
+mean(hypo_distance)
+mean(hyper_distance)
+mean(hetero_distance)
+
+
+ggplot()+geom_density(aes(distance),plt_df_background, fill="lightgrey", color="grey40")+
   geom_vline(xintercept=mean(background_distance), color="black")+
   geom_vline(aes(xintercept=distance),plt_lines, color="red")+
   theme_bw()+th+facet_wrap(~list_cpg, ncol=1, scales="free_y")
 ggsave(here("figs","ORC_CpGs_passage.pdf"),width = 4, height = 6)
 ggsave(here("figs/jpeg","ORC_CpGs_passage.jpeg"), width = 4, height = 6)
+
+
+ggplot()+#geom_density(aes(distance),plt_df_background, fill="lightgrey", color="grey40")+
+  geom_density(aes(distance, color=list_cpg),plt_df_passage)+
+  geom_vline(xintercept=mean(background_distance), color="black")+
+  geom_vline(aes(xintercept=distance),plt_lines, color="red")+
+  theme_bw()+th
+
+ggplot()+#geom_density(aes(distance),plt_df_background, fill="lightgrey", color="grey40")+
+  geom_density(aes(log(distance), color=list_cpg),plt_df_passage)+
+  #geom_vline(xintercept=mean(background_distance), color="black")+
+  geom_vline(aes(xintercept=log(distance), color=list_cpg),plt_lines)+
+  theme_bw()+th
+
+ggplot()+#geom_density(aes(distance),plt_df_background, fill="lightgrey", color="grey40")+
+  geom_histogram(aes(log(distance), color=list_cpg),plt_df_passage)+
+  geom_vline(xintercept=mean(background_distance), color="black")+
+  geom_vline(aes(xintercept=distance),plt_lines, color="red")+
+  theme_bw()+th
+
+
+
+# plot single random versus actual
+set.seed(1)
+hypo_back<-sample(background_hypo$IlmnID, length(hypo_distance))
+hypo_back_distance<-anno_EPIC_minimal$distance_to_ORC[which(anno_EPIC_minimal$IlmnID%in%hypo_back)]
+plt_df_background_hypo<-data.frame(distance=c(hypo_back_distance,hypo_distance), 
+                              rnd_og=rep(c("Background", "Passage CpGs"), each = length(hypo_distance)),
+                              list_cpg=rep(c("Hypomethylated"), each = length(hypo_distance)*2))
+set.seed(1)
+hyper_back<-sample(background_hyper$IlmnID, length(hyper_distance))
+hyper_back_distance<-anno_EPIC_minimal$distance_to_ORC[which(anno_EPIC_minimal$IlmnID%in%hyper_back)]
+plt_df_background_hyper<-data.frame(distance=c(hyper_back_distance,hyper_distance), 
+                                   rnd_og=rep(c("Background", "Passage CpGs"), each = length(hyper_distance)),
+                                   list_cpg=rep(c("Hypermethylated"), each = length(hyper_distance)*2))
+set.seed(1)
+hetero_back<-sample(background$IlmnID, length(hetero_distance))
+hetero_back_distance<-anno_EPIC_minimal$distance_to_ORC[which(anno_EPIC_minimal$IlmnID%in%hetero_back)]
+plt_df_background_hetero<-data.frame(distance=c(hetero_back_distance,hetero_distance), 
+                                    rnd_og=rep(c("Background", "Passage CpGs"), each = length(hetero_distance)),
+                                    list_cpg=rep(c("Heteroskedastic"), each = length(hetero_distance)*2))
+
+plt_df_background<-rbind(plt_df_background_hypo,plt_df_background_hyper, plt_df_background_hetero)
+plt_df_background$rnd_og<-factor(plt_df_background$rnd_og, levels=c("Background","Passage CpGs"))
+plt_lines<-data.frame(distance=c(mean(hypo_distance), mean(hyper_distance), mean(hetero_distance)), 
+                      list_cpg=c("Hypomethylated", "Hypermethylated","Heteroskedastic"))
+
+ggplot()+
+  geom_density(aes((distance), color=rnd_og, fill=rnd_og),plt_df_background)+
+  geom_vline(xintercept=mean(background_distance), color="grey30")+
+  geom_vline(aes(xintercept=distance),plt_lines, color="#3676e8")+
+  theme_bw()+th+facet_wrap(~list_cpg, ncol=1)+
+  scale_fill_manual(values=c("lightgrey",NA))+scale_color_manual(values=c("lightgrey","cornflowerblue"))+
+  xlab("Distance to ORC Peak")+guides(fill=guide_legend(title="CpGs"),color=guide_legend(title="CpGs"))
+ggsave(here("figs","ORC_CpGs_passage_distribution.pdf"),width = 8, height = 6)
+ggsave(here("figs/jpeg","ORC_CpGs_passage_distribution.jpeg"), width = 8, height = 6)
+
+
+quantile(plt_df_background$distance, seq(0,1,0.1))
+ggplot()+
+  geom_density(aes((distance), color=rnd_og, fill=rnd_og),plt_df_background)+
+  geom_vline(xintercept=mean(background_distance), color="grey30")+
+  geom_vline(aes(xintercept=distance),plt_lines, color="#3676e8")+
+  theme_bw()+th+facet_wrap(~list_cpg, ncol=1)+
+  scale_fill_manual(values=c("lightgrey",NA))+scale_color_manual(values=c("lightgrey","cornflowerblue"))+
+  xlim(0,300000)+
+  xlab("Distance to ORC Peak")+guides(fill=guide_legend(title="CpGs"),color=guide_legend(title="CpGs"))
+ggsave(here("figs","ORC_CpGs_passage_distributionzoom.pdf"),width = 8, height = 6)
+ggsave(here("figs/jpeg","ORC_CpGs_passage_distributionzoom.jpeg"), width = 8, height = 6)
+
+
+ggplot()+
+  geom_density(aes(log(distance), color=rnd_og, fill=rnd_og),plt_df_background)+
+  geom_vline(xintercept=log(mean(background_distance)), color="grey30")+
+  geom_vline(aes(xintercept=log(distance)),plt_lines, color="#3676e8")+
+  theme_bw()+th+facet_wrap(~list_cpg, ncol=1)+
+  scale_fill_manual(values=c("lightgrey",NA))+scale_color_manual(values=c("lightgrey","cornflowerblue"))+
+  xlab("Distance to ORC Peak (log)")+guides(fill=guide_legend(title="CpGs"),color=guide_legend(title="CpGs"))
+ggsave(here("figs","ORC_CpGs_passage_distributionlog.pdf"),width = 8, height = 6)
+ggsave(here("figs/jpeg","ORC_CpGs_passage_distributionlog.jpeg"), width = 8, height = 6)
+
+
+
+### Random distances median
+dis_med<-function(background_CpGs, original_list, perm){
+  sapply(1:perm, function(x) {
+    set.seed(x)
+    rnd_cpg<-sample(background_CpGs$IlmnID, length(original_list))
+    rnd_distance<-anno_EPIC_minimal$distance_to_ORC[which(anno_EPIC_minimal$IlmnID%in%rnd_cpg)]
+    median(rnd_distance)})}
+
+perm=1000
+hypo_rnd_median<-dis_means(background_hypo, hypo_distance, perm)
+(length(which(hypo_rnd_median>median(hypo_distance)))+1)/(perm+1)
+(length(which(hypo_rnd_median<median(hypo_distance)))+1)/(perm+1)
+
+hyper_rnd_median<-dis_means(background_hyper, hyper_distance, perm)
+(length(which(hyper_rnd_median>median(hyper_distance)))+1)/(perm+1)
+(length(which(hyper_rnd_median<median(hyper_distance)))+1)/(perm+1)
+
+hetero_rnd_median<-dis_means(background, hetero_distance, perm)
+(length(which(hetero_rnd_median>median(hetero_distance)))+1)/(perm+1)
+(length(which(hetero_rnd_median<median(hetero_distance)))+1)/(perm+1)
+
+plt_df_background_median<-data.frame(distance=c(hypo_rnd_median,hyper_rnd_median,hetero_rnd_median), list_cpg=rep(c("hypo", "hyper","hetero"), each = perm))
+plt_lines_median<-data.frame(distance=c(median(hypo_distance), median(hyper_distance), median(hetero_distance)), list_cpg=c("hypo", "hyper","hetero"))
+
+plt_df_passage_median<-data.frame(distance=c(hypo_distance,hyper_distance,hetero_distance), list_cpg=rep(c("hypo1", "hyper1","hetero1"), times = c(length(hypo_distance),length(hyper_distance),length(hetero_distance))))
+
+
+median(hypo_distance)
+median(hyper_distance)
+median(hetero_distance)
+
+
+
+############
+#'### continuous
+############
+
+pvals_long_distance<-merge(pvals_long, anno_EPIC_minimal, by.x="CpG", by.y="IlmnID")
+pvals_long_distance$direction<-"gain"
+pvals_long_distance$direction[which((pvals_long_distance$mean_db)>=0)]<-"lose"
+
+ggplot(pvals_long_distance, aes(log(distance_to_ORC), mean_db))+geom_bin2d()
+ggplot(pvals_long_distance, aes(log(distance_to_ORC), mean_db))+geom_hex()
+ggplot(pvals_long_distance, aes(distance_to_ORC, mean_db))+geom_bin2d()
+
+
+ggplot(pvals_long_distance[sample(1:nrow(pvals_long_distance), 1000),], aes(distance_to_ORC, mean_db)) +
+  geom_density_2d(show.legend = FALSE) +
+  coord_cartesian(expand = FALSE)
+
+ggplot(pvals_long_distance, aes(log(distance_to_ORC), mean_db))+geom_smooth()
+
+ggplot(pvals_long_distance, aes(distance_to_ORC, mean_db))+geom_smooth()+facet_wrap(~direction, scales="free_y", ncol=1)
+ggplot(pvals_long_distance, aes(-log10(distance_to_ORC), mean_db))+geom_smooth()+facet_wrap(~direction, scales="free_y", ncol=1)
+
+
+ggplot(pvals_long_distance, aes(distance_to_ORC, mean_db))+geom_bin2d()+geom_smooth()+facet_wrap(~direction, scales="free_y", ncol=1)
+ggplot(pvals_long_distance, aes(distance_to_ORC, mean_db))+geom_bin2d()+geom_smooth()+facet_wrap(~direction, scales="free_y")+ylim()
+ggplot(pvals_long_distance, aes(distance_to_ORC, mean_db))+geom_bin2d()+geom_smooth()+facet_wrap(~direction, scales="free_y")+ylim()
+
+ggplot(pvals_long_distance, aes(-log10(distance_to_ORC), mean_db))+geom_bin2d(bins=100)
+
+
+
+
+cor(pvals_long_distance[which(pvals_long_distance$direction>0),]$mean_db, pvals_long_distance[which(pvals_long_distance$direction>0),]$distance_to_ORC)
+cor(pvals_long_distance[which(pvals_long_distance$direction<0),]$mean_db, pvals_long_distance[which(pvals_long_distance$direction<0),]$distance_to_ORC)
+
+plot_grid(ggplot(pvals_long_distance, aes(distance_to_ORC, mean_db))+geom_smooth()+facet_wrap(~direction, scales="free_y", ncol=1),
+          ggplot(pvals_long_distance, aes(mean_db))+geom_density(fill="lightgrey")+facet_wrap(~direction, scales="free_y", ncol=1)+coord_flip(),
+          ggplot(pvals_long_distance, aes(distance_to_ORC))+geom_density(fill="lightgrey")+theme_bw()+th)
+
+placeholder<-ggplot() + theme_void()
+plot_grid(ggplot(pvals_long_distance, aes(distance_to_ORC))+geom_density(fill="lightgrey")+theme_bw()+th,placeholder,
+          ggplot(pvals_long_distance[which(pvals_long_distance$direction=="gain"),], aes(distance_to_ORC, mean_db))+geom_smooth()+ylim(0,-0.5),
+          ggplot(pvals_long_distance[which(pvals_long_distance$direction=="gain"),], aes(mean_db))+geom_density(fill="lightgrey")+coord_flip()+xlim(0,-0.5),
+          ggplot(pvals_long_distance[which(pvals_long_distance$direction=="lose"),], aes(distance_to_ORC, mean_db))+geom_smooth()+ylim(0,0.5),
+          ggplot(pvals_long_distance[which(pvals_long_distance$direction=="lose"),], aes(mean_db))+geom_density(fill="lightgrey")+coord_flip()+xlim(0,0.5), 
+          ncol=2,align = "hv")
+
+
+plot_grid(ggplot(pvals_long_distance, aes(distance_to_ORC))+geom_density(fill="lightgrey")+theme_bw()+th,
+          ggplot(pvals_long_distance[which(pvals_long_distance$direction=="gain"),], aes(distance_to_ORC, mean_db))+geom_smooth(),
+          ggplot(pvals_long_distance[which(pvals_long_distance$direction=="lose"),], aes(distance_to_ORC, mean_db))+geom_smooth(),
+          ncol=1,align = "hv")
+
+
+## volcano style plot
+pvals_long_distance$Interesting_CpG3<-sapply(1:nrow(pvals_long_distance), function(x) if(pvals_long_distance$diff_fdr[x]<=0.05){
+  if(abs(pvals_long_distance$mean_db[x])>0.15){
+    if(pvals_long_distance$mean_db[x]>0.15){"Lose Methylation\n(Significant)"}else{"Gain Methylation\n (Significant)"}
+  }else{if(pvals_long_distance$mean_db[x]>0){"Lose Methylation"}else{"Gain Methylation"}}}else{"Not Significantly Different"})
+
+
+myColors <- c(muted("red", l=80, c=30),"red",muted("blue", l=70, c=40),"blue", "grey")
+
+color_possibilities<-c("Lose Methylation",
+                       "Lose Methylation\n(Significant)",
+                       "Gain Methylation",
+                       "Gain Methylation\n (Significant)",
+                       "Not Significantly Different")
+
+names(myColors) <- color_possibilities
+colscale <- scale_color_manual(name = "Passage Association",
+                               values = myColors, drop = FALSE)
+
+
+#omg
+ggplot(pvals_long_distance[1:20000,], aes(mean_db, -log10(distance_to_ORC), color=Interesting_CpG3))+
+  geom_point(shape=19, size=1, alpha=0.1)+theme_bw()+
+  colscale+
+  geom_vline(xintercept=c(-0.15,0.15), color="grey60")+
+  ylab("-log 10 distance_to_ORC")+xlab("Delta Beta")+
+  theme(plot.margin=unit(c(1,1,1,2),"cm"))+ th+
+  guides(color = guide_legend(override.aes = list(size = 4)))
+
+ggplot(pvals_long_distance[1:200000,], aes(mean_db, (distance_to_ORC), color=Interesting_CpG3))+
+  geom_point(shape=19, size=1, alpha=0.1)+theme_bw()+
+  colscale+
+  geom_vline(xintercept=c(-0.15,0.15), color="grey60")+
+  ylab("distance_to_ORC")+xlab("Delta Beta")+
+  theme(plot.margin=unit(c(1,1,1,2),"cm"))+ th+
+  guides(color = guide_legend(override.aes = list(size = 4)))
+
+hist(-log10(pvals_long_distance$distance_to_ORC))
+hist((pvals_long_distance$mean_db))
