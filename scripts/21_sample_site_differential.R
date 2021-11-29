@@ -67,19 +67,24 @@ CpG_order<-rownames(db_top)[order(db_top$delta_beta)]
 
 heat_plot_df$X1<-factor(heat_plot_df$X1, levels=CpG_order)
 
-beta_palette <- colorRampPalette(rev(brewer.pal(11, "RdBu")))
+beta_palette <- colorRampPalette((brewer.pal(9, "Blues")))
 
 plot_grid(
-  ggplot()+geom_tile(aes(X2, 1, fill=sample.site),heat_plot_df)+theme_void()+fillscale_sampsite,
+  ggplot()+geom_tile(aes(X2, 1, fill=sample.site),heat_plot_df)+theme_void()+fillscale_sampsite+
+    geom_text(aes(x=c(20, 60), 1, label=c("SC","TI")))+ theme(legend.position = "none"),
   ggplot()+geom_tile(aes(X2, 1, fill=as.factor(passage.or.rescope.no_numeric)),heat_plot_df)+ 
-    scale_fill_manual(values=pass_col,name="Passage\nNumber")+th+theme_void(),
+    scale_fill_manual(values=pass_col,name="Passage")+th+theme_void()+guides(fill=guide_legend(ncol=3))+
+    theme( legend.key.height= unit(0.01, 'cm'),legend.key.width= unit(0.25, 'cm'), 
+           legend.title = element_text(size=6),legend.text = element_text(size=4)),
   ggplot()+geom_tile(aes(X2, X1, fill=value),heat_plot_df)+
     ylab("CpG")+xlab("Individual")+
     scale_fill_gradientn(colours = beta_palette(100), limits=c(0, 1))+
     theme(axis.text = element_blank(),
           axis.ticks = element_blank()),
-  ncol=1, align="v", rel_heights = c(1,1,15))
+  ncol=1, align="v",axis="lr", rel_heights = c(1,1,18))
 
+ggsave(file=here("figs", "heat_plot_samplesite_top.pdf"), w=7, h=5 )
+ggsave(file=here("figs/jpeg", "heat_plot_samplesite_top.jpeg"), w=7, h=5 )
 
 
 #### overlap with passage hits
@@ -111,6 +116,8 @@ length(intersect(diff_CpG_db_hypo, rownames(organoid_hits)))
 length(intersect(diff_CpG_db_hyper, rownames(organoid_hits)))
 length(intersect(hetero_CpG, rownames(organoid_hits)))
 
+paste(round((length(intersect(c(hetero_CpG,diff_CpG_db_hyper,diff_CpG_db_hypo), rownames(organoid_hits)))/length(rownames(organoid_hits)))*100,2), "% of sample site CpGs differential with passage")
+
 
 ## hypo heatplot
 organoid_beta_topdiff<-organoid_beta[which(rownames(organoid_beta)%in%intersect(diff_CpG_db_hypo, rownames(organoid_hits))),]
@@ -125,7 +132,9 @@ CpG_order<-rownames(db_top)[order(db_top$delta_beta)]
 
 heat_plot_df$X1<-factor(heat_plot_df$X1, levels=CpG_order)
 
-beta_palette <- colorRampPalette(rev(brewer.pal(11, "RdBu")))
+#beta_palette <- colorRampPalette(rev(brewer.pal(11, "RdBu")))
+beta_palette <- colorRampPalette((brewer.pal(9, "Blues")))
+
 
 plot_grid(
   ggplot()+geom_tile(aes(X2, 1, fill=sample.site),heat_plot_df)+theme_void()+fillscale_sampsite,
@@ -192,3 +201,58 @@ plot_grid(
     theme(axis.text = element_blank(),
           axis.ticks = element_blank()),
   ncol=1, align="v", rel_heights = c(1,1,15))
+
+
+
+##################
+#'## Overlap by chance
+##################
+anno_EPIC<-read.csv(here("data", "MethylationEPIC_v-1-0_B4.csv"), skip=7)
+
+#' ### Backgorund CpG List to compare to
+#' CpGs which have an passage=0 intercept <0.15 need to be excluded from the hypomethylayed background. Since they start <0.15 they can decrease by >0.15 as there is a lower limit of 0.
+#' CpGs which have an passage=0 intercept >0.85 need to be excluded from the hypermethylayed background. Since they start >0.15 they can increase by >0.15 as there is a upper limit of 1.
+background<-anno_EPIC[which(anno_EPIC$IlmnID%in%rownames(organoid_beta)), c('IlmnID', 'CHR', 'MAPINFO')]
+
+intercepts<-sapply(1:nrow(organoid_beta), function(x) as.numeric(lm(organoid_beta[x,]~epic.organoid$passage.or.rescope.no_numeric)$coefficients[1]))
+
+rm_hypo<-rownames(organoid_beta)[which(intercepts<=0.15)]
+rm_hyper<-rownames(organoid_beta)[which(intercepts>=0.85)]
+
+length(rm_hypo)
+length(rm_hyper)
+
+background_hypo<-background[which(!(background$IlmnID%in%rm_hypo)),]
+background_hyper<-background[which(!(background$IlmnID%in%rm_hyper)),]
+
+
+length(intersect(diff_CpG_db_hypo, rownames(organoid_hits)))
+
+
+
+### Random CpG Overlap
+overlap_rnd<-function(background_CpGs, original_list, perm){
+  sapply(1:perm, function(x) {
+    set.seed(x)
+    rnd_cpg<-sample(background_CpGs$IlmnID, length(original_list))
+    length(intersect(rnd_cpg, rownames(organoid_hits)))
+    })}
+
+perm=1000
+hypo_sitediff<-length(intersect(diff_CpG_db_hypo, rownames(organoid_hits)))
+hypo_rnd<-overlap_rnd(background_hypo, diff_CpG_db_hypo, perm)
+(length(which(hypo_rnd>hypo_sitediff))+1)/(perm+1)
+(length(which(hypo_rnd<hypo_sitediff))+1)/(perm+1)
+
+hyper_sitediff<-length(intersect(diff_CpG_db_hyper, rownames(organoid_hits)))
+hyper_rnd<-overlap_rnd(background_hyper, diff_CpG_db_hyper, perm)
+(length(which(hyper_rnd>hyper_sitediff))+1)/(perm+1)
+(length(which(hyper_rnd<hyper_sitediff))+1)/(perm+1)
+
+hetero_sitediff<-length(intersect(hetero_CpG, rownames(organoid_hits)))
+hetero_rnd<-overlap_rnd(background, hetero_CpG, perm)
+(length(which(hetero_rnd>hetero_sitediff))+1)/(perm+1)
+(length(which(hetero_rnd<hetero_sitediff))+1)/(perm+1)
+
+
+
