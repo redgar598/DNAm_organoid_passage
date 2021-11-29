@@ -47,7 +47,7 @@ epic.organoid<-epic.organoid[which(epic.organoid$det_pval<0.005),]
 # multiple DMAP files common with epic so need to force https://support.bioconductor.org/p/97773/
 rgset_organoid <- read.metharray(epic.organoid$array.id.path, verbose = FALSE,force=TRUE)
 MSet.illumina <- preprocessFunnorm(rgset_organoid, sex=epic.organoid$sex)
-organoid_beta<-getBeta(MSet.illumina)
+organoid_beta<-as.data.frame(getBeta(MSet.illumina))
 
 
 organoid_beta<-organoid_beta[which(rownames(organoid_beta)%in%datmini$Name),]#24443
