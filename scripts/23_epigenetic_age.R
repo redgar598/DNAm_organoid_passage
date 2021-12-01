@@ -34,21 +34,21 @@ rgset_organoid <- read.metharray(epic.organoid$array.id.path, verbose = FALSE,fo
 #http://bioconductor.org/help/course-materials/2015/BioC2015/methylation450k.html
 MSet.illumina <- preprocessFunnorm(rgset_organoid, sex=epic.organoid$sex)
 organoid_beta<-as.data.frame(getBeta(MSet.illumina))
-
-avg_detPval <- colMeans(detectionP(rgset_organoid))
-epic.organoid$det_pval<-avg_detPval
-
-print(paste("Number of samples: ", nrow(epic.organoid), sep=""))
-epic.organoid<-epic.organoid[which(epic.organoid$det_pval<0.005),]
-epic.organoid[(which(epic.organoid$det_pval>0.005)),]
-
-#'Number of samples after removal of high detection p value: `r nrow(epic.organoid)`
-#'
-#' Normalize raw again but this time without bad samples
-# multiple DMAP files common with epic so need to force https://support.bioconductor.org/p/97773/
-rgset_organoid <- read.metharray(epic.organoid$array.id.path, verbose = FALSE,force=TRUE)
-MSet.illumina <- preprocessFunnorm(rgset_organoid, sex=epic.organoid$sex)
-organoid_beta<-as.data.frame(getBeta(MSet.illumina))
+#' 
+#' avg_detPval <- colMeans(detectionP(rgset_organoid))
+#' epic.organoid$det_pval<-avg_detPval
+#' 
+#' print(paste("Number of samples: ", nrow(epic.organoid), sep=""))
+#' epic.organoid<-epic.organoid[which(epic.organoid$det_pval<0.005),]
+#' epic.organoid[(which(epic.organoid$det_pval>0.005)),]
+#' 
+#' #'Number of samples after removal of high detection p value: `r nrow(epic.organoid)`
+#' #'
+#' #' Normalize raw again but this time without bad samples
+#' # multiple DMAP files common with epic so need to force https://support.bioconductor.org/p/97773/
+#' rgset_organoid <- read.metharray(epic.organoid$array.id.path, verbose = FALSE,force=TRUE)
+#' MSet.illumina <- preprocessFunnorm(rgset_organoid, sex=epic.organoid$sex)
+#' organoid_beta<-as.data.frame(getBeta(MSet.illumina))
 
 dim(organoid_beta)
 
@@ -57,7 +57,7 @@ datNA<-datmini[which(!(datmini$Name%in%rownames(organoid_beta))),]
 organoid_beta[datNA$Name,]<-NA
 organoid_beta$ProbeID<-rownames(organoid_beta)
 dim(organoid_beta)
-organoid_beta<-organoid_beta[,c(81, 1:80)]
+organoid_beta<-organoid_beta[,c(83, 1:82)]
 
 #format for clock
 write.csv(organoid_beta, file="data/organoid_clock.csv", row.names = F, quote = F)
