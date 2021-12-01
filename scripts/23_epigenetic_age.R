@@ -40,6 +40,7 @@ epic.organoid$det_pval<-avg_detPval
 
 print(paste("Number of samples: ", nrow(epic.organoid), sep=""))
 epic.organoid<-epic.organoid[which(epic.organoid$det_pval<0.005),]
+epic.organoid[(which(epic.organoid$det_pval>0.005)),]
 
 #'Number of samples after removal of high detection p value: `r nrow(epic.organoid)`
 #'

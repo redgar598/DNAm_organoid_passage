@@ -179,3 +179,4 @@ scp redgar@ebi:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/output/01_val
 scp redgar@ebi:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/data/validation/DNAm/validation_betas_normalized.RData /home/redgar/Documents/DNAm_organoid_passage/data/validation/DNAm
 
 
+scp redgar@ebi-login:/nfs/research1/zerbino/redgar/DNAm_organoid_passage/data/*clock* /home/redgar/Documents/DNAm_organoid_passage/data
