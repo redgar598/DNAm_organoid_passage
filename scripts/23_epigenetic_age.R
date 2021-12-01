@@ -49,11 +49,13 @@ rgset_organoid <- read.metharray(epic.organoid$array.id.path, verbose = FALSE,fo
 MSet.illumina <- preprocessFunnorm(rgset_organoid, sex=epic.organoid$sex)
 organoid_beta<-as.data.frame(getBeta(MSet.illumina))
 
+dim(organoid_beta)
 
 organoid_beta<-organoid_beta[which(rownames(organoid_beta)%in%datmini$Name),]#24443
 datNA<-datmini[which(!(datmini$Name%in%rownames(organoid_beta))),]
 organoid_beta[datNA$Name,]<-NA
 organoid_beta$ProbeID<-rownames(organoid_beta)
+dim(organoid_beta)
 organoid_beta<-organoid_beta[,c(81, 1:80)]
 
 #format for clock
