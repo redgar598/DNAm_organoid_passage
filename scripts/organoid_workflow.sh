@@ -145,6 +145,23 @@ bsub -M 10000 -R "rusage[mem=10000]" -n 8 bash scripts/validation/rnaseq/01_RNA_
 bsub -M 10000 -R "rusage[mem=10000]" -n 8 bash scripts/validation/rnaseq/02_RNA_seq_runs_merge.sh
 bsub -M 10000 -R "rusage[mem=10000]" -n 8 bash scripts/validation/rnaseq/04_RNA_seq_quantification.sh
 
+
+
+
+##############
+## Segement seperate Permutate the heteroskedacity and differential pvalue calculations
+##############
+for iter in $(seq 1 10 1000); do
+	bsub -M 15000 -R "rusage[mem=15000]" python scripts/02_heteroskedasicity_CpGs.py $iter
+done
+
+#combine outputs into one file
+bsub -M 25000 -R "rusage[mem=25000]" python scripts/03_heteroskedascity_CpGs_combine.py
+
+
+
+
+
 # bsub -M 10000 -R "rusage[mem=10000]" -n 8 bash RNAseq/rna_seq_quantification.sh
 # bsub -M 80000 -R "rusage[mem=40000]" Rscript RNAseq/sleuth_exploratory.R
 # bsub -M 80000 -R "rusage[mem=20000]" Rscript RNAseq/rna_seq_countadjustment.R

@@ -312,6 +312,24 @@ ggsave(here("figs","heat_scree_EPIC_organoid.pdf"), suppressWarnings(heat_scree_
 ggsave(here("figs/jpeg","heat_scree_EPIC_organoid.jpeg"), suppressWarnings(heat_scree_plot(Loadings, Importance, 3.4, 2.75)),width = 9, height = 6)
 
 
+
+#' #### heat scree simplified
+meta_categorical <- epic.organoid[, c(5,9)]  # input column numbers in meta that contain categorical variables
+meta_continuous <- as.data.frame(epic.organoid[, c(10, 17)] ) # input column numbers in meta that contain continuous variables
+colnames(meta_categorical) <- c("Sample Site","Gender")
+colnames(meta_continuous) <- c("Age", "Passage")
+
+ord<-c(1,4,3,2)
+# how many PCs to display in plot?
+PCs_to_view<-10
+
+suppressWarnings(heat_scree_plot(Loadings, Importance, 3.4, 2.75))
+
+ggsave(here("figs","heat_scree_EPIC_organoid_simplified.pdf"), suppressWarnings(heat_scree_plot(Loadings, Importance, 3.3, 2.8)),width = 9, height = 5)
+ggsave(here("figs/jpeg","heat_scree_EPIC_organoid_simplified.jpeg"), suppressWarnings(heat_scree_plot(Loadings, Importance, 3.3, 2.8)),width = 9, height = 5)
+
+
+
 #' ### PC vs PC plot
 Loadings$array.id<-rownames(Loadings)
 Loadings_meta<-merge(Loadings, epic.organoid, by="array.id")
