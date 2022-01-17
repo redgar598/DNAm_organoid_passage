@@ -478,6 +478,7 @@ diff_markers_low[which(!(diff_markers_low$ext_gene%in%diff_markers_high$ext_gene
 diff_markers_low[which(!(diff_markers_low$target_id%in%diff_markers_high$target_id)),]
 
 
+
 # gene level sumary
 mat_high <- sleuth:::spread_abundance_by(so_diff_high$obs_norm, "scaled_reads_per_base",  so_diff_high$sample_to_covariates$sample)
 mat_low <- sleuth:::spread_abundance_by(so_diff_low$obs_norm, "scaled_reads_per_base",  so_diff_low$sample_to_covariates$sample)
@@ -577,6 +578,8 @@ length(unique(sleuth_sig_DNAm$ext_gene))
 
 gene_exp_plot_differentiation(c("DISC1","BCL3","NR1D1","LYZ"))
 
+write.table(unique(sleuth_significant_low_tested$ext_gene), file=here("data/validation","low_differentiationgenes.txt"), quote=F, row.names = F, col.names = F)
+write.table(unique(sleuth_significant_high_tested$ext_gene), file=here("data/validation","high_differentiationgenes.txt"), quote=F, row.names = F, col.names = F)
 
 write.table(unique(low_not_high_diff$ext_gene), file=here("data/validation","low_not_high_differentiationgenes.txt"), quote=F, row.names = F, col.names = F)
 
@@ -899,6 +902,11 @@ gene_exp_plot_treatment("NDUFA8")
 gene_exp_plot_treatment("NDUFA7")
 gene_exp_plot_treatment("SEC24B")
 
+
+write.table(unique(sleuth_significant_low_tested$ext_gene), file=here("data/validation","low_treatmentgenes.txt"), quote=F, row.names = F, col.names = F)
+write.table(unique(unique(sleuth_significant_high_tested$ext_gene)), file=here("data/validation","high_treatmentgenes.txt"), quote=F, row.names = F, col.names = F)
+
+
 write.table(unique(low_not_high_treatment$ext_gene), file=here("data/validation","low_not_high_treatmentgenes.txt"), quote=F, row.names = F, col.names = F)
 
 
@@ -1103,6 +1111,10 @@ low_not_high_treatment[grep("DNMT|TET|TLR",low_not_high_treatment$ext_gene),]
 gene_exp_plot_treatment("PGLYRP4")
 gene_exp_plot_treatment("ARRDC3")
 gene_exp_plot_treatment("DUOXA2")
+
+write.table(unique(sleuth_significant_low_tested$ext_gene), file=here("data/validation","low_treatmentgenes_TNFa.txt"), quote=F, row.names = F, col.names = F)
+write.table(unique(unique(sleuth_significant_high_tested$ext_gene)), file=here("data/validation","high_treatmentgenes_TNFa.txt"), quote=F, row.names = F, col.names = F)
+
 
 write.table(unique(low_not_high_treatment$ext_gene), file=here("data/validation","low_not_high_treatmentgenes_TNFa.txt"), quote=F, row.names = F, col.names = F)
 

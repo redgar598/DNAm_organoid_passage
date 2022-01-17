@@ -65,6 +65,12 @@ identical(colnames(GSE48684_beta), GSE48684$gsm)
 
 GSE48684$description_simple<-sapply(1:nrow(GSE48684), function(x) strsplit(GSE48684$description[x],";\t|-")[[1]][1])
 
+# GSE48684$sex<-sapply(1:nrow(GSE48684), function(x) strsplit(GSE48684$characteristics_ch1[x],";\t|-")[[1]][grep("gender",strsplit(GSE48684$characteristics_ch1[x],";\t|-")[[1]])])
+# GSE48684$sex<-as.factor(GSE48684$sex)
+# levels(GSE48684$sex)<-c("F","F","M","M")
+# GSE48684$region<-sapply(1:nrow(GSE48684), function(x) strsplit(GSE48684$characteristics_ch1[x],";\t|-")[[1]][2])
+
+
 GSE48684_beta<-GSE48684_beta
 GSE48684_cancer<-GSE48684
 identical(colnames(GSE48684_beta), GSE48684_cancer$gsm)

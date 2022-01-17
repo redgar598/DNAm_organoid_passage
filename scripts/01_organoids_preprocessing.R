@@ -316,7 +316,7 @@ ggsave(here("figs/jpeg","heat_scree_EPIC_organoid.jpeg"), suppressWarnings(heat_
 #' #### heat scree simplified
 meta_categorical <- epic.organoid[, c(5,9)]  # input column numbers in meta that contain categorical variables
 meta_continuous <- as.data.frame(epic.organoid[, c(10, 17)] ) # input column numbers in meta that contain continuous variables
-colnames(meta_categorical) <- c("Sample Site","Gender")
+colnames(meta_categorical) <- c("Segment","Gender")
 colnames(meta_continuous) <- c("Age", "Passage")
 
 ord<-c(1,4,3,2)
@@ -325,8 +325,8 @@ PCs_to_view<-10
 
 suppressWarnings(heat_scree_plot(Loadings, Importance, 3.4, 2.75))
 
-ggsave(here("figs","heat_scree_EPIC_organoid_simplified.pdf"), suppressWarnings(heat_scree_plot(Loadings, Importance, 3.3, 2.8)),width = 9, height = 5)
-ggsave(here("figs/jpeg","heat_scree_EPIC_organoid_simplified.jpeg"), suppressWarnings(heat_scree_plot(Loadings, Importance, 3.3, 2.8)),width = 9, height = 5)
+ggsave(here("figs","heat_scree_EPIC_organoid_simplified.pdf"), suppressWarnings(heat_scree_plot(Loadings, Importance, 3.3, 3.3)),width = 9, height = 5)
+ggsave(here("figs/jpeg","heat_scree_EPIC_organoid_simplified.jpeg"), suppressWarnings(heat_scree_plot(Loadings, Importance, 3.3, 3.3)),width = 9, height = 5)
 
 
 

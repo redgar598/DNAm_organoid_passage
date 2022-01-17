@@ -370,6 +370,22 @@ PCs_to_view<-10
 suppressWarnings(heat_scree_plot(Loadings, Importance, 2.5, 2.7))
 
 
+## heat scree simplier
+meta_categorical <- sampleinfo_organoid_notfetal[, c(8,13)]  # input column numbers in meta that contain categorical variables
+meta_continuous <- sampleinfo_organoid_notfetal[, c(9,21)]  # input column numbers in meta that contain continuous variables
+colnames(meta_categorical) <- c("Segment","Gender")
+colnames(meta_continuous) <- c("Age", "Passage")
+meta_continuous$Age<-as.numeric(meta_continuous$Age)
+
+
+ord<-c(1,4,3,2)
+PCs_to_view<-10
+suppressWarnings(heat_scree_plot(Loadings, Importance, 2.5, 2.7))
+
+ggsave(here("figs","MTAB4957_Ped_heat_scree_simplified.pdf"), suppressWarnings(heat_scree_plot(Loadings, Importance, 3.3, 3.3)),width = 9, height = 5)
+ggsave(here("figs/jpeg","MTAB4957_Ped_heat_scree_simplified.jpeg"), suppressWarnings(heat_scree_plot(Loadings, Importance, 3.3, 3.3)),width = 9, height = 5)
+
+
 ## PC vs PC plot
 Loadings$Assay.Name<-rownames(Loadings)
 Loadings_meta<-merge(Loadings, sampleinfo_organoid_notfetal, by="Assay.Name")
@@ -402,18 +418,21 @@ pc_plt<-ggplot(Loadings_meta, aes(PC2, PC3, fill=as.factor(passage.or.rescope.no
   theme_bw()+xlab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+ylab(paste("PC3 (",round(Importance[3]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),axis.title = element_text(size=14))+
   scale_fill_manual(values=pass_col,name="Passage\nNumber")+scale_color_manual(values=c("black","white","black"))
 
+
 legend<-ggplot(sampleinfo_organoid_notfetal, aes(as.factor(-passage.or.rescope.no_numeric), fill=as.factor(passage.or.rescope.no_numeric)))+geom_bar(color="black")+
   theme_bw()+theme(legend.position = "none", axis.text.y = element_blank(),
                    axis.title.y = element_blank(),
                    axis.ticks.y = element_blank(),
                    legend.title=element_text(size=10),
                    legend.text=element_text(size=8))+
-  coord_flip()+
+  coord_flip()+scale_y_continuous(breaks = seq(0, 10, by = 2))+
   scale_fill_manual(values=pass_col,name="Passage\nNumber")+th
 
 r <- ggplot() + theme_void()
 
 grid.arrange(pc_plt,arrangeGrob(r,legend,r, heights=c(0.6,1.25,0.4)), ncol=2, widths=c(7,1))
+ggsave(here("figs","MTAB4957_Ped_PC2_PC3_organoid.pdf"), grid.arrange(pc_plt,arrangeGrob(r,legend,r, heights=c(0.6,1,0.4)), ncol=2, widths=c(7,1)),width = 7, height = 5)
+ggsave(here("figs/jpeg","MTAB4957_Ped_PC2_PC3_organoid.jpeg"), grid.arrange(pc_plt,arrangeGrob(r,legend,r, heights=c(0.6,1,0.4)), ncol=2, widths=c(7,1)),width = 7, height = 5)
 
 
 

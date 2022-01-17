@@ -582,6 +582,24 @@ Loadings<-as.data.frame(pca_res$x)
 vars <- pca_res$sdev^2
 Importance<-vars/sum(vars)
 
+meta_categorical <- GSE141256_meta_combo_spheroids[, c(3,11)]  # input column numbers in meta that contain categorical variables
+meta_continuous <- as.data.frame(GSE141256_meta_combo_spheroids[, c(16, 10)] ) # input column numbers in meta that contain continuous variables
+colnames(meta_categorical) <- c("Segment", "Gender")
+colnames(meta_continuous) <- c("Passage", "Age")
+
+ord<-c(1,3,4,2)
+# how far do you want the plot to go?
+PCs_to_view<-10
+
+suppressWarnings(heat_scree_plot(Loadings, Importance, 2.5, 2.7))
+
+ggsave(here("figs/GSE141256_only_organoids_heat_scree_after_combat_simplified.pdf"), suppressWarnings(heat_scree_plot(Loadings, Importance, 3.3, 3.3)),width = 9, height = 5)
+ggsave(here("figs/jpeg","GSE141256_only_organoids_heat_scree_after_combat_simplified.jpeg"), suppressWarnings(heat_scree_plot(Loadings, Importance, 3.3, 3.3)),width = 9, height = 5)
+
+
+
+
+
 Loadings$Assay.Name<-rownames(Loadings)
 Loadings_meta<-merge(Loadings, GSE141256_meta_combo_spheroids, by="Assay.Name")
 
@@ -600,8 +618,31 @@ pc2<-ggplot(Loadings_meta, aes(PC2, PC3, fill=as.factor(passage.or.numeric.facto
 
 grid.arrange(pc1, pc2)
 
-ggsave(here("figs/GSE141256_organoid_PCA.pdf"),grid.arrange(pc1, pc2),width = 3.75, height = 2.5)
-ggsave(here("figs/jpeg","GSE141256_organoid_PCA.jpeg"), grid.arrange(pc1, pc2),width = 7.5, height = 5)
+ggsave(here("figs/GSE141256_organoid_PCA.pdf"),grid.arrange(pc1, pc2),width = 6, height = 8)
+ggsave(here("figs/jpeg","GSE141256_organoid_PCA.jpeg"), grid.arrange(pc1, pc2),width = 7.5, height = 10)
+
+Loadings_meta$Sample.ID<-sapply(1:nrow(Loadings_meta), function(x) gsub(" - paired analysis","",Loadings_meta$Sample.ID[x]))
+
+pc_plt<-ggplot(Loadings_meta, aes(PC2, PC3, fill=as.factor(passage_numeric)))+geom_line(aes(PC2,PC3, group=Sample.ID), color="lightgrey")+#, color=sampling.time.point
+  geom_point(shape=21,size=3)+#
+  theme_bw()+xlab(paste("PC2 (",round(Importance[2]*100,0),"%)", sep=""))+ylab(paste("PC3 (",round(Importance[3]*100,0),"%)", sep=""))+th+theme(axis.text = element_text(size=12),axis.title = element_text(size=14))+
+  scale_fill_manual(values=pass_col,name="Passage\nNumber")+scale_color_manual(values=c("black","white","black"))
+
+
+legend<-ggplot(Loadings_meta, aes(as.factor(-passage_numeric), fill=as.factor(passage_numeric)))+geom_bar(color="black")+
+  theme_bw()+theme(legend.position = "none", axis.text.y = element_blank(),
+                   axis.title.y = element_blank(),
+                   axis.ticks.y = element_blank(),
+                   legend.title=element_text(size=10),
+                   legend.text=element_text(size=8))+
+  coord_flip()+scale_y_continuous(breaks = seq(0, 10, by = 2))+
+  scale_fill_manual(values=pass_col,name="Passage\nNumber")+th
+
+r <- ggplot() + theme_void()
+
+grid.arrange(pc_plt,arrangeGrob(r,legend,r, heights=c(0.6,1,0.4)), ncol=2, widths=c(7,1))
+ggsave(here("figs","GSE141256_PC2_PC3_organoid_legend.pdf"), grid.arrange(pc_plt,arrangeGrob(r,legend,r, heights=c(0.55,0.675,0.4)), ncol=2, widths=c(7,1)),width = 7, height = 5)
+ggsave(here("figs/jpeg","GSE141256_PC2_PC3_organoid_legend.jpeg"), grid.arrange(pc_plt,arrangeGrob(r,legend,r, heights=c(0.55,0.675,0.4)), ncol=2, widths=c(7,1)),width = 7, height = 5)
 
 
 # beta plot variable CpGs
