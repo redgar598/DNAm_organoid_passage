@@ -22,3 +22,9 @@ th <-   theme(axis.text=element_text(size=10),
               strip.text = element_text(size = 12),
               legend.text=element_text(size=12),
               legend.title=element_text(size=14))
+
+th_present <- theme(axis.text=element_text(size=12),
+                    axis.title=element_text(size=14),
+                    strip.text = element_text(size = 12),
+                    legend.text=element_text(size=12),
+                    legend.title=element_text(size=14))

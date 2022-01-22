@@ -168,7 +168,17 @@ ggplot()+#geom_density(aes(distance),plt_df_background, fill="lightgrey", color=
 
 
 
+
+######
 # plot single random versus actual
+######
+# save the background of permutations
+plt_df_background_permutated<-plt_df_background
+plt_lines_background<-as.data.frame(tapply(plt_df_background_permutated$distance, plt_df_background_permutated$list_cpg, mean))
+plt_lines_background$list_cpg<-rownames(plt_lines_background)
+colnames(plt_lines_background)<-c("mean_distance", "list_cpg")
+plt_lines_background$list_cpg<-c("Heteroskedastic","Hypermethylated","Hypomethylated")
+
 set.seed(1)
 hypo_back<-sample(background_hypo$IlmnID, length(hypo_distance))
 hypo_back_distance<-anno_EPIC_minimal$distance_to_ORC[which(anno_EPIC_minimal$IlmnID%in%hypo_back)]
@@ -195,7 +205,7 @@ plt_lines<-data.frame(distance=c(mean(hypo_distance), mean(hyper_distance), mean
 
 ggplot()+
   geom_density(aes((distance), color=rnd_og, fill=rnd_og),plt_df_background)+
-  geom_vline(xintercept=mean(background_distance), color="grey30")+
+  geom_vline(aes(xintercept=mean_distance),plt_lines_background, color="grey30")+
   geom_vline(aes(xintercept=distance),plt_lines, color="#3676e8")+
   theme_bw()+th+facet_wrap(~list_cpg, ncol=1)+
   scale_fill_manual(values=c("lightgrey",NA))+scale_color_manual(values=c("lightgrey","cornflowerblue"))+
@@ -207,7 +217,7 @@ ggsave(here("figs/jpeg","ORC_CpGs_passage_distribution.jpeg"), width = 8, height
 quantile(plt_df_background$distance, seq(0,1,0.1))
 ggplot()+
   geom_density(aes((distance), color=rnd_og, fill=rnd_og),plt_df_background)+
-  geom_vline(xintercept=mean(background_distance), color="grey30")+
+  geom_vline(aes(xintercept=mean_distance),plt_lines_background, color="grey30")+
   geom_vline(aes(xintercept=distance),plt_lines, color="#3676e8")+
   theme_bw()+th+facet_wrap(~list_cpg, ncol=1)+
   scale_fill_manual(values=c("lightgrey",NA))+scale_color_manual(values=c("lightgrey","cornflowerblue"))+
@@ -219,13 +229,25 @@ ggsave(here("figs/jpeg","ORC_CpGs_passage_distributionzoom.jpeg"), width = 8, he
 
 ggplot()+
   geom_density(aes(log(distance), color=rnd_og, fill=rnd_og),plt_df_background)+
-  geom_vline(xintercept=log(mean(background_distance)), color="grey30")+
-  geom_vline(aes(xintercept=log(distance)),plt_lines, color="#3676e8")+
+  geom_vline(aes(xintercept=log(mean_distance)),plt_lines_background, color="grey30")+
+  geom_vline(aes(xintercept=log(distance)),plt_lines, color="#2125A5", size=1)+
   theme_bw()+th+facet_wrap(~list_cpg, ncol=1)+
-  scale_fill_manual(values=c("lightgrey",NA))+scale_color_manual(values=c("lightgrey","cornflowerblue"))+
-  xlab("Distance to ORC Peak (log)")+guides(fill=guide_legend(title="CpGs"),color=guide_legend(title="CpGs"))
+  scale_fill_manual(values=c("lightgrey",NA))+scale_color_manual(values=c("lightgrey","#2125A5"))+
+  xlab("Distance to ORC Site (log)")+guides(fill=guide_legend(title="CpGs"),color=guide_legend(title="CpGs"))
 ggsave(here("figs","ORC_CpGs_passage_distributionlog.pdf"),width = 8, height = 6)
 ggsave(here("figs/jpeg","ORC_CpGs_passage_distributionlog.jpeg"), width = 8, height = 6)
+
+
+plt_df_background$list_cpg<-factor(plt_df_background$list_cpg, levels=c())
+ggplot()+
+  geom_density(aes(log(distance), color=rnd_og, fill=rnd_og),plt_df_background)+
+  geom_vline(aes(xintercept=log(mean_distance)),plt_lines_background, color="grey30", size=0.75)+
+  geom_vline(aes(xintercept=log(distance)),plt_lines, color="#2125A5", size=0.75)+
+  theme_bw()+th+facet_wrap(~list_cpg, ncol=3)+
+  scale_fill_manual(values=c("lightgrey",NA))+scale_color_manual(values=c("lightgrey","#2125A5"))+
+  xlab("Distance to ORC Site (log)")+guides(fill=guide_legend(title="CpGs"),color=guide_legend(title="CpGs"))
+ggsave(here("figs","ORC_CpGs_passage_distributionlog_wide.pdf"),width = 12, height = 3)
+ggsave(here("figs/jpeg","ORC_CpGs_passage_distributionlog_wide.jpeg"), width = 12, height = 3)
 
 
 

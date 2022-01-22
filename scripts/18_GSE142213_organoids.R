@@ -233,6 +233,17 @@ ggplot(Beta_Plot, aes(Beta,color=primary_site))+
            legend.key.size = unit(0.7,"line"))
 
 
+ggplot()+
+  geom_density(data=Beta_Plot, aes(Beta,color=primary_site, group=ID),size=0.75)+
+  theme_bw()+xlab("DNAm Beta Value")+ylab("Density")+
+  th+theme(legend.text = element_text(size=7),
+           legend.title = element_text(size=10),
+           legend.key.size = unit(0.7,"line"))+
+  scale_color_manual(values=c("#cb181d","#1d91c0","#df65b0","#fc8d59","#c7e9b4","#41ab5d"), guide=F)+
+  facet_wrap(~primary_site)
+ggsave(here("figs","GSE144213_variable_CpGs_not_split_tri.pdf"),width = 7, height = 5)
+ggsave(here("figs/jpeg","GSE144213_variable_CpGs_not_split_tri.jpeg"), width = 7, height = 5)
+
 
 
 
