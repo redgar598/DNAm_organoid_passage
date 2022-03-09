@@ -48,6 +48,8 @@ sampleinfo$treatment<-sapply(1:nrow(sampleinfo), function(x) if(sampleinfo$compa
 sampleinfo$differentiation<-sapply(1:nrow(sampleinfo), function(x) if(sampleinfo$comparison[x]=="differentiation"){sampleinfo$condition[x]}else{"UD"})
 
 
+
+
 ###########
 #'# aggregate to gene level
 ###########

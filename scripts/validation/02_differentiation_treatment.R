@@ -330,3 +330,47 @@ gene_DNAm("PSMB9","IFNg")
 #   facet_wrap(~passage_hilo)+cols+fills+
 #   ylab("DNAm Beta")+xlab(xaxis)+ylim(0,1)
 # 
+
+
+
+##########################
+## Confounding example
+##########################
+
+## compare low undiff and high diff
+
+validation_epic.organoid_confoundedlow<-validation_epic.organoid[which(validation_epic.organoid$passage_hilo=="low" & validation_epic.organoid$comparison=="differentiation" & validation_epic.organoid$differentiation=="UD"),]
+validation_epic.organoid_confoundedhigh<-validation_epic.organoid[which(validation_epic.organoid$passage_hilo=="high" & validation_epic.organoid$comparison=="differentiation" & validation_epic.organoid$differentiation=="D"),]
+validation_epic.organoid_confounded<-rbind(validation_epic.organoid_confoundedlow, validation_epic.organoid_confoundedhigh)
+table(validation_epic.organoid_confounded$differentiation, validation_epic.organoid_confounded$passage_hilo)
+
+validation_organoid_beta_confounded<-validation_organoid_beta[,which(colnames(validation_organoid_beta)%in%validation_epic.organoid_confounded$array.id)]
+validation_epic.organoid_confounded<-validation_epic.organoid_confounded[match(colnames(validation_organoid_beta_confounded),validation_epic.organoid_confounded$array.id,),]
+identical(validation_epic.organoid_confounded$array.id, colnames(validation_organoid_beta_confounded))
+
+validation_epic.organoid_confounded$individual<-as.factor(validation_epic.organoid_confounded$individual)
+
+mod<-model.matrix(~ differentiation + individual, data=validation_epic.organoid_confounded)
+fit <- lmFit(validation_organoid_beta_confounded, mod)
+ebfit <- eBayes(fit)
+
+# Delta beta
+confounded_pass_diff_db<-sapply(1:nrow(validation_organoid_beta_confounded), function(x){
+  sampleinfo_cpg<-validation_epic.organoid_confounded
+  sampleinfo_cpg$beta<-as.numeric(validation_organoid_beta_confounded[x,])
+  mns<-tapply(sampleinfo_cpg$beta,  sampleinfo_cpg$differentiation, mean)
+  mns[2]-mns[1]# UD minus D
+})
+
+
+differnetiation_confounded_stats<-data.frame(p.value=ebfit$p.value[,"differentiationUD"], CpG=rownames(validation_organoid_beta_confounded), db=confounded_pass_diff_db)
+
+# Adjust P values
+differnetiation_confounded_stats$p_adjusted<-p.adjust(differnetiation_confounded_stats$p.value, method="BH")
+
+diff_CpG_lowdiff<-differnetiation_confounded_stats[which(differnetiation_confounded_stats$p_adjusted<0.05 & abs(differnetiation_confounded_stats$db)>0.15),] #
+dim(diff_CpG_lowdiff)
+diff_CpG_db_lowdiff<-diff_CpG_lowdiff$CpG[which((diff_CpG_lowdiff$db)>=0.15)] #  
+diff_CpG_db_lowdiff<-diff_CpG_lowdiff$CpG[which((diff_CpG_lowdiff$db)<=(-0.15))] #  
+
+

@@ -90,6 +90,16 @@ mean(hetero_distance)
 mean(anno_EPIC_minimal$distance_to_ORC)
 
 
+### compared to eachother
+plt_df_passage<-data.frame(distance=c(hypo_distance,hyper_distance,hetero_distance), list_cpg=rep(c("Hypomethylated", "Hypermethylated","Heteroskedastic"), times = c(length(hypo_distance),length(hyper_distance),length(hetero_distance))))
+ggplot(plt_df_passage, aes(log(distance), color=list_cpg))+geom_density(size=0.75)+
+  scale_color_manual(values=c("#8da0cb","#66c2a5","#fc8d62"), name="CpG Type")+
+  theme_bw()+th+xlab("Distance to ORC Site (log)")
+
+ggsave(here("figs","Compare_to_each_other_ORC_CpGs_passage.pdf"),width = 5, height = 2)
+ggsave(here("figs/jpeg","Compare_to_each_other_ORC_CpGs_passage.jpeg"), width = 5, height = 2)
+
+
 #' ### Backgorund CpG List to compare to
 #' CpGs which have an passage=0 intercept <0.15 need to be excluded from the hypomethylayed background. Since they start <0.15 they can decrease by >0.15 as there is a lower limit of 0.
 #' CpGs which have an passage=0 intercept >0.85 need to be excluded from the hypermethylayed background. Since they start >0.15 they can increase by >0.15 as there is a upper limit of 1.

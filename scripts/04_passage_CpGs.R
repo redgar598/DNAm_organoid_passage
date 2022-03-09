@@ -130,6 +130,34 @@ background_36<-anno_EPIC[which(anno_EPIC$IlmnID%in%rownames(organoid_beta)), c('
 write.csv(background_36, here("data", "passage_background_build36.csv"), row.names = F)
 
 
+### bar plot percent CpGs
+CpG_proportions<-data.frame(CpG=c("Heteroskedastic","Hypomethylated","Hypermethylated","Not Passage\nAssociated"),
+           Number=c(length(hetero_CpG),length(diff_CpG_db_hypo), length(diff_CpG_db_hyper), (nrow(pvals_long)-sum(length(hetero_CpG),length(diff_CpG_db_hypo), length(diff_CpG_db_hyper))) ))
+
+CpG_proportions$Proportion_CpG<-(CpG_proportions$Number/nrow(pvals_long))*100
+
+ggplot(CpG_proportions, aes(fill=CpG, y=Proportion_CpG, x=1)) + 
+  geom_bar(position="stack", stat="identity")
+
+CpG_proportions<-data.frame(CpG=c("Heteroskedastic","Hypomethylated","Hypermethylated"),
+                            Number=c(length(hetero_CpG),length(diff_CpG_db_hypo), length(diff_CpG_db_hyper) ))
+
+CpG_proportions$Proportion_CpG<-(CpG_proportions$Number/(sum(length(hetero_CpG),length(diff_CpG_db_hypo), length(diff_CpG_db_hyper))))*100
+
+CpG_proportions$CpG<-factor(CpG_proportions$CpG, levels=rev(c("Heteroskedastic","Hypomethylated","Hypermethylated")))
+CpG_proportions$cumsum<-cumsum(CpG_proportions$Proportion_CpG)
+
+ggplot(CpG_proportions, aes(fill=CpG, y=Proportion_CpG, x=1)) + 
+  geom_bar(position="stack", stat="identity", color="black")+coord_flip()+
+  geom_text(aes(x = 1, y = cumsum-(Proportion_CpG/2), label = paste(round(Proportion_CpG),"%", sep="")),colour = "black")+
+  th_present+theme_void()+scale_fill_manual(values=c("#66c2a5","#fc8d62","#8da0cb"))+
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        legend.position = "none")
+
+ggsave(here("figs","Proportions_Passage_all_CpGs.pdf"),width = 6, height = 0.5)
+ggsave(here("figs/jpeg","Proportions_Passage_all_CpGs.jpeg"), width = 6, height = 0.5)
 
 
 

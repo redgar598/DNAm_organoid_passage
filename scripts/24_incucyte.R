@@ -100,3 +100,7 @@ ggsave("figs/incucyte_growth_hilo.pdf", width = 8, height=3)
 ggsave("figs/jpeg/incucyte_growth_hilo.jpeg", width = 8, height=3)
 
 
+aov(agg$mean ~ agg$hilo + agg$segment)
+summary(aov(agg$mean ~ agg$hilo + agg$segment))
+
+
