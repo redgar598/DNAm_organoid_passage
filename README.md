@@ -33,7 +33,6 @@ Below links connect to notebook style outputs (html for R and ipynb for python c
 | 24_incucyte.R <br /> Plotting the incucyte data | 3ce, S3b              |
 | 01_validation_organoids <br /> DNAm in the additional 42 organoids with matched RNAseq  | -              |
 | 02_differentiation_treatment <br /> Differenital DNAm with treatment and differentiation in the  42 organoids  | 4a, S5              |
-
 | 01_RNA_seq_processing <br /> Process the RNAseq of the 42 validation organoids |-               |
 | 02_RNA_seq_runs_merge.sh <br /> Merge multiple runs |-               |
 | 04_RNA_seq_quantification.sh <br /> Quantification of RNAseq reads to counts   | -              |
