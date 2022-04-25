@@ -156,7 +156,7 @@ gene_exp_plot_differentiation<-function(gene, pltrows, dupens_rm, ordered){
   plt$differentiation<-factor(plt$differentiation, levels=c("UD","D"))
   
   ggplot(plt, aes(sample.site, scaled_reads_per_base,fill=differentiation))+geom_boxplot()+
-    geom_point(aes(fill=differentiation), shape=21, color="black", position=position_dodge(width=0.75))+theme_bw()+th+facet_wrap(~passage_hilo)+
+    geom_point(aes(fill=differentiation), shape=21, color="black", position=position_dodge(width=0.75))+theme_bw()+th_present+facet_wrap(~passage_hilo)+
     scale_fill_manual(values=c("#abd9e9","#a1d99b"), name="Differentiation")+ggtitle(label)+
     xlab("Scaled reads per base")+ylab("Segment")}
 
@@ -180,8 +180,8 @@ plot_grid(gene_exp_plot_differentiation("LGR5")+ theme(legend.position="none"),
           gene_exp_plot_differentiation("FABP6")+ theme(legend.position="none"),
           ncol=3, rel_widths=c(1,1,0.5))
 
-ggsave(here("figs","differenital_expression_differentiation_genes_segment_specific.pdf"),width = 10, height = 6)
-ggsave(here("figs/jpeg","differenital_expression_differentiation_genes_segment_specific.jpeg"), width = 10, height = 6)
+ggsave(here("figs","differenital_expression_differentiation_genes_segment_specific.pdf"),width = 7, height = 6)
+ggsave(here("figs/jpeg","differenital_expression_differentiation_genes_segment_specific.jpeg"), width = 7, height = 6)
 
 
 ########################################## interaction

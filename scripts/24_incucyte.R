@@ -92,15 +92,86 @@ agg = ddply(incucyte_df, .(time, hilo, segment), function(x){
 ggplot(agg, aes(x=time, y=mean, group=hilo)) + 
   geom_errorbar(aes(ymin=mean+sterr, ymax=mean-sterr), color="lightgrey", width=.2) +
   geom_line(aes(colour=hilo)) +
-  geom_point(aes(colour=hilo)) +
-  labs(x = "Time (Days)", y = "Organoid Area\n(normalized to 0hr (%))", colour = "Passage")+ylim(0,500)+th_present+theme_bw()+
+  geom_point(aes(colour=hilo), size=0.75) +
+  labs(x = "Time (Days)", y = "Organoid Area\n(normalized to 0hr (%))", colour = "Passage")+th_present+theme_bw()+
   scale_color_manual(values=c("#0055ff","#ff2b00"),name="Passage")+facet_wrap(~segment)
 
-ggsave("figs/incucyte_growth_hilo.pdf", width = 8, height=3)
-ggsave("figs/jpeg/incucyte_growth_hilo.jpeg", width = 8, height=3)
+ggsave("figs/incucyte_growth_hilo.pdf", width = 5, height=2)
+ggsave("figs/jpeg/incucyte_growth_hilo.jpeg", width = 6, height=2)
 
 
 aov(agg$mean ~ agg$hilo + agg$segment)
 summary(aov(agg$mean ~ agg$hilo + agg$segment))
 
 
+
+############################### 
+## forskolin
+############################### 
+pzfx_tables("data/incucyte/Forskolin assay for the passage paper 25.03.22.pzfx")
+
+incucyte_df_early <- read_pzfx("data/incucyte/Forskolin assay for the passage paper 25.03.22.pzfx","early")
+incucyte_df_late <- read_pzfx("data/incucyte/Forskolin assay for the passage paper 25.03.22.pzfx","late")
+
+
+incucyte_df_early<-melt(incucyte_df_early, id="ROWTITLE")
+incucyte_df_early$variable<-as.character(incucyte_df_early$variable)
+incucyte_df_early$treatment<-sapply(1:nrow(incucyte_df_early), function(x) strsplit(incucyte_df_early$variable[x],"_")[[1]][1])
+incucyte_df_early$passage<-"early"
+
+incucyte_df_late<-melt(incucyte_df_late, id="ROWTITLE")
+incucyte_df_late$variable<-as.character(incucyte_df_late$variable)
+incucyte_df_late$treatment<-sapply(1:nrow(incucyte_df_late), function(x) strsplit(incucyte_df_late$variable[x],"_")[[1]][1])
+incucyte_df_late$passage<-"late"
+
+incucyte_df<-rbind(incucyte_df_late, incucyte_df_early)
+
+
+ggplot(incucyte_df, aes(ROWTITLE,value, group=passage ))+geom_point()+
+  stat_summary(fun.y=mean, colour="red", geom="line", aes(group = passage))
+
+std <- function(x) sd(x, na.rm=T)/sqrt(length(x))
+
+
+agg = ddply(incucyte_df, .(ROWTITLE, passage, treatment), function(x){
+  c(mean=mean(x$value, na.rm=T), sterr = std(x$value))
+})
+
+
+ggplot(agg, aes(x=ROWTITLE, y=mean, group=passage)) +
+  geom_errorbar(aes(ymin=mean+sterr, ymax=mean-sterr), color="lightgrey", width=.2) +
+  geom_line(aes(colour=passage)) +
+  geom_point(aes(colour=passage),size=0.75) +
+  labs(x = "Time (Hours)", y = "Organoid Area\n(normalized to 0hr (%))", colour = "Passage")+ylim(0,500)+th_present+theme_bw()+
+  scale_color_manual(values=c("#0055ff","#ff2b00"),name="Passage")+facet_wrap(~treatment)
+
+ggsave("figs/incucyte_forskolin_hilo.pdf", width = 5, height=3)
+ggsave("figs/jpeg/incucyte_forskolin_hilo.jpeg", width = 5, height=3)
+
+
+agg_main<-agg[which(agg$treatment%in%c("IFNg+Forskolin","TNFa+Forskolin")),]
+agg_supp<-agg[which(!(agg$treatment%in%c("IFNg+Forskolin","TNFa+Forskolin"))),]
+
+ggplot(agg_main, aes(x=ROWTITLE, y=mean, group=passage)) +
+  geom_errorbar(aes(ymin=mean+sterr, ymax=mean-sterr), color="lightgrey", width=.2) +
+  geom_line(aes(colour=passage)) +
+  geom_point(aes(colour=passage), size=0.75) +
+  labs(x = "Time (Hours)", y = "Organoid Area\n(normalized to 0hr (%))", colour = "Passage")+th_present+theme_bw()+
+  scale_color_manual(values=c("#0055ff","#ff2b00"),name="Passage")+facet_wrap(~treatment)
+
+ggsave("figs/incucyte_forskolin_hilo_main.pdf", width = 6, height=2)
+ggsave("figs/jpeg/incucyte_forskolin_hilo_main.jpeg", width = 6, height=2)
+
+
+ggplot(agg_supp, aes(x=ROWTITLE, y=mean, group=passage)) +
+  geom_errorbar(aes(ymin=mean+sterr, ymax=mean-sterr), color="lightgrey", width=.2) +
+  geom_line(aes(colour=passage)) +
+  geom_point(aes(colour=passage),size=0.75) +
+  labs(x = "Time (Hours)", y = "Organoid Area\n(normalized to 0hr (%))", colour = "Passage")+th_present+theme_bw()+
+  scale_color_manual(values=c("#0055ff","#ff2b00"),name="Passage")+facet_wrap(~treatment)
+
+ggsave("figs/incucyte_forskolin_hilo_supp.pdf", width = 9, height=2)
+ggsave("figs/jpeg/incucyte_forskolin_hilo_supp.jpeg", width = 9, height=2)
+
+aov(agg$mean ~ agg$passage + agg$treatment)
+summary(aov(agg$mean ~ agg$passage + agg$treatment))

@@ -727,6 +727,59 @@ gene_exp_plot_differentiation(c("FKBP5","STK39","COL1A1","WNT11"),1)
 ggsave(here("figs","differenital_expression_differentiation_genes_difflowhigh.pdf"),width = 10, height = 2.5)
 ggsave(here("figs/jpeg","differenital_expression_differentiation_genes_difflowhigh.jpeg"), width = 10, height = 2.5)
 
+############
+## fold change
+############
+sleuth_significant_low <- dplyr::filter(sleuth_table_low, qval <= 0.01)
+sleuth_significant_high <- dplyr::filter(sleuth_table_high, qval <= 0.01)
+
+sleuth_significant_low_tested<-sleuth_significant_low[which(sleuth_significant_low$target_id%in%sleuth_table_high$target_id),]
+sleuth_significant_high_tested<-sleuth_significant_high[which(sleuth_significant_high$target_id%in%sleuth_table_low$target_id),]
+
+
+so_diff_high <- sleuth_wt(so_diff_high, paste0('differentiationUD'))
+sleuth_table_high_wt <- sleuth_results(so_diff_high, 'differentiationUD', 'wt', show_all = FALSE)
+
+so_diff_low <- sleuth_wt(so_diff_low, paste0('differentiationUD'))
+sleuth_table_low_wt <- sleuth_results(so_diff_low, 'differentiationUD', 'wt', show_all = FALSE)
+
+
+## overlap with fold change
+# 8968/10942 0.819
+
+low_fold_change<-sleuth_table_low_wt[which(abs(sleuth_table_low_wt$b)>0.5),]
+high_fold_change<-sleuth_table_high_wt[which(abs(sleuth_table_high_wt$b)>0.5),]
+
+length(unique(sleuth_significant_high_tested$ext_gene))
+length(unique(sleuth_significant_low_tested$ext_gene))
+
+sig_low_tested_foldchange<-sleuth_significant_low_tested[which(sleuth_significant_low_tested$target_id%in%low_fold_change$target_id),]
+dim(sig_low_tested_foldchange)
+sig_high_tested_foldchange<-sleuth_significant_high_tested[which(sleuth_significant_high_tested$target_id%in%high_fold_change$target_id),]
+dim(sig_high_tested_foldchange)
+
+length(intersect(sig_low_tested_foldchange$ext_gene, sig_high_tested_foldchange$ext_gene))
+
+2790/5224
+
+#manually calculate fold change
+mat_high <- sleuth:::spread_abundance_by(so_diff_high$obs_norm, "scaled_reads_per_base",  so_diff_high$sample_to_covariates$sample)
+mat_low <- sleuth:::spread_abundance_by(so_diff_low$obs_norm, "scaled_reads_per_base",  so_diff_low$sample_to_covariates$sample)
+identical(rownames(mat_low), rownames(mat_high))
+
+mat_high_UD<-mat_high[,grep("UD",colnames(mat_high))]
+mat_high_D<-mat_high[,grep("_D",colnames(mat_high))]
+
+mat_high_UDmean<-rowMeans(mat_high_UD)
+mat_high_Dmean<-rowMeans(mat_high_D)
+
+fc_higha<-log((mat_high_Dmean-mat_high_UDmean)/mat_high_UDmean)
+fc_highb<-log(mat_high_Dmean/mat_high_UDmean)
+fc_highc<-log((mat_high_UDmean-mat_high_Dmean)/mat_high_Dmean)
+
+fc_higha[which(names(fc_higha)%in%sleuth_table_high_wt$target_id[1:5])]
+fc_highb[which(names(fc_highb)%in%sleuth_table_high_wt$target_id[1:5])]
+fc_highc[which(names(fc_highc)%in%sleuth_table_high_wt$target_id[1:5])]
 
 
 #' 
