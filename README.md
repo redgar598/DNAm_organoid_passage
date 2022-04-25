@@ -31,8 +31,6 @@ Below links connect to notebook style outputs (html for R and ipynb for python c
 | 22_gender_differential.R <br /> Differences in DNAm between genders  | -              |
 | 23_epigenetic_age.R <br /> Applying the Horvath epigenetic clock to organoids DNAm | S1              |
 | 24_incucyte.R <br /> Plotting the incucyte data | 3ce, S3b              |
-
-
 | 01_validation_organoids <br /> DNAm in the additional 42 organoids with matched RNAseq  | -              |
 | 02_differentiation_treatment <br /> Differenital DNAm with treatment and differentiation in the  42 organoids  | 4a, S5              |
 
